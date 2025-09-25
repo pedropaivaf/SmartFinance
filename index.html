@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Finance</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Config to enable dark mode in Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles and Animations -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Animation for list items */
+        .list-item-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Custom radio button styles */
+        .custom-radio input:checked+label {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
+        }
+
+        .custom-radio-expense input:checked+label {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-container {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* Paid transaction styles */
+        .transaction-paid {
+            opacity: 0.6;
+        }
+
+        .transaction-paid .description-text {
+            text-decoration: line-through;
+        }
+
+        /* Filter button styles */
+        .filter-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .dark .filter-btn.active {
+            background-color: #2563eb;
+        }
+
+        /* Projection styles */
+        .transaction-projection {
+            opacity: 0.8;
+            border-left: 3px solid #64748b;
+            /* a subtle indicator */
+        }
+
+        /* Payment Tab styles */
+        .payment-tab.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .dark .payment-tab.active {
+            border-color: #3b82f6;
+            color: #60a5fa;
+            background-color: #2563eb20;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+    <div
+        class="w-full max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-slate-300/60 dark:shadow-black/30 overflow-hidden grid grid-cols-1 lg:grid-cols-5">
+
+        <!-- Left Panel: Form and Summary -->
+        <div
+            class="col-span-1 lg:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-6 md:p-8 border-r border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-start mb-2">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Smart Finance</h1>
+                <button id="theme-toggle" type="button"
+                    class="text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"
+                            fill-rule="evenodd" clip-rule="evenloop"></path>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 mb-8">Controle seus gastos de uma forma inteligente!</p>
+            <p class="text-slate-500 dark:text-slate-400 mb-8">Adicione suas rendas e despesas.</p>
+
+            <!-- Summary Cards -->
+            <div class="space-y-4 mb-8">
+                <div
+                    class="bg-blue-100/60 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-blue-700 dark:text-blue-300">Renda Total</h3>
+                    <p id="total-income" class="text-2xl font-semibold text-blue-900 dark:text-blue-100">R$ 0,00</p>
+                </div>
+                <div class="bg-red-100/60 dark:bg-red-900/40 border border-red-200 dark:border-red-800 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-red-700 dark:text-red-300">Despesa Total</h3>
+                    <p id="total-expense" class="text-2xl font-semibold text-red-900 dark:text-red-100">R$ 0,00</p>
+                </div>
+                <div
+                    class="bg-green-100/60 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-green-700 dark:text-green-300">Pagos</h3>
+                    <p id="total-paid" class="text-2xl font-semibold text-green-900 dark:text-green-100">R$ 0,00</p>
+                </div>
+                <div
+                    class="bg-slate-200/60 dark:bg-slate-700/60 border border-slate-300 dark:border-slate-600 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-slate-600 dark:text-slate-400">Saldo Atual</h3>
+                    <p id="balance" class="text-2xl font-semibold text-slate-800 dark:text-slate-100">R$ 0,00</p>
+                </div>
+            </div>
+
+            <!-- Add Transaction Form -->
+            <div class="h-full">
+                <h2
+                    class="text-lg font-semibold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-700 pt-6 mb-4">
+                    Nova Transação</h2>
+                <form id="transaction-form" class="space-y-4">
+                    <div>
+                        <label for="description"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
+                        <input type="text" id="description" placeholder="Ex: Salário, Aluguel"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="amount"
+                                class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor
+                                (R$)</label>
+                            <input type="number" id="amount" placeholder="250,50" step="0.01"
+                                class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                required>
+                        </div>
+                        <div id="transaction-date-group">
+                            <label for="transaction-date"
+                                class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
+                            <input type="date" id="transaction-date"
+                                class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="recurrence"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de
+                            Recorrência</label>
+                        <select id="recurrence"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="single" selected>Única</option>
+                            <option value="monthly">Mensal (Recorrente)</option>
+                            <option value="installment">Parcelada</option>
+                        </select>
+                    </div>
+                    <div id="installments-group" class="hidden">
+                        <label for="installments"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Número de
+                            Parcelas</label>
+                        <input type="number" id="installments" placeholder="Ex: 12" min="2"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="custom-radio">
+                            <input type="radio" id="type-income" name="type" value="income" class="sr-only" checked>
+                            <label for="type-income"
+                                class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                    </path>
+                                </svg>
+                                Renda
+                            </label>
+                        </div>
+                        <div class="custom-radio custom-radio-expense">
+                            <input type="radio" id="type-expense" name="type" value="expense" class="sr-only">
+                            <label for="type-expense"
+                                class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"></path>
+                                </svg>
+                                Despesa
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 transform hover:scale-105">
+                        Adicionar Transação
+                    </button>
+                </form>
+
+                <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button id="clean-all-btn"
+                        class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300">
+                        Limpar Tudo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Transaction List -->
+        <div class="col-span-1 lg:col-span-3 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Histórico de Transações</h2>
+                <div id="filter-container" class="flex items-center gap-2 flex-wrap">
+                    <button data-filter="month"
+                        class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">Mês</button>
+                    <button data-filter="total"
+                        class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition active">Total</button>
+                </div>
+            </div>
+
+            <!-- Payment Method Tabs -->
+            <div id="payment-tabs-container" class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                <nav class="-mb-px flex gap-4 text-sm font-medium">
+                    <button data-payment-filter="all"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent active">Todos</button>
+                    <button data-payment-filter="pix"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Pix</button>
+                    <button data-payment-filter="debit"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Débito</button>
+                    <button data-payment-filter="credit"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Crédito</button>
+                    <button data-payment-filter="cash"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Dinheiro</button>
+                </nav>
+            </div>
+
+            <div id="transaction-list-container" class="max-h-[74vh] overflow-y-auto pr-2">
+                <ul id="transaction-list" class="space-y-1">
+                    <!-- Transactions will be dynamically inserted here -->
+                    <li id="empty-state" class="text-center py-10">
+                        <svg class="mx-auto h-12 w-12 text-slate-400 dark:text-slate-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-200">Nenhuma transação</h3>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comece adicionando uma renda ou
+                            despesa.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Editar Transação</h2>
+                <button id="close-modal-btn"
+                    class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="edit-transaction-form" class="space-y-4">
+                <div>
+                    <label for="edit-description"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
+                    <input type="text" id="edit-description"
+                        class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-amount"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor (R$)</label>
+                        <input type="number" id="edit-amount" step="0.01"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
+                    </div>
+                    <div>
+                        <label for="edit-date"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
+                        <input type="date" id="edit-date"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <div class="custom-radio">
+                        <input type="radio" id="edit-type-income" name="edit-type" value="income" class="sr-only">
+                        <label for="edit-type-income"
+                            class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                            Renda
+                        </label>
+                    </div>
+                    <div class="custom-radio custom-radio-expense">
+                        <input type="radio" id="edit-type-expense" name="edit-type" value="expense" class="sr-only">
+                        <label for="edit-type-expense"
+                            class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                            Despesa
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label for="edit-recurrence"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de
+                        Recorrência</label>
+                    <select id="edit-recurrence"
+                        class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700">
+                        <option value="single">Única</option>
+                        <option value="monthly">Mensal (Recorrente)</option>
+                        <option value="installment">Parcelada</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" id="cancel-edit-btn"
+                        class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-3 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Salvar
+                        Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div id="payment-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Confirmar Pagamento</h2>
+                <button id="close-payment-modal-btn"
+                    class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="payment-form" class="space-y-4">
+                <p class="text-sm text-slate-600 dark:text-slate-400">Selecione como esta despesa foi paga:</p>
+                <div class="space-y-2">
+                    <div class="custom-radio">
+                        <input type="radio" id="payment-pix" name="payment-method" value="pix" class="sr-only" checked>
+                        <label for="payment-pix"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Pix</label>
+                    </div>
+                    <div class="custom-radio">
+                        <input type="radio" id="payment-debit" name="payment-method" value="debit" class="sr-only">
+                        <label for="payment-debit"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão
+                            (Débito)</label>
+                    </div>
+                    <div class="custom-radio">
+                        <input type="radio" id="payment-credit" name="payment-method" value="credit" class="sr-only">
+                        <label for="payment-credit"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão
+                            (Crédito)</label>
+                    </div>
+                    <div id="credit-card-name-group" class="hidden pl-2 pt-2">
+                        <label for="credit-card-name"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Nome do Cartão
+                            (Opcional)</label>
+                        <input type="text" id="credit-card-name" placeholder="Ex: Nubank"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div class="custom-radio">
+                        <input type="radio" id="payment-cash" name="payment-method" value="cash" class="sr-only">
+                        <label for="payment-cash"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Dinheiro</label>
+                    </div>
+                </div>
+                <div class="flex pt-4">
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete All Modal -->
+    <div id="confirm-delete-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="text-center">
+                <svg class="mx-auto h-12 w-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-4">Apagar Tudo?</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                    Tem certeza que deseja apagar todas as transações? Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button type="button" id="cancel-delete-btn"
+                    class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
+                <button type="button" id="confirm-delete-btn"
+                    class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">Sim,
+                    Apagar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURAÇÃO ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "...", projectId: "..." };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let userId = null;
+        let transactionsCollectionRef = null;
+        let unsubscribeTransactions = null;
+        let allTransactions = [];
+        let processedTransactions = [];
+        let currentFilter = 'total';
+        let currentPaymentFilter = 'all';
+
+
+        // --- THEME SWITCHER ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            }
+        };
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            if (isDarkMode) {
+                applyTheme('light');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                applyTheme('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+
+
+        // --- DOM ELEMENTS ---
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpenseEl = document.getElementById('total-expense');
+        const balanceEl = document.getElementById('balance');
+        const totalPaidEl = document.getElementById('total-paid');
+        const transactionListEl = document.getElementById('transaction-list');
+        const form = document.getElementById('transaction-form');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const transactionDateInput = document.getElementById('transaction-date');
+        const transactionDateGroup = document.getElementById('transaction-date-group');
+        const emptyState = document.getElementById('empty-state');
+        const recurrenceSelect = document.getElementById('recurrence');
+        const installmentsGroup = document.getElementById('installments-group');
+        const installmentsInput = document.getElementById('installments');
+
+        // Filter DOM Elements
+        const filterContainer = document.getElementById('filter-container');
+        const paymentTabsContainer = document.getElementById('payment-tabs-container');
+
+        // Modal DOM Elements
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-transaction-form');
+        const editDescriptionInput = document.getElementById('edit-description');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editDateInput = document.getElementById('edit-date');
+        const editRecurrenceSelect = document.getElementById('edit-recurrence');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+        // Payment Modal DOM Elements
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentForm = document.getElementById('payment-form');
+        const closePaymentModalBtn = document.getElementById('close-payment-modal-btn');
+        const creditCardNameGroup = document.getElementById('credit-card-name-group');
+        const creditCardNameInput = document.getElementById('credit-card-name');
+
+        // Clean All Modal
+        const cleanAllBtn = document.getElementById('clean-all-btn');
+        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+
+        // --- FUNÇÕES ---
+
+        const handleRecurrenceChange = () => {
+            const recurrenceType = recurrenceSelect.value;
+
+            // Handle installments group visibility
+            const isInstallment = recurrenceType === 'installment';
+            installmentsGroup.classList.toggle('hidden', !isInstallment);
+            if (isInstallment) {
+                installmentsInput.setAttribute('required', 'required');
+            } else {
+                installmentsInput.removeAttribute('required');
+                installmentsInput.value = '';
+            }
+
+            // Handle date field visibility
+            const isSingle = recurrenceType === 'single';
+            transactionDateGroup.classList.toggle('hidden', !isSingle);
+            if (isSingle) {
+                transactionDateInput.setAttribute('required', 'required');
+            } else {
+                transactionDateInput.removeAttribute('required');
+                transactionDateInput.valueAsDate = new Date(); // Reset to today when hidden
+            }
+        };
+
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            }).format(amount);
+        };
+
+        const toggleModal = (modalEl, show) => {
+            const container = modalEl.querySelector('.modal-container');
+            if (show) {
+                modalEl.classList.remove('hidden');
+                setTimeout(() => {
+                    modalEl.classList.remove('opacity-0');
+                    container.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            } else {
+                modalEl.classList.add('opacity-0');
+                container.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modalEl.classList.add('hidden');
+                }, 300);
+            }
+        };
+
+        const renderTransactions = (transactions) => {
+            transactionListEl.innerHTML = '';
+
+            if (transactions.length === 0) {
+                emptyState.style.display = 'block';
+                transactionListEl.appendChild(emptyState);
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            const groupedTransactions = transactions.reduce((acc, transaction) => {
+                const date = transaction.createdAt?.toDate ? transaction.createdAt.toDate() : new Date(transaction.createdAt);
+                if (!date || isNaN(date)) return acc;
+                const monthYear = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(date);
+                const key = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(transaction);
+                return acc;
+            }, {});
+
+            const sortedMonthKeys = Object.keys(groupedTransactions).sort((a, b) => {
+                const [monthA, yearA] = a.split(' de ');
+                const [monthB, yearB] = b.split(' de ');
+                const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                const dateA = new Date(yearA, months.indexOf(monthA));
+                const dateB = new Date(yearB, months.indexOf(monthB));
+                return dateA - dateB;
+            });
+
+            sortedMonthKeys.forEach(monthKey => {
+                const monthTransactions = groupedTransactions[monthKey];
+
+                const headerLi = document.createElement('li');
+                headerLi.className = 'pt-4 pb-2';
+                headerLi.innerHTML = `<h3 class="text-md font-semibold text-slate-500 dark:text-slate-400 tracking-wider">${monthKey}</h3>`;
+                transactionListEl.appendChild(headerLi);
+
+                monthTransactions.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                    const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                    return dateA - dateB;
+                });
+
+                monthTransactions.forEach(transaction => {
+                    const isIncome = transaction.type === 'income';
+                    const sign = isIncome ? '+' : '-';
+                    const amount = Math.abs(transaction.amount);
+
+                    const li = document.createElement('li');
+                    li.classList.add('flex', 'items-center', 'justify-between', 'p-3', 'bg-slate-100', 'dark:bg-slate-700/50', 'rounded-lg', 'list-item-enter', 'gap-2');
+                    li.classList.toggle('transaction-paid', transaction.paid);
+                    li.classList.toggle('transaction-projection', transaction.isProjection);
+                    li.setAttribute('data-id', transaction.id);
+                    if (transaction.isProjection) {
+                        li.setAttribute('data-projection-details', JSON.stringify(transaction));
+                    }
+
+                    let paymentInfo = '';
+                    if (transaction.paid && transaction.paymentMethod) {
+                        const methods = { pix: 'Pix', debit: 'Débito', credit: 'Crédito', cash: 'Dinheiro' };
+                        let methodName = methods[transaction.paymentMethod] || '';
+                        if (transaction.paymentMethod === 'credit' && transaction.creditCardName) {
+                            methodName += ` (${transaction.creditCardName})`;
+                        }
+                        paymentInfo = `<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pago com: ${methodName}</p>`;
+                    }
+
+                    li.innerHTML = `
+                        <div class="flex items-center gap-3 flex-grow min-w-0">
+                             ${!isIncome ? `
+                                <input type="checkbox" data-id="${transaction.id}" class="transaction-paid-checkbox h-5 w-5 rounded border-slate-400 dark:border-slate-500 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0" ${transaction.paid ? 'checked' : ''}>
+                             ` : `
+                                <div class="h-5 w-5 flex-shrink-0"></div>
+                             `}
+                            <span class="p-2 rounded-full ${isIncome ? 'bg-blue-200/70 dark:bg-blue-900/60' : 'bg-red-200/70 dark:bg-red-900/60'}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
+                                    ${isIncome ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />' : '<path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />'}
+                                </svg>
+                            </span>
+                            <div class="flex-grow min-w-0">
+                                <p class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 description-text truncate">
+                                    ${transaction.description}
+                                    ${transaction.recurrence === 'monthly' && !transaction.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-200 px-2 py-0.5 rounded-full">Recorrente</span>` : ''}
+                                    ${transaction.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">Projeção</span>` : ''}
+                                </p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">${(transaction.createdAt?.toDate ? transaction.createdAt.toDate() : new Date(transaction.createdAt)).toLocaleDateString('pt-BR')}</p>
+                                ${paymentInfo}
+                            </div>
+                        </div>
+                        <div class="text-right flex items-center gap-2 flex-shrink-0">
+                            <p class="font-semibold text-lg ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}">${sign} ${formatCurrency(amount)}</p>
+                            ${!transaction.isProjection ? `
+                            <div class="flex flex-col">
+                                <button class="edit-btn text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition text-sm font-medium">Editar</button>
+                                <button class="delete-btn text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition text-sm">Remover</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    transactionListEl.appendChild(li);
+                });
+            });
+        };
+
+        const updateSummary = (transactions) => {
+            const income = transactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense' && !t.isProjection)
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            const paidExpense = transactions
+                .filter(t => t.type === 'expense' && !t.isProjection && t.paid) // Only count paid expenses in summary
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            const balance = income + paidExpense;
+
+            totalIncomeEl.textContent = formatCurrency(income);
+            totalExpenseEl.textContent = formatCurrency(Math.abs(totalExpense));
+            totalPaidEl.textContent = formatCurrency(Math.abs(paidExpense));
+            balanceEl.textContent = formatCurrency(balance);
+
+            balanceEl.classList.toggle('text-red-700', balance < 0);
+            balanceEl.classList.toggle('dark:text-red-400', balance < 0);
+            balanceEl.classList.toggle('text-slate-800', balance >= 0);
+            balanceEl.classList.toggle('dark:text-slate-100', balance >= 0);
+        };
+
+        const generateProcessedTransactions = (transactions) => {
+            const today = new Date();
+            const projectionEndDate = new Date(today.getFullYear() + 1, 11, 31); // Project until end of next year
+
+            let newProcessed = [...transactions];
+            const realTransactionSignatures = new Set();
+
+            transactions.forEach(t => {
+                if (t.createdAt?.toDate) {
+                    const tDate = t.createdAt.toDate();
+                    const signature = `${t.sourceOf || t.id}-${tDate.getFullYear()}-${tDate.getMonth()}`;
+                    realTransactionSignatures.add(signature);
+                }
+            });
+
+            transactions.forEach(t => {
+                if (t.recurrence === 'monthly' && t.createdAt?.toDate) {
+                    const startDate = t.createdAt.toDate();
+                    let currentDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+
+                    while (currentDate <= projectionEndDate) {
+                        const year = currentDate.getFullYear();
+                        const month = currentDate.getMonth();
+                        const signature = `${t.id}-${year}-${month}`;
+
+                        if (!realTransactionSignatures.has(signature)) {
+                            newProcessed.push({
+                                ...t,
+                                id: `proj_${t.id}_${year}-${month}`,
+                                createdAt: currentDate.toISOString(),
+                                isProjection: true,
+                                paid: false,
+                                sourceOf: t.id,
+                            });
+                        }
+                        currentDate.setMonth(currentDate.getMonth() + 1);
+                    }
+                }
+            });
+            processedTransactions = newProcessed;
+        };
+
+        const applyFilterAndRender = () => {
+            const now = new Date();
+            let timeFiltered = [];
+
+            switch (currentFilter) {
+                case 'month':
+                    timeFiltered = processedTransactions.filter(t => {
+                        const tDate = t.createdAt?.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
+                        return tDate.getFullYear() === now.getFullYear() && tDate.getMonth() === now.getMonth();
+                    });
+                    break;
+                case 'total':
+                default:
+                    timeFiltered = processedTransactions;
+                    break;
+            }
+
+            let finalFiltered = timeFiltered;
+            if (currentPaymentFilter !== 'all') {
+                finalFiltered = timeFiltered.filter(t => t.paymentMethod === currentPaymentFilter);
+            }
+
+            renderTransactions(finalFiltered);
+            updateSummary(timeFiltered); // Summary is based on time filter, not payment method
+        };
+
+        const initRealtimeListeners = () => {
+            if (unsubscribeTransactions) unsubscribeTransactions();
+
+            transactionsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/transactions`);
+            const qTransactions = query(transactionsCollectionRef);
+            unsubscribeTransactions = onSnapshot(qTransactions, (snapshot) => {
+                allTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                generateProcessedTransactions(allTransactions);
+                applyFilterAndRender();
+            });
+        };
+
+        // --- EVENT LISTENERS ---
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const description = descriptionInput.value.trim();
+            const type = document.querySelector('input[name="type"]:checked').value;
+            let amount = parseFloat(amountInput.value);
+            const recurrence = recurrenceSelect.value;
+            const totalInstallments = parseInt(installmentsInput.value);
+            const selectedDate = new Date(transactionDateInput.value + "T12:00:00");
+
+            if (!description || isNaN(amount) || amount <= 0 || !userId || isNaN(selectedDate)) { return; }
+
+            if (recurrence === 'installment' && type === 'expense' && !isNaN(totalInstallments) && totalInstallments >= 2) {
+                const installmentAmount = -Math.abs(amount) / totalInstallments;
+                const promises = [];
+                for (let i = 0; i < totalInstallments; i++) {
+                    const transactionDate = new Date(selectedDate);
+                    transactionDate.setMonth(transactionDate.getMonth() + i);
+                    promises.push(addDoc(transactionsCollectionRef, {
+                        description: `${description} (${i + 1}/${totalInstallments})`,
+                        amount: installmentAmount, type: 'expense', createdAt: transactionDate, recurrence: 'installment', paid: false
+                    }));
+                }
+                try { await Promise.all(promises); } catch (error) { console.error("Error adding installments: ", error); }
+            } else {
+                if (type === 'expense') { amount = -amount; }
+                try {
+                    await addDoc(transactionsCollectionRef, { description, amount, type, createdAt: selectedDate, recurrence, paid: false });
+                } catch (error) { console.error("Error adding document: ", error); }
+            }
+            form.reset();
+            transactionDateInput.valueAsDate = new Date();
+            installmentsGroup.classList.add('hidden');
+            installmentsInput.removeAttribute('required');
+            descriptionInput.focus();
+        });
+
+        transactionListEl.addEventListener('click', async (e) => {
+            const target = e.target;
+            const li = target.closest('li[data-id]');
+            if (!li) return;
+            const docId = li.getAttribute('data-id');
+
+            if (target.closest('.delete-btn')) {
+                if (docId && !docId.startsWith('proj_')) { try { await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId)); } catch (error) { console.error("Error deleting document: ", error); } }
+            }
+
+            if (target.closest('.edit-btn')) {
+                const transactionToEdit = allTransactions.find(t => t.id === docId);
+                if (transactionToEdit) {
+                    editForm.setAttribute('data-id', docId);
+                    editDescriptionInput.value = transactionToEdit.description.replace(/\s\(\d+\/\d+\)$/, '');
+                    editAmountInput.value = Math.abs(transactionToEdit.amount);
+                    const tDate = transactionToEdit.createdAt.toDate();
+                    editDateInput.value = tDate.toISOString().split('T')[0];
+                    editRecurrenceSelect.value = transactionToEdit.recurrence;
+                    document.getElementById(transactionToEdit.type === 'income' ? 'edit-type-income' : 'edit-type-expense').checked = true;
+                    toggleModal(editModal, true);
+                }
+            }
+        });
+
+        transactionListEl.addEventListener('change', async (e) => {
+            if (e.target.classList.contains('transaction-paid-checkbox')) {
+                const checkbox = e.target;
+                const li = checkbox.closest('li[data-id]');
+                const docId = checkbox.dataset.id;
+                const isPaid = checkbox.checked;
+
+                if (isPaid) {
+                    paymentForm.setAttribute('data-id', docId);
+                    if (li.dataset.projectionDetails) {
+                        paymentForm.setAttribute('data-projection-details', li.dataset.projectionDetails);
+                    }
+                    toggleModal(paymentModal, true);
+                    checkbox.checked = false; // Revert checkbox until payment is confirmed
+                } else {
+                    // Un-paying logic
+                    if (!docId.startsWith('proj_')) {
+                        try {
+                            const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
+                            await updateDoc(docRef, { paid: false, paymentMethod: null, creditCardName: null });
+                        } catch (error) { console.error("Error un-paying status: ", error); }
+                    }
+                }
+            }
+        });
+
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const docId = paymentForm.getAttribute('data-id');
+            const projectionDetailsJSON = paymentForm.getAttribute('data-projection-details');
+
+            const paymentMethod = paymentForm.querySelector('input[name="payment-method"]:checked').value;
+            const creditCardName = creditCardNameInput.value.trim();
+
+            const paymentData = {
+                paid: true,
+                paymentMethod: paymentMethod,
+                creditCardName: paymentMethod === 'credit' ? creditCardName : null,
+            };
+
+            if (docId.startsWith('proj_')) {
+                const projectionDetails = JSON.parse(projectionDetailsJSON);
+                try {
+                    await addDoc(transactionsCollectionRef, {
+                        description: projectionDetails.description,
+                        amount: projectionDetails.amount,
+                        type: projectionDetails.type,
+                        recurrence: 'single',
+                        createdAt: new Date(projectionDetails.createdAt),
+                        sourceOf: projectionDetails.sourceOf,
+                        ...paymentData
+                    });
+                } catch (error) { console.error("Error converting projection:", error); }
+            } else {
+                try {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
+                    await updateDoc(docRef, paymentData);
+                } catch (error) { console.error("Error updating paid status: ", error); }
+            }
+
+            paymentForm.reset();
+            creditCardNameGroup.classList.add('hidden');
+            paymentForm.removeAttribute('data-id');
+            paymentForm.removeAttribute('data-projection-details');
+            toggleModal(paymentModal, false);
+        });
+
+        paymentForm.addEventListener('change', (e) => {
+            if (e.target.name === 'payment-method') {
+                creditCardNameGroup.classList.toggle('hidden', e.target.value !== 'credit');
+            }
+        });
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const docId = editForm.getAttribute('data-id');
+            if (!docId) return;
+
+            const newType = document.querySelector('input[name="edit-type"]:checked').value;
+            let newAmount = parseFloat(editAmountInput.value);
+            const newDate = new Date(editDateInput.value + "T12:00:00");
+
+            newAmount = newType === 'expense' ? -Math.abs(newAmount) : Math.abs(newAmount);
+
+            const originalTransaction = allTransactions.find(t => t.id === docId);
+            let newDescription = editDescriptionInput.value.trim();
+            if (originalTransaction && originalTransaction.recurrence === 'installment') {
+                const match = originalTransaction.description.match(/\s(\(\d+\/\d+\))$/);
+                if (match) { newDescription += ` ${match[1]}`; }
+            }
+
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
+                await updateDoc(docRef, {
+                    description: newDescription,
+                    amount: newAmount,
+                    type: newType,
+                    createdAt: newDate,
+                    recurrence: editRecurrenceSelect.value,
+                });
+                toggleModal(editModal, false);
+            } catch (error) { console.error("Error updating document: ", error); }
+        });
+
+        recurrenceSelect.addEventListener('change', handleRecurrenceChange);
+
+        filterContainer.addEventListener('click', (e) => {
+            if (e.target.matches('.filter-btn')) {
+                currentFilter = e.target.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                applyFilterAndRender();
+            }
+        });
+
+        paymentTabsContainer.addEventListener('click', (e) => {
+            if (e.target.matches('.payment-tab')) {
+                currentPaymentFilter = e.target.dataset.paymentFilter;
+                document.querySelectorAll('.payment-tab').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                applyFilterAndRender();
+            }
+        });
+
+        closeModalBtn.addEventListener('click', () => toggleModal(editModal, false));
+        cancelEditBtn.addEventListener('click', () => toggleModal(editModal, false));
+        editModal.addEventListener('click', (e) => { if (e.target.id === 'edit-modal') { toggleModal(editModal, false); } });
+
+        closePaymentModalBtn.addEventListener('click', () => toggleModal(paymentModal, false));
+        paymentModal.addEventListener('click', (e) => { if (e.target.id === 'payment-modal') { toggleModal(paymentModal, false); } });
+
+        cleanAllBtn.addEventListener('click', () => {
+            toggleModal(confirmDeleteModal, true);
+        });
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            toggleModal(confirmDeleteModal, false);
+        });
+
+        confirmDeleteModal.addEventListener('click', (e) => {
+            if (e.target.id === 'confirm-delete-modal') {
+                toggleModal(confirmDeleteModal, false);
+            }
+        });
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (!userId || !transactionsCollectionRef) return;
+
+            const transactionsToDelete = allTransactions.filter(t => !t.isProjection);
+
+            if (transactionsToDelete.length === 0) {
+                toggleModal(confirmDeleteModal, false);
+                return;
+            }
+
+            const deletePromises = transactionsToDelete.map(t => {
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, t.id);
+                return deleteDoc(docRef);
+            });
+
+            try {
+                await Promise.all(deletePromises);
+            } catch (error) {
+                console.error("Error deleting all transactions: ", error);
+            } finally {
+                toggleModal(confirmDeleteModal, false);
+            }
+        });
+
+        // --- AUTENTICAÇÃO E INICIALIZAÇÃO ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                transactionDateInput.valueAsDate = new Date();
+                handleRecurrenceChange(); // Set initial state for the date field
+                initRealtimeListeners();
+            } else {
+                userId = null;
+                if (unsubscribeTransactions) unsubscribeTransactions();
+                transactionListEl.innerHTML = `<li><p class="text-center text-slate-500">Por favor, faça login para ver seus dados.</p></li>`;
+            }
+        });
+
+        (async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                transactionListEl.innerHTML = `<li><p class="text-center text-red-500">Falha na autenticação.</p></li>`;
+            }
+        })();
+
+    </script>
+</body>
+
+</html>
