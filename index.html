@@ -481,32 +481,334 @@
     </div>
 
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- CONFIGURAÇÃO ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "...", projectId: "..." };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let userId = null;
-        let transactionsCollectionRef = null;
-        let unsubscribeTransactions = null;
+    <!-- MODO LOCAL (sem Firebase) -->
+    <script>
+        /* ===== Store local com API parecida com Firestore ===== */
+        const LS_KEY = 'sf_transactions_v1';
         let allTransactions = [];
         let processedTransactions = [];
         let currentFilter = 'total';
         let currentPaymentFilter = 'all';
+        let listeners = [];
 
+        const load = () => { try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { return []; } };
+        const save = (arr) => {
+            localStorage.setItem(LS_KEY, JSON.stringify(arr));
+            allTransactions = arr;
+            generateProcessedTransactions(allTransactions);
+            applyFilterAndRender();
+            listeners.forEach(fn => fn(allTransactions));
+        };
+        const genId = () => 'loc_' + Math.random().toString(36).slice(2) + Date.now();
+        const addDocLocal = async (obj) => { const rec = { id: genId(), ...obj }; save([...load(), rec]); return rec; };
+        const deleteDocLocal = async (id) => { save(load().filter(t => t.id !== id)); };
+        const updateDocLocal = async (id, data) => { save(load().map(t => t.id === id ? { ...t, ...data } : t)); };
 
-        // --- THEME SWITCHER ---
+        /* ===== DOM refs ===== */
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpenseEl = document.getElementById('total-expense');
+        const balanceEl = document.getElementById('balance');
+        const totalPaidEl = document.getElementById('total-paid');
+        const transactionListEl = document.getElementById('transaction-list');
+        const form = document.getElementById('transaction-form');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const transactionDateInput = document.getElementById('transaction-date');
+        const transactionDateGroup = document.getElementById('transaction-date-group');
+        const emptyState = document.getElementById('empty-state');
+        const recurrenceSelect = document.getElementById('recurrence');
+        const installmentsGroup = document.getElementById('installments-group');
+        const installmentsInput = document.getElementById('installments');
+        const filterContainer = document.getElementById('filter-container');
+        const paymentTabsContainer = document.getElementById('payment-tabs-container');
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-transaction-form');
+        const editDescriptionInput = document.getElementById('edit-description');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editDateInput = document.getElementById('edit-date');
+        const editRecurrenceSelect = document.getElementById('edit-recurrence');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentForm = document.getElementById('payment-form');
+        const closePaymentModalBtn = document.getElementById('close-payment-modal-btn');
+        const creditCardNameGroup = document.getElementById('credit-card-name-group');
+        const creditCardNameInput = document.getElementById('credit-card-name');
+        const cleanAllBtn = document.getElementById('clean-all-btn');
+        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+        /* ===== theme já está configurado no topo — sem mudanças ===== */
+
+        /* ===== utils ===== */
+        const formatCurrency = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
+        const toggleModal = (modalEl, show) => {
+            const container = modalEl.querySelector('.modal-container');
+            if (show) { modalEl.classList.remove('hidden'); setTimeout(() => { modalEl.classList.remove('opacity-0'); container.classList.remove('scale-95', 'opacity-0'); }, 10); }
+            else { modalEl.classList.add('opacity-0'); container.classList.add('scale-95', 'opacity-0'); setTimeout(() => modalEl.classList.add('hidden'), 300); }
+        };
+
+        const handleRecurrenceChange = () => {
+            const recurrenceType = recurrenceSelect.value;
+            const isInstallment = recurrenceType === 'installment';
+            installmentsGroup.classList.toggle('hidden', !isInstallment);
+            if (isInstallment) installmentsInput.setAttribute('required', 'required'); else { installmentsInput.removeAttribute('required'); installmentsInput.value = ''; }
+            const isSingle = recurrenceType === 'single';
+            transactionDateGroup.classList.toggle('hidden', !isSingle);
+            if (isSingle) transactionDateInput.setAttribute('required', 'required'); else { transactionDateInput.removeAttribute('required'); transactionDateInput.valueAsDate = new Date(); }
+        };
+
+        /* ===== render & resumo ===== */
+        const renderTransactions = (transactions) => {
+            transactionListEl.innerHTML = '';
+            if (transactions.length === 0) { emptyState.style.display = 'block'; transactionListEl.appendChild(emptyState); return; }
+            emptyState.style.display = 'none';
+
+            const grouped = transactions.reduce((acc, t) => {
+                const d = new Date(t.createdAt); if (isNaN(d)) return acc;
+                const fmt = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(d);
+                const key = fmt.charAt(0).toUpperCase() + fmt.slice(1);
+                (acc[key] ||= []).push(t); return acc;
+            }, {});
+
+            const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            Object.keys(grouped).sort((a, b) => { const [ma, ya] = a.split(' de '), [mb, yb] = b.split(' de '); return new Date(ya, months.indexOf(ma)) - new Date(yb, months.indexOf(mb)); })
+                .forEach(mk => {
+                    const headerLi = document.createElement('li'); headerLi.className = 'pt-4 pb-2';
+                    headerLi.innerHTML = `<h3 class="text-md font-semibold text-slate-500 dark:text-slate-400 tracking-wider">${mk}</h3>`;
+                    transactionListEl.appendChild(headerLi);
+
+                    grouped[mk].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).forEach(t => {
+                        const isIncome = t.type === 'income', sign = isIncome ? '+' : '-', amount = Math.abs(t.amount);
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg list-item-enter gap-2';
+                        if (t.paid) li.classList.add('transaction-paid');
+                        if (t.isProjection) li.classList.add('transaction-projection');
+                        li.dataset.id = t.id; if (t.isProjection) li.dataset.projectionDetails = JSON.stringify(t);
+
+                        let paymentInfo = ''; if (t.paid && t.paymentMethod) {
+                            const methods = { pix: 'Pix', debit: 'Débito', credit: 'Crédito', cash: 'Dinheiro' };
+                            let name = methods[t.paymentMethod] || ''; if (t.paymentMethod === 'credit' && t.creditCardName) name += ` (${t.creditCardName})`;
+                            paymentInfo = `<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pago com: ${name}</p>`;
+                        }
+
+                        li.innerHTML = `
+        <div class="flex items-center gap-3 flex-grow min-w-0">
+          ${!isIncome ? `<input type="checkbox" data-id="${t.id}" class="transaction-paid-checkbox h-5 w-5 rounded border-slate-400 dark:border-slate-500 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0" ${t.paid ? 'checked' : ''}>` : `<div class="h-5 w-5 flex-shrink-0"></div>`}
+          <span class="p-2 rounded-full ${isIncome ? 'bg-blue-200/70 dark:bg-blue-900/60' : 'bg-red-200/70 dark:bg-red-900/60'}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
+              ${isIncome ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>' : '<path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"/>'}
+            </svg>
+          </span>
+          <div class="flex-grow min-w-0">
+            <p class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 description-text truncate">
+              ${t.description}
+              ${t.recurrence === 'monthly' && !t.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-200 px-2 py-0.5 rounded-full">Recorrente</span>` : ''}
+              ${t.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">Projeção</span>` : ''}
+            </p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">${new Date(t.createdAt).toLocaleDateString('pt-BR')}</p>
+            ${paymentInfo}
+          </div>
+        </div>
+        <div class="text-right flex items-center gap-2 flex-shrink-0">
+          <p class="font-semibold text-lg ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}">${sign} ${formatCurrency(amount)}</p>
+          ${!t.isProjection ? `<div class="flex flex-col"><button class="edit-btn text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition text-sm font-medium">Editar</button><button class="delete-btn text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition text-sm">Remover</button></div>` : ''}
+        </div>`;
+                        transactionListEl.appendChild(li);
+                    });
+                });
+        };
+
+        const updateSummary = (transactions) => {
+            const income = transactions.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense' && !t.isProjection).reduce((a, t) => a + t.amount, 0);
+            const paidExpense = transactions.filter(t => t.type === 'expense' && !t.isProjection && t.paid).reduce((a, t) => a + t.amount, 0);
+            const balance = income + paidExpense;
+            totalIncomeEl.textContent = formatCurrency(income);
+            totalExpenseEl.textContent = formatCurrency(Math.abs(totalExpense));
+            totalPaidEl.textContent = formatCurrency(Math.abs(paidExpense));
+            balanceEl.textContent = formatCurrency(balance);
+            balanceEl.classList.toggle('text-red-700', balance < 0);
+            balanceEl.classList.toggle('dark:text-red-400', balance < 0);
+            balanceEl.classList.toggle('text-slate-800', balance >= 0);
+            balanceEl.classList.toggle('dark:text-slate-100', balance >= 0);
+        };
+
+        const generateProcessedTransactions = (transactions) => {
+            const today = new Date();
+            const projectionEndDate = new Date(today.getFullYear() + 1, 11, 31);
+            let newProcessed = [...transactions];
+            const realSignatures = new Set();
+            transactions.forEach(t => {
+                const d = new Date(t.createdAt);
+                const signature = `${t.sourceOf || t.id}-${d.getFullYear()}-${d.getMonth()}`;
+                realSignatures.add(signature);
+            });
+            transactions.forEach(t => {
+                if (t.recurrence === 'monthly') {
+                    const start = new Date(t.createdAt);
+                    let cur = new Date(start.getFullYear(), start.getMonth() + 1, start.getDate());
+                    while (cur <= projectionEndDate) {
+                        const y = cur.getFullYear(), m = cur.getMonth();
+                        const sig = `${t.id}-${y}-${m}`;
+                        if (!realSignatures.has(sig)) {
+                            newProcessed.push({ ...t, id: `proj_${t.id}_${y}-${m}`, createdAt: cur.toISOString(), isProjection: true, paid: false, sourceOf: t.id });
+                        }
+                        cur.setMonth(cur.getMonth() + 1);
+                    }
+                }
+            });
+            processedTransactions = newProcessed;
+        };
+
+        const applyFilterAndRender = () => {
+            const now = new Date();
+            let timeFiltered = currentFilter === 'month'
+                ? processedTransactions.filter(t => { const d = new Date(t.createdAt); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); })
+                : processedTransactions;
+
+            let finalFiltered = currentPaymentFilter === 'all' ? timeFiltered : timeFiltered.filter(t => t.paymentMethod === currentPaymentFilter);
+            renderTransactions(finalFiltered);
+            updateSummary(timeFiltered);
+        };
+
+        const initRealtimeListeners = () => {
+            allTransactions = load();
+            generateProcessedTransactions(allTransactions);
+            applyFilterAndRender();
+            listeners.push(() => { });
+        };
+
+        /* ===== Listeners ===== */
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const description = descriptionInput.value.trim();
+            const type = document.querySelector('input[name="type"]:checked').value;
+            let amount = parseFloat(amountInput.value);
+            const recurrence = recurrenceSelect.value;
+            const totalInstallments = parseInt(installmentsInput.value);
+            const selectedDate = new Date((transactionDateInput.value || new Date().toISOString().slice(0, 10)) + "T12:00:00");
+            if (!description || isNaN(amount) || amount <= 0) return;
+
+            if (recurrence === 'installment' && type === 'expense' && !isNaN(totalInstallments) && totalInstallments >= 2) {
+                const installmentAmount = -Math.abs(amount) / totalInstallments;
+                const arr = load();
+                for (let i = 0; i < totalInstallments; i++) {
+                    const d = new Date(selectedDate); d.setMonth(d.getMonth() + i);
+                    arr.push({ id: genId(), description: `${description} (${i + 1}/${totalInstallments})`, amount: installmentAmount, type: 'expense', createdAt: d.toISOString(), recurrence: 'installment', paid: false });
+                }
+                save(arr);
+            } else {
+                if (type === 'expense') amount = -amount;
+                await addDocLocal({ description, amount, type, createdAt: selectedDate.toISOString(), recurrence, paid: false });
+            }
+            form.reset();
+            transactionDateInput.valueAsDate = new Date();
+            installmentsGroup.classList.add('hidden');
+            installmentsInput.removeAttribute('required');
+            descriptionInput.focus();
+        });
+
+        transactionListEl.addEventListener('click', async (e) => {
+            const li = e.target.closest('li[data-id]'); if (!li) return;
+            const id = li.dataset.id;
+
+            if (e.target.closest('.delete-btn')) { if (id && !id.startsWith('proj_')) await deleteDocLocal(id); }
+            if (e.target.closest('.edit-btn')) {
+                const t = allTransactions.find(x => x.id === id);
+                if (t) {
+                    editForm.dataset.id = id;
+                    editDescriptionInput.value = (t.description || '').replace(/\s\(\d+\/\d+\)$/, '');
+                    editAmountInput.value = Math.abs(t.amount);
+                    editDateInput.value = new Date(t.createdAt).toISOString().slice(0, 10);
+                    editRecurrenceSelect.value = t.recurrence || 'single';
+                    document.getElementById(t.type === 'income' ? 'edit-type-income' : 'edit-type-expense').checked = true;
+                    toggleModal(editModal, true);
+                }
+            }
+        });
+
+        transactionListEl.addEventListener('change', async (e) => {
+            if (!e.target.classList.contains('transaction-paid-checkbox')) return;
+            const checkbox = e.target;
+            const li = checkbox.closest('li[data-id]');
+            const id = checkbox.dataset.id;
+            const isPaid = checkbox.checked;
+
+            if (isPaid) {
+                paymentForm.dataset.id = id;
+                if (li.dataset.projectionDetails) paymentForm.setAttribute('data-projection-details', li.dataset.projectionDetails);
+                toggleModal(paymentModal, true);
+                checkbox.checked = false;
+            } else {
+                if (!id.startsWith('proj_')) await updateDocLocal(id, { paid: false, paymentMethod: null, creditCardName: null });
+            }
+        });
+
+        paymentForm.addEventListener('change', (e) => {
+            if (e.target.name === 'payment-method') creditCardNameGroup.classList.toggle('hidden', e.target.value !== 'credit');
+        });
+
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = paymentForm.dataset.id;
+            const projJSON = paymentForm.getAttribute('data-projection-details');
+            const paymentMethod = paymentForm.querySelector('input[name="payment-method"]:checked').value;
+            const creditCardName = creditCardNameInput.value.trim();
+            const paymentData = { paid: true, paymentMethod, creditCardName: paymentMethod === 'credit' ? creditCardName : null };
+
+            if (id.startsWith('proj_')) {
+                const p = JSON.parse(projJSON);
+                await addDocLocal({ description: p.description, amount: p.amount, type: p.type, recurrence: 'single', createdAt: new Date(p.createdAt).toISOString(), sourceOf: p.sourceOf, ...paymentData });
+            } else {
+                await updateDocLocal(id, paymentData);
+            }
+            paymentForm.reset();
+            creditCardNameGroup.classList.add('hidden');
+            paymentForm.removeAttribute('data-id');
+            paymentForm.removeAttribute('data-projection-details');
+            toggleModal(paymentModal, false);
+        });
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editForm.dataset.id; if (!id) return;
+            const newType = document.querySelector('input[name="edit-type"]:checked').value;
+            let newAmount = parseFloat(editAmountInput.value);
+            const newDate = new Date(editDateInput.value + "T12:00:00");
+            newAmount = newType === 'expense' ? -Math.abs(newAmount) : Math.abs(newAmount);
+            const original = allTransactions.find(t => t.id === id);
+            let newDescription = editDescriptionInput.value.trim();
+            if (original && original.recurrence === 'installment') {
+                const m = (original.description || '').match(/\s(\(\d+\/\d+\))$/); if (m) newDescription += ` ${m[1]}`;
+            }
+            await updateDocLocal(id, { description: newDescription, amount: newAmount, type: newType, createdAt: newDate.toISOString(), recurrence: editRecurrenceSelect.value });
+            toggleModal(editModal, false);
+        });
+
+        recurrenceSelect.addEventListener('change', handleRecurrenceChange);
+        filterContainer.addEventListener('click', (e) => { if (e.target.matches('.filter-btn')) { currentFilter = e.target.dataset.filter; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); applyFilterAndRender(); } });
+        paymentTabsContainer.addEventListener('click', (e) => { if (e.target.matches('.payment-tab')) { currentPaymentFilter = e.target.dataset.paymentFilter; document.querySelectorAll('.payment-tab').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); applyFilterAndRender(); } });
+
+        closeModalBtn.addEventListener('click', () => toggleModal(editModal, false));
+        cancelEditBtn.addEventListener('click', () => toggleModal(editModal, false));
+        editModal.addEventListener('click', (e) => { if (e.target.id === 'edit-modal') toggleModal(editModal, false); });
+        closePaymentModalBtn.addEventListener('click', () => toggleModal(paymentModal, false));
+        paymentModal.addEventListener('click', (e) => { if (e.target.id === 'payment-modal') toggleModal(paymentModal, false); });
+
+        cleanAllBtn.addEventListener('click', () => toggleModal(confirmDeleteModal, true));
+        cancelDeleteBtn.addEventListener('click', () => toggleModal(confirmDeleteModal, false));
+        confirmDeleteModal.addEventListener('click', (e) => { if (e.target.id === 'confirm-delete-modal') toggleModal(confirmDeleteModal, false); });
+        confirmDeleteBtn.addEventListener('click', async () => { const toDelete = load().filter(t => !t.isProjection); if (toDelete.length === 0) { toggleModal(confirmDeleteModal, false); return; } save([]); toggleModal(confirmDeleteModal, false); });
+
+        /* ===== boot ===== */
+        transactionDateInput.valueAsDate = new Date();
+        handleRecurrenceChange();
+        initRealtimeListeners();
+    </script>
+    <script>
+        // Toggle de tema (dark/light)
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
@@ -523,591 +825,18 @@
             }
         };
 
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            applyTheme('dark');
-        } else {
-            applyTheme('light');
-        }
+        // Tema inicial
+        const stored = localStorage.getItem('color-theme');
+        if (stored) applyTheme(stored);
+        else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
+        // Clique no botão
         themeToggleBtn.addEventListener('click', () => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
-            if (isDarkMode) {
-                applyTheme('light');
-                localStorage.setItem('color-theme', 'light');
-            } else {
-                applyTheme('dark');
-                localStorage.setItem('color-theme', 'dark');
-            }
+            const isDark = document.documentElement.classList.contains('dark');
+            const next = isDark ? 'light' : 'dark';
+            applyTheme(next);
+            localStorage.setItem('color-theme', next);
         });
-
-
-        // --- DOM ELEMENTS ---
-        const totalIncomeEl = document.getElementById('total-income');
-        const totalExpenseEl = document.getElementById('total-expense');
-        const balanceEl = document.getElementById('balance');
-        const totalPaidEl = document.getElementById('total-paid');
-        const transactionListEl = document.getElementById('transaction-list');
-        const form = document.getElementById('transaction-form');
-        const descriptionInput = document.getElementById('description');
-        const amountInput = document.getElementById('amount');
-        const transactionDateInput = document.getElementById('transaction-date');
-        const transactionDateGroup = document.getElementById('transaction-date-group');
-        const emptyState = document.getElementById('empty-state');
-        const recurrenceSelect = document.getElementById('recurrence');
-        const installmentsGroup = document.getElementById('installments-group');
-        const installmentsInput = document.getElementById('installments');
-
-        // Filter DOM Elements
-        const filterContainer = document.getElementById('filter-container');
-        const paymentTabsContainer = document.getElementById('payment-tabs-container');
-
-        // Modal DOM Elements
-        const editModal = document.getElementById('edit-modal');
-        const editForm = document.getElementById('edit-transaction-form');
-        const editDescriptionInput = document.getElementById('edit-description');
-        const editAmountInput = document.getElementById('edit-amount');
-        const editDateInput = document.getElementById('edit-date');
-        const editRecurrenceSelect = document.getElementById('edit-recurrence');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const cancelEditBtn = document.getElementById('cancel-edit-btn');
-
-        // Payment Modal DOM Elements
-        const paymentModal = document.getElementById('payment-modal');
-        const paymentForm = document.getElementById('payment-form');
-        const closePaymentModalBtn = document.getElementById('close-payment-modal-btn');
-        const creditCardNameGroup = document.getElementById('credit-card-name-group');
-        const creditCardNameInput = document.getElementById('credit-card-name');
-
-        // Clean All Modal
-        const cleanAllBtn = document.getElementById('clean-all-btn');
-        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
-        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-
-
-        // --- FUNÇÕES ---
-
-        const handleRecurrenceChange = () => {
-            const recurrenceType = recurrenceSelect.value;
-
-            // Handle installments group visibility
-            const isInstallment = recurrenceType === 'installment';
-            installmentsGroup.classList.toggle('hidden', !isInstallment);
-            if (isInstallment) {
-                installmentsInput.setAttribute('required', 'required');
-            } else {
-                installmentsInput.removeAttribute('required');
-                installmentsInput.value = '';
-            }
-
-            // Handle date field visibility
-            const isSingle = recurrenceType === 'single';
-            transactionDateGroup.classList.toggle('hidden', !isSingle);
-            if (isSingle) {
-                transactionDateInput.setAttribute('required', 'required');
-            } else {
-                transactionDateInput.removeAttribute('required');
-                transactionDateInput.valueAsDate = new Date(); // Reset to today when hidden
-            }
-        };
-
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-            }).format(amount);
-        };
-
-        const toggleModal = (modalEl, show) => {
-            const container = modalEl.querySelector('.modal-container');
-            if (show) {
-                modalEl.classList.remove('hidden');
-                setTimeout(() => {
-                    modalEl.classList.remove('opacity-0');
-                    container.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            } else {
-                modalEl.classList.add('opacity-0');
-                container.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    modalEl.classList.add('hidden');
-                }, 300);
-            }
-        };
-
-        const renderTransactions = (transactions) => {
-            transactionListEl.innerHTML = '';
-
-            if (transactions.length === 0) {
-                emptyState.style.display = 'block';
-                transactionListEl.appendChild(emptyState);
-                return;
-            }
-
-            emptyState.style.display = 'none';
-
-            const groupedTransactions = transactions.reduce((acc, transaction) => {
-                const date = transaction.createdAt?.toDate ? transaction.createdAt.toDate() : new Date(transaction.createdAt);
-                if (!date || isNaN(date)) return acc;
-                const monthYear = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(date);
-                const key = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
-                if (!acc[key]) {
-                    acc[key] = [];
-                }
-                acc[key].push(transaction);
-                return acc;
-            }, {});
-
-            const sortedMonthKeys = Object.keys(groupedTransactions).sort((a, b) => {
-                const [monthA, yearA] = a.split(' de ');
-                const [monthB, yearB] = b.split(' de ');
-                const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                const dateA = new Date(yearA, months.indexOf(monthA));
-                const dateB = new Date(yearB, months.indexOf(monthB));
-                return dateA - dateB;
-            });
-
-            sortedMonthKeys.forEach(monthKey => {
-                const monthTransactions = groupedTransactions[monthKey];
-
-                const headerLi = document.createElement('li');
-                headerLi.className = 'pt-4 pb-2';
-                headerLi.innerHTML = `<h3 class="text-md font-semibold text-slate-500 dark:text-slate-400 tracking-wider">${monthKey}</h3>`;
-                transactionListEl.appendChild(headerLi);
-
-                monthTransactions.sort((a, b) => {
-                    const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-                    const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
-                    return dateA - dateB;
-                });
-
-                monthTransactions.forEach(transaction => {
-                    const isIncome = transaction.type === 'income';
-                    const sign = isIncome ? '+' : '-';
-                    const amount = Math.abs(transaction.amount);
-
-                    const li = document.createElement('li');
-                    li.classList.add('flex', 'items-center', 'justify-between', 'p-3', 'bg-slate-100', 'dark:bg-slate-700/50', 'rounded-lg', 'list-item-enter', 'gap-2');
-                    li.classList.toggle('transaction-paid', transaction.paid);
-                    li.classList.toggle('transaction-projection', transaction.isProjection);
-                    li.setAttribute('data-id', transaction.id);
-                    if (transaction.isProjection) {
-                        li.setAttribute('data-projection-details', JSON.stringify(transaction));
-                    }
-
-                    let paymentInfo = '';
-                    if (transaction.paid && transaction.paymentMethod) {
-                        const methods = { pix: 'Pix', debit: 'Débito', credit: 'Crédito', cash: 'Dinheiro' };
-                        let methodName = methods[transaction.paymentMethod] || '';
-                        if (transaction.paymentMethod === 'credit' && transaction.creditCardName) {
-                            methodName += ` (${transaction.creditCardName})`;
-                        }
-                        paymentInfo = `<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pago com: ${methodName}</p>`;
-                    }
-
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3 flex-grow min-w-0">
-                             ${!isIncome ? `
-                                <input type="checkbox" data-id="${transaction.id}" class="transaction-paid-checkbox h-5 w-5 rounded border-slate-400 dark:border-slate-500 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0" ${transaction.paid ? 'checked' : ''}>
-                             ` : `
-                                <div class="h-5 w-5 flex-shrink-0"></div>
-                             `}
-                            <span class="p-2 rounded-full ${isIncome ? 'bg-blue-200/70 dark:bg-blue-900/60' : 'bg-red-200/70 dark:bg-red-900/60'}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
-                                    ${isIncome ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />' : '<path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />'}
-                                </svg>
-                            </span>
-                            <div class="flex-grow min-w-0">
-                                <p class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 description-text truncate">
-                                    ${transaction.description}
-                                    ${transaction.recurrence === 'monthly' && !transaction.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-200 px-2 py-0.5 rounded-full">Recorrente</span>` : ''}
-                                    ${transaction.isProjection ? `<span class="text-xs flex-shrink-0 font-medium bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">Projeção</span>` : ''}
-                                </p>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">${(transaction.createdAt?.toDate ? transaction.createdAt.toDate() : new Date(transaction.createdAt)).toLocaleDateString('pt-BR')}</p>
-                                ${paymentInfo}
-                            </div>
-                        </div>
-                        <div class="text-right flex items-center gap-2 flex-shrink-0">
-                            <p class="font-semibold text-lg ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}">${sign} ${formatCurrency(amount)}</p>
-                            ${!transaction.isProjection ? `
-                            <div class="flex flex-col">
-                                <button class="edit-btn text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition text-sm font-medium">Editar</button>
-                                <button class="delete-btn text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition text-sm">Remover</button>
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    transactionListEl.appendChild(li);
-                });
-            });
-        };
-
-        const updateSummary = (transactions) => {
-            const income = transactions
-                .filter(t => t.type === 'income')
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            const totalExpense = transactions
-                .filter(t => t.type === 'expense' && !t.isProjection)
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            const paidExpense = transactions
-                .filter(t => t.type === 'expense' && !t.isProjection && t.paid) // Only count paid expenses in summary
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            const balance = income + paidExpense;
-
-            totalIncomeEl.textContent = formatCurrency(income);
-            totalExpenseEl.textContent = formatCurrency(Math.abs(totalExpense));
-            totalPaidEl.textContent = formatCurrency(Math.abs(paidExpense));
-            balanceEl.textContent = formatCurrency(balance);
-
-            balanceEl.classList.toggle('text-red-700', balance < 0);
-            balanceEl.classList.toggle('dark:text-red-400', balance < 0);
-            balanceEl.classList.toggle('text-slate-800', balance >= 0);
-            balanceEl.classList.toggle('dark:text-slate-100', balance >= 0);
-        };
-
-        const generateProcessedTransactions = (transactions) => {
-            const today = new Date();
-            const projectionEndDate = new Date(today.getFullYear() + 1, 11, 31); // Project until end of next year
-
-            let newProcessed = [...transactions];
-            const realTransactionSignatures = new Set();
-
-            transactions.forEach(t => {
-                if (t.createdAt?.toDate) {
-                    const tDate = t.createdAt.toDate();
-                    const signature = `${t.sourceOf || t.id}-${tDate.getFullYear()}-${tDate.getMonth()}`;
-                    realTransactionSignatures.add(signature);
-                }
-            });
-
-            transactions.forEach(t => {
-                if (t.recurrence === 'monthly' && t.createdAt?.toDate) {
-                    const startDate = t.createdAt.toDate();
-                    let currentDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
-
-                    while (currentDate <= projectionEndDate) {
-                        const year = currentDate.getFullYear();
-                        const month = currentDate.getMonth();
-                        const signature = `${t.id}-${year}-${month}`;
-
-                        if (!realTransactionSignatures.has(signature)) {
-                            newProcessed.push({
-                                ...t,
-                                id: `proj_${t.id}_${year}-${month}`,
-                                createdAt: currentDate.toISOString(),
-                                isProjection: true,
-                                paid: false,
-                                sourceOf: t.id,
-                            });
-                        }
-                        currentDate.setMonth(currentDate.getMonth() + 1);
-                    }
-                }
-            });
-            processedTransactions = newProcessed;
-        };
-
-        const applyFilterAndRender = () => {
-            const now = new Date();
-            let timeFiltered = [];
-
-            switch (currentFilter) {
-                case 'month':
-                    timeFiltered = processedTransactions.filter(t => {
-                        const tDate = t.createdAt?.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
-                        return tDate.getFullYear() === now.getFullYear() && tDate.getMonth() === now.getMonth();
-                    });
-                    break;
-                case 'total':
-                default:
-                    timeFiltered = processedTransactions;
-                    break;
-            }
-
-            let finalFiltered = timeFiltered;
-            if (currentPaymentFilter !== 'all') {
-                finalFiltered = timeFiltered.filter(t => t.paymentMethod === currentPaymentFilter);
-            }
-
-            renderTransactions(finalFiltered);
-            updateSummary(timeFiltered); // Summary is based on time filter, not payment method
-        };
-
-        const initRealtimeListeners = () => {
-            if (unsubscribeTransactions) unsubscribeTransactions();
-
-            transactionsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/transactions`);
-            const qTransactions = query(transactionsCollectionRef);
-            unsubscribeTransactions = onSnapshot(qTransactions, (snapshot) => {
-                allTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                generateProcessedTransactions(allTransactions);
-                applyFilterAndRender();
-            });
-        };
-
-        // --- EVENT LISTENERS ---
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const description = descriptionInput.value.trim();
-            const type = document.querySelector('input[name="type"]:checked').value;
-            let amount = parseFloat(amountInput.value);
-            const recurrence = recurrenceSelect.value;
-            const totalInstallments = parseInt(installmentsInput.value);
-            const selectedDate = new Date(transactionDateInput.value + "T12:00:00");
-
-            if (!description || isNaN(amount) || amount <= 0 || !userId || isNaN(selectedDate)) { return; }
-
-            if (recurrence === 'installment' && type === 'expense' && !isNaN(totalInstallments) && totalInstallments >= 2) {
-                const installmentAmount = -Math.abs(amount) / totalInstallments;
-                const promises = [];
-                for (let i = 0; i < totalInstallments; i++) {
-                    const transactionDate = new Date(selectedDate);
-                    transactionDate.setMonth(transactionDate.getMonth() + i);
-                    promises.push(addDoc(transactionsCollectionRef, {
-                        description: `${description} (${i + 1}/${totalInstallments})`,
-                        amount: installmentAmount, type: 'expense', createdAt: transactionDate, recurrence: 'installment', paid: false
-                    }));
-                }
-                try { await Promise.all(promises); } catch (error) { console.error("Error adding installments: ", error); }
-            } else {
-                if (type === 'expense') { amount = -amount; }
-                try {
-                    await addDoc(transactionsCollectionRef, { description, amount, type, createdAt: selectedDate, recurrence, paid: false });
-                } catch (error) { console.error("Error adding document: ", error); }
-            }
-            form.reset();
-            transactionDateInput.valueAsDate = new Date();
-            installmentsGroup.classList.add('hidden');
-            installmentsInput.removeAttribute('required');
-            descriptionInput.focus();
-        });
-
-        transactionListEl.addEventListener('click', async (e) => {
-            const target = e.target;
-            const li = target.closest('li[data-id]');
-            if (!li) return;
-            const docId = li.getAttribute('data-id');
-
-            if (target.closest('.delete-btn')) {
-                if (docId && !docId.startsWith('proj_')) { try { await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId)); } catch (error) { console.error("Error deleting document: ", error); } }
-            }
-
-            if (target.closest('.edit-btn')) {
-                const transactionToEdit = allTransactions.find(t => t.id === docId);
-                if (transactionToEdit) {
-                    editForm.setAttribute('data-id', docId);
-                    editDescriptionInput.value = transactionToEdit.description.replace(/\s\(\d+\/\d+\)$/, '');
-                    editAmountInput.value = Math.abs(transactionToEdit.amount);
-                    const tDate = transactionToEdit.createdAt.toDate();
-                    editDateInput.value = tDate.toISOString().split('T')[0];
-                    editRecurrenceSelect.value = transactionToEdit.recurrence;
-                    document.getElementById(transactionToEdit.type === 'income' ? 'edit-type-income' : 'edit-type-expense').checked = true;
-                    toggleModal(editModal, true);
-                }
-            }
-        });
-
-        transactionListEl.addEventListener('change', async (e) => {
-            if (e.target.classList.contains('transaction-paid-checkbox')) {
-                const checkbox = e.target;
-                const li = checkbox.closest('li[data-id]');
-                const docId = checkbox.dataset.id;
-                const isPaid = checkbox.checked;
-
-                if (isPaid) {
-                    paymentForm.setAttribute('data-id', docId);
-                    if (li.dataset.projectionDetails) {
-                        paymentForm.setAttribute('data-projection-details', li.dataset.projectionDetails);
-                    }
-                    toggleModal(paymentModal, true);
-                    checkbox.checked = false; // Revert checkbox until payment is confirmed
-                } else {
-                    // Un-paying logic
-                    if (!docId.startsWith('proj_')) {
-                        try {
-                            const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
-                            await updateDoc(docRef, { paid: false, paymentMethod: null, creditCardName: null });
-                        } catch (error) { console.error("Error un-paying status: ", error); }
-                    }
-                }
-            }
-        });
-
-        paymentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const docId = paymentForm.getAttribute('data-id');
-            const projectionDetailsJSON = paymentForm.getAttribute('data-projection-details');
-
-            const paymentMethod = paymentForm.querySelector('input[name="payment-method"]:checked').value;
-            const creditCardName = creditCardNameInput.value.trim();
-
-            const paymentData = {
-                paid: true,
-                paymentMethod: paymentMethod,
-                creditCardName: paymentMethod === 'credit' ? creditCardName : null,
-            };
-
-            if (docId.startsWith('proj_')) {
-                const projectionDetails = JSON.parse(projectionDetailsJSON);
-                try {
-                    await addDoc(transactionsCollectionRef, {
-                        description: projectionDetails.description,
-                        amount: projectionDetails.amount,
-                        type: projectionDetails.type,
-                        recurrence: 'single',
-                        createdAt: new Date(projectionDetails.createdAt),
-                        sourceOf: projectionDetails.sourceOf,
-                        ...paymentData
-                    });
-                } catch (error) { console.error("Error converting projection:", error); }
-            } else {
-                try {
-                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
-                    await updateDoc(docRef, paymentData);
-                } catch (error) { console.error("Error updating paid status: ", error); }
-            }
-
-            paymentForm.reset();
-            creditCardNameGroup.classList.add('hidden');
-            paymentForm.removeAttribute('data-id');
-            paymentForm.removeAttribute('data-projection-details');
-            toggleModal(paymentModal, false);
-        });
-
-        paymentForm.addEventListener('change', (e) => {
-            if (e.target.name === 'payment-method') {
-                creditCardNameGroup.classList.toggle('hidden', e.target.value !== 'credit');
-            }
-        });
-
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const docId = editForm.getAttribute('data-id');
-            if (!docId) return;
-
-            const newType = document.querySelector('input[name="edit-type"]:checked').value;
-            let newAmount = parseFloat(editAmountInput.value);
-            const newDate = new Date(editDateInput.value + "T12:00:00");
-
-            newAmount = newType === 'expense' ? -Math.abs(newAmount) : Math.abs(newAmount);
-
-            const originalTransaction = allTransactions.find(t => t.id === docId);
-            let newDescription = editDescriptionInput.value.trim();
-            if (originalTransaction && originalTransaction.recurrence === 'installment') {
-                const match = originalTransaction.description.match(/\s(\(\d+\/\d+\))$/);
-                if (match) { newDescription += ` ${match[1]}`; }
-            }
-
-            try {
-                const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, docId);
-                await updateDoc(docRef, {
-                    description: newDescription,
-                    amount: newAmount,
-                    type: newType,
-                    createdAt: newDate,
-                    recurrence: editRecurrenceSelect.value,
-                });
-                toggleModal(editModal, false);
-            } catch (error) { console.error("Error updating document: ", error); }
-        });
-
-        recurrenceSelect.addEventListener('change', handleRecurrenceChange);
-
-        filterContainer.addEventListener('click', (e) => {
-            if (e.target.matches('.filter-btn')) {
-                currentFilter = e.target.dataset.filter;
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                applyFilterAndRender();
-            }
-        });
-
-        paymentTabsContainer.addEventListener('click', (e) => {
-            if (e.target.matches('.payment-tab')) {
-                currentPaymentFilter = e.target.dataset.paymentFilter;
-                document.querySelectorAll('.payment-tab').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                applyFilterAndRender();
-            }
-        });
-
-        closeModalBtn.addEventListener('click', () => toggleModal(editModal, false));
-        cancelEditBtn.addEventListener('click', () => toggleModal(editModal, false));
-        editModal.addEventListener('click', (e) => { if (e.target.id === 'edit-modal') { toggleModal(editModal, false); } });
-
-        closePaymentModalBtn.addEventListener('click', () => toggleModal(paymentModal, false));
-        paymentModal.addEventListener('click', (e) => { if (e.target.id === 'payment-modal') { toggleModal(paymentModal, false); } });
-
-        cleanAllBtn.addEventListener('click', () => {
-            toggleModal(confirmDeleteModal, true);
-        });
-
-        cancelDeleteBtn.addEventListener('click', () => {
-            toggleModal(confirmDeleteModal, false);
-        });
-
-        confirmDeleteModal.addEventListener('click', (e) => {
-            if (e.target.id === 'confirm-delete-modal') {
-                toggleModal(confirmDeleteModal, false);
-            }
-        });
-
-        confirmDeleteBtn.addEventListener('click', async () => {
-            if (!userId || !transactionsCollectionRef) return;
-
-            const transactionsToDelete = allTransactions.filter(t => !t.isProjection);
-
-            if (transactionsToDelete.length === 0) {
-                toggleModal(confirmDeleteModal, false);
-                return;
-            }
-
-            const deletePromises = transactionsToDelete.map(t => {
-                const docRef = doc(db, `artifacts/${appId}/users/${userId}/transactions`, t.id);
-                return deleteDoc(docRef);
-            });
-
-            try {
-                await Promise.all(deletePromises);
-            } catch (error) {
-                console.error("Error deleting all transactions: ", error);
-            } finally {
-                toggleModal(confirmDeleteModal, false);
-            }
-        });
-
-        // --- AUTENTICAÇÃO E INICIALIZAÇÃO ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userId = user.uid;
-                transactionDateInput.valueAsDate = new Date();
-                handleRecurrenceChange(); // Set initial state for the date field
-                initRealtimeListeners();
-            } else {
-                userId = null;
-                if (unsubscribeTransactions) unsubscribeTransactions();
-                transactionListEl.innerHTML = `<li><p class="text-center text-slate-500">Por favor, faça login para ver seus dados.</p></li>`;
-            }
-        });
-
-        (async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Authentication failed:", error);
-                transactionListEl.innerHTML = `<li><p class="text-center text-red-500">Falha na autenticação.</p></li>`;
-            }
-        })();
-
     </script>
 </body>
 
