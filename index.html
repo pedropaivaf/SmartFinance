@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plano de Gastos Interativo - Avançado</title>
-    
+    <link rel="icon" type="image/png" href="LogoSF.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Config to enable dark mode in Tailwind
@@ -14,94 +16,116 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+
         /* Custom scrollbar for a cleaner look */
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
+
         .dark ::-webkit-scrollbar-track {
             background: #1e293b;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #94a3b8;
             border-radius: 10px;
         }
+
         .dark ::-webkit-scrollbar-thumb {
             background: #475569;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
         .dark ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
         /* Animation for list items */
         .list-item-enter {
             animation: slideIn 0.3s ease-out forwards;
         }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
                 transform: translateX(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
+
         /* Custom radio button styles */
-        .custom-radio input:checked + label {
+        .custom-radio input:checked+label {
             border-color: #2563eb;
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
         }
-        .custom-radio-expense input:checked + label {
+
+        .custom-radio-expense input:checked+label {
             border-color: #dc2626;
             box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4);
         }
+
         /* Modal styles */
         .modal-overlay {
             transition: opacity 0.3s ease;
         }
+
         .modal-container {
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
+
         /* Paid transaction styles */
         .transaction-paid {
             opacity: 0.6;
         }
+
         .transaction-paid .description-text {
             text-decoration: line-through;
         }
+
         /* Filter button styles */
         .filter-btn.active {
             background-color: #3b82f6;
             color: white;
         }
+
         .dark .filter-btn.active {
             background-color: #2563eb;
         }
+
         /* Projection styles */
         .transaction-projection {
             opacity: 0.8;
-            border-left: 3px solid #64748b; /* a subtle indicator */
+            border-left: 3px solid #64748b;
+            /* a subtle indicator */
         }
-         /* Payment Tab styles */
+
+        /* Payment Tab styles */
         .payment-tab.active {
             border-color: #3b82f6;
             color: #3b82f6;
             background-color: #eff6ff;
         }
+
         .dark .payment-tab.active {
             border-color: #3b82f6;
             color: #60a5fa;
@@ -109,22 +133,41 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
 
-    <div class="w-full max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-slate-300/60 dark:shadow-black/30 overflow-hidden grid grid-cols-1 md:grid-cols-5">
-        
-        <div class="col-span-1 md:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-6 md:p-8 border-r border-slate-200 dark:border-slate-700">
-            <div class="flex justify-between items-start mb-2">
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Smart Finance</h1>
-                <button id="theme-toggle" type="button" class="text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="loop"></path></svg>
+<body
+    class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+    <div
+        class="w-full max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-slate-300/60 dark:shadow-black/30 overflow-hidden grid grid-cols-1 md:grid-cols-5">
+
+        <div
+            class="col-span-1 md:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-6 md:p-8 border-r border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-3">
+                    <img src="LogoSFblue.png" alt="Logo do App"
+                        class="w-10 h-10">
+
+                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Smart Finance</h1>
+                </div>
+                <button id="theme-toggle" type="button"
+                    class="text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"
+                            fill-rule="evenodd" clip-rule="loop"></path>
+                    </svg>
                 </button>
             </div>
             <p class="text-slate-500 dark:text-slate-400 mb-8">Adicione suas rendas e despesas.</p>
 
             <div class="space-y-4 mb-8">
-                <div class="bg-blue-100/60 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+                <div
+                    class="bg-blue-100/60 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
                     <h3 class="text-sm font-medium text-blue-700 dark:text-blue-300">Renda Total</h3>
                     <p id="total-income" class="text-2xl font-semibold text-blue-900 dark:text-blue-100">R$ 0,00</p>
                 </div>
@@ -132,76 +175,106 @@
                     <h3 class="text-sm font-medium text-red-700 dark:text-red-300">Despesa Total</h3>
                     <p id="total-expense" class="text-2xl font-semibold text-red-900 dark:text-red-100">R$ 0,00</p>
                 </div>
-                <div class="bg-green-100/60 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+                <div
+                    class="bg-green-100/60 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-4 rounded-lg">
                     <h3 class="text-sm font-medium text-green-700 dark:text-green-300">Pagos</h3>
                     <p id="total-paid" class="text-2xl font-semibold text-green-900 dark:text-green-100">R$ 0,00</p>
                 </div>
-                <div class="bg-slate-200/60 dark:bg-slate-700/60 border border-slate-300 dark:border-slate-600 p-4 rounded-lg">
+                <div
+                    class="bg-slate-200/60 dark:bg-slate-700/60 border border-slate-300 dark:border-slate-600 p-4 rounded-lg">
                     <h3 class="text-sm font-medium text-slate-600 dark:text-slate-400">Saldo Atual</h3>
                     <p id="balance" class="text-2xl font-semibold text-slate-800 dark:text-slate-100">R$ 0,00</p>
                 </div>
             </div>
 
             <div class="h-full">
-                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-700 pt-6 mb-4">Nova Transação</h2>
+                <h2
+                    class="text-lg font-semibold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-700 pt-6 mb-4">
+                    Nova Transação</h2>
                 <form id="transaction-form" class="space-y-4">
                     <div>
-                        <label for="description" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
-                        <input type="text" id="description" placeholder="Ex: Salário, Aluguel" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                        <label for="description"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
+                        <input type="text" id="description" placeholder="Ex: Salário, Aluguel"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="amount" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor (R$)</label>
-                            <input type="number" id="amount" placeholder="250,50" step="0.01" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                            <label for="amount"
+                                class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor
+                                (R$)</label>
+                            <input type="number" id="amount" placeholder="250,50" step="0.01"
+                                class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                required>
                         </div>
                         <div id="transaction-date-group">
-                            <label for="transaction-date" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
-                            <input type="date" id="transaction-date" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                            <label for="transaction-date"
+                                class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
+                            <input type="date" id="transaction-date"
+                                class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                required>
                         </div>
                     </div>
                     <div>
-                        <label for="recurrence" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de Recorrência</label>
-                        <select id="recurrence" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <label for="recurrence"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de
+                            Recorrência</label>
+                        <select id="recurrence"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                             <option value="single" selected>Única</option>
                             <option value="monthly">Mensal (Recorrente)</option>
                             <option value="installment">Parcelada</option>
                         </select>
                     </div>
                     <div id="installments-group" class="hidden">
-                        <label for="installments" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Número de Parcelas</label>
-                        <input type="number" id="installments" placeholder="Ex: 12" min="2" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <label for="installments"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Número de
+                            Parcelas</label>
+                        <input type="number" id="installments" placeholder="Ex: 12" min="2"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
                     <div id="paid-installments-group" class="hidden">
-                        <label for="paid-installments" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Parcelas Já Pagas (Opcional)</label>
-                        <input type="number" id="paid-installments" placeholder="Ex: 4" min="0" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <label for="paid-installments"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Parcelas Já Pagas
+                            (Opcional)</label>
+                        <input type="number" id="paid-installments" placeholder="Ex: 4" min="0"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
-                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                         <div class="custom-radio">
                             <input type="radio" id="type-income" name="type" value="income" class="sr-only" checked>
-                            <label for="type-income" class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            <label for="type-income"
+                                class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                    </path>
                                 </svg>
                                 Renda
                             </label>
                         </div>
                         <div class="custom-radio custom-radio-expense">
                             <input type="radio" id="type-expense" name="type" value="expense" class="sr-only">
-                            <label for="type-expense" class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <label for="type-expense"
+                                class="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"></path>
                                 </svg>
                                 Despesa
                             </label>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 transform hover:scale-105">
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 transform hover:scale-105">
                         Adicionar Transação
                     </button>
                 </form>
 
                 <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <button id="clean-all-btn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300">
+                    <button id="clean-all-btn"
+                        class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300">
                         Limpar Tudo
                     </button>
                 </div>
@@ -217,99 +290,137 @@
             </div>
 
             <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
-                 <h2 class="text-xl font-bold text-slate-900 dark:text-white">Histórico de Transações</h2>
-                 <div id="filter-container" class="flex items-center gap-2 flex-wrap">
-                    <button data-filter="month" class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">Mês</button>
-                    <button data-filter="total" class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition active">Total</button>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Histórico de Transações</h2>
+                <div id="filter-container" class="flex items-center gap-2 flex-wrap">
+                    <button data-filter="month"
+                        class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">Mês</button>
+                    <button data-filter="total"
+                        class="filter-btn px-3 py-1 text-sm font-medium rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition active">Total</button>
                 </div>
             </div>
 
             <div id="payment-tabs-container" class="border-b border-slate-200 dark:border-slate-700 mb-4">
                 <nav class="-mb-px flex gap-4 text-sm font-medium overflow-x-auto">
-                    <button data-payment-filter="all" class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent active">Todos</button>
-                    <button data-payment-filter="pix" class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Pix</button>
-                    <button data-payment-filter="debit" class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Débito</button>
-                    <button data-payment-filter="credit" class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Crédito</button>
-                    <button data-payment-filter="cash" class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Dinheiro</button>
+                    <button data-payment-filter="all"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent active">Todos</button>
+                    <button data-payment-filter="pix"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Pix</button>
+                    <button data-payment-filter="debit"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Débito</button>
+                    <button data-payment-filter="credit"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Crédito</button>
+                    <button data-payment-filter="cash"
+                        class="payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent">Dinheiro</button>
                 </nav>
             </div>
 
             <div id="transaction-list-container" class="flex-grow overflow-y-auto pr-2">
                 <ul id="transaction-list" class="space-y-1">
                     <li id="empty-state" class="text-center py-10">
-                        <svg class="mx-auto h-12 w-12 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+                        <svg class="mx-auto h-12 w-12 text-slate-400 dark:text-slate-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-200">Nenhuma transação</h3>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comece adicionando uma renda ou despesa.</p>
-                      </li>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Comece adicionando uma renda ou
+                            despesa.</p>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div id="edit-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+    <div id="edit-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white">Editar Transação</h2>
-                <button id="close-modal-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button id="close-modal-btn"
+                    class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
             <form id="edit-transaction-form" class="space-y-4">
-                 <div>
-                    <label for="edit-description" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
-                    <input type="text" id="edit-description" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                <div>
+                    <label for="edit-description"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Descrição</label>
+                    <input type="text" id="edit-description"
+                        class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        required>
                 </div>
-                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="edit-amount" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor (R$)</label>
-                        <input type="number" id="edit-amount" step="0.01" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                        <label for="edit-amount"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Valor (R$)</label>
+                        <input type="number" id="edit-amount" step="0.01"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
                     </div>
                     <div>
-                        <label for="edit-date" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
-                        <input type="date" id="edit-date" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                        <label for="edit-date"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Data</label>
+                        <input type="date" id="edit-date"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            required>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <div class="custom-radio">
                         <input type="radio" id="edit-type-income" name="edit-type" value="income" class="sr-only">
-                        <label for="edit-type-income" class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                        <label for="edit-type-income"
+                            class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
                             Renda
                         </label>
                     </div>
                     <div class="custom-radio custom-radio-expense">
                         <input type="radio" id="edit-type-expense" name="edit-type" value="expense" class="sr-only">
-                        <label for="edit-type-expense" class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
+                        <label for="edit-type-expense"
+                            class="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">
                             Despesa
                         </label>
                     </div>
                 </div>
-                 <div>
-                    <label for="edit-recurrence" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de Recorrência</label>
-                    <select id="edit-recurrence" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700">
+                <div>
+                    <label for="edit-recurrence"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Tipo de
+                        Recorrência</label>
+                    <select id="edit-recurrence"
+                        class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700">
                         <option value="single">Única</option>
                         <option value="monthly">Mensal (Recorrente)</option>
                         <option value="installment">Parcelada</option>
                     </select>
                 </div>
                 <div class="flex gap-4">
-                    <button type="button" id="cancel-edit-btn" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-3 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Salvar Alterações</button>
+                    <button type="button" id="cancel-edit-btn"
+                        class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-3 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Salvar
+                        Alterações</button>
                 </div>
             </form>
         </div>
     </div>
-    
-    <div id="payment-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
-             <div class="flex justify-between items-center mb-6">
+
+    <div id="payment-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white">Confirmar Pagamento</h2>
-                <button id="close-payment-modal-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                <button id="close-payment-modal-btn"
+                    class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
             <form id="payment-form" class="space-y-4">
@@ -317,37 +428,51 @@
                 <div class="space-y-2">
                     <div class="custom-radio">
                         <input type="radio" id="payment-pix" name="payment-method" value="pix" class="sr-only" checked>
-                        <label for="payment-pix" class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Pix</label>
+                        <label for="payment-pix"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Pix</label>
                     </div>
-                     <div class="custom-radio">
+                    <div class="custom-radio">
                         <input type="radio" id="payment-debit" name="payment-method" value="debit" class="sr-only">
-                        <label for="payment-debit" class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão (Débito)</label>
+                        <label for="payment-debit"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão
+                            (Débito)</label>
                     </div>
-                     <div class="custom-radio">
+                    <div class="custom-radio">
                         <input type="radio" id="payment-credit" name="payment-method" value="credit" class="sr-only">
-                        <label for="payment-credit" class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão (Crédito)</label>
+                        <label for="payment-credit"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Cartão
+                            (Crédito)</label>
                     </div>
                     <div id="credit-card-name-group" class="hidden pl-2 pt-2">
-                        <label for="credit-card-name" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Nome do Cartão (Opcional)</label>
-                        <input type="text" id="credit-card-name" placeholder="Ex: Nubank" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <label for="credit-card-name"
+                            class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Nome do Cartão
+                            (Opcional)</label>
+                        <input type="text" id="credit-card-name" placeholder="Ex: Nubank"
+                            class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
-                     <div class="custom-radio">
+                    <div class="custom-radio">
                         <input type="radio" id="payment-cash" name="payment-method" value="cash" class="sr-only">
-                        <label for="payment-cash" class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Dinheiro</label>
+                        <label for="payment-cash"
+                            class="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200">Dinheiro</label>
                     </div>
                 </div>
                 <div class="flex pt-4">
-                     <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Confirmar</button>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Confirmar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="confirm-delete-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
-             <div class="text-center">
-                <svg class="mx-auto h-12 w-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+    <div id="confirm-delete-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="text-center">
+                <svg class="mx-auto h-12 w-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-4">Apagar Tudo?</h2>
                 <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
@@ -355,54 +480,91 @@
                 </p>
             </div>
             <div class="flex gap-4 mt-6">
-                 <button type="button" id="cancel-delete-btn" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
-                 <button type="button" id="confirm-delete-btn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">Sim, Apagar Tudo</button>
+                <button type="button" id="cancel-delete-btn"
+                    class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
+                <button type="button" id="confirm-delete-btn"
+                    class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">Sim,
+                    Apagar Tudo</button>
             </div>
         </div>
     </div>
 
-    <div id="delete-choice-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
-             <div class="text-center">
-                <svg class="mx-auto h-12 w-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <div id="delete-choice-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="text-center">
+                <svg class="mx-auto h-12 w-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-4">Excluir Parcela</h2>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Você está excluindo uma transação parcelada. O que deseja fazer?</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Você está excluindo uma transação parcelada.
+                    O que deseja fazer?</p>
             </div>
             <div class="flex flex-col gap-3 mt-6">
-                 <button type="button" id="delete-all-btn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition">Excluir Todas as Parcelas</button>
-                 <button type="button" id="delete-single-btn" class="w-full bg-red-200 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold py-2 px-4 rounded-lg hover:bg-red-300 dark:hover:bg-red-900/60 transition">Excluir Apenas Esta Parcela</button>
-                 <button type="button" data-close-modal="delete-choice-modal" class="w-full text-center text-sm font-semibold text-slate-600 dark:text-slate-400 py-2">Cancelar</button>
+                <button type="button" id="delete-all-btn"
+                    class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition">Excluir
+                    Todas as Parcelas</button>
+                <button type="button" id="delete-single-btn"
+                    class="w-full bg-red-200 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold py-2 px-4 rounded-lg hover:bg-red-300 dark:hover:bg-red-900/60 transition">Excluir
+                    Apenas Esta Parcela</button>
+                <button type="button" data-close-modal="delete-choice-modal"
+                    class="w-full text-center text-sm font-semibold text-slate-600 dark:text-slate-400 py-2">Cancelar</button>
             </div>
         </div>
     </div>
-    
-    <div id="edit-choice-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
-             <div class="text-center">
-                <svg class="mx-auto h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+
+    <div id="edit-choice-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+            <div class="text-center">
+                <svg class="mx-auto h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-4">Editar Parcela</h2>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Você está editando uma transação parcelada. O que deseja fazer?</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Você está editando uma transação parcelada. O
+                    que deseja fazer?</p>
             </div>
             <div class="flex flex-col gap-3 mt-6">
-                 <button type="button" id="edit-all-choice-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Alterar Valor das Futuras</button>
-                 <button type="button" id="edit-single-choice-btn" class="w-full bg-blue-200 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold py-2 px-4 rounded-lg hover:bg-blue-300 dark:hover:bg-blue-900/60 transition">Editar Apenas Esta Parcela</button>
-                 <button type="button" data-close-modal="edit-choice-modal" class="w-full text-center text-sm font-semibold text-slate-600 dark:text-slate-400 py-2">Cancelar</button>
+                <button type="button" id="edit-all-choice-btn"
+                    class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Alterar
+                    Valor das Futuras</button>
+                <button type="button" id="edit-single-choice-btn"
+                    class="w-full bg-blue-200 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold py-2 px-4 rounded-lg hover:bg-blue-300 dark:hover:bg-blue-900/60 transition">Editar
+                    Apenas Esta Parcela</button>
+                <button type="button" data-close-modal="edit-choice-modal"
+                    class="w-full text-center text-sm font-semibold text-slate-600 dark:text-slate-400 py-2">Cancelar</button>
             </div>
         </div>
     </div>
-    
-    <div id="edit-all-value-modal" class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
+
+    <div id="edit-all-value-modal"
+        class="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0">
+        <div
+            class="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8 transform scale-95 opacity-0">
             <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Alterar Valor das Parcelas Futuras</h2>
             <form id="edit-all-value-form">
-                <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Digite o novo valor para cada uma das parcelas futuras que ainda não foram pagas. Esta ação não pode ser desfeita.</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Digite o novo valor para cada uma das
+                    parcelas futuras que ainda não foram pagas. Esta ação não pode ser desfeita.</p>
                 <div>
-                    <label for="new-installment-value" class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Novo Valor da Parcela (R$)</label>
-                    <input type="number" id="new-installment-value" step="0.01" min="0" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                    <label for="new-installment-value"
+                        class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">Novo Valor da Parcela
+                        (R$)</label>
+                    <input type="number" id="new-installment-value" step="0.01" min="0"
+                        class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        required>
                 </div>
                 <div class="flex gap-4 mt-6">
-                    <button type="button" data-close-modal="edit-all-value-modal" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Salvar Alterações</button>
+                    <button type="button" data-close-modal="edit-all-value-modal"
+                        class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition">Cancelar</button>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Salvar
+                        Alterações</button>
                 </div>
             </form>
         </div>
@@ -493,7 +655,7 @@
             const editRecurrenceSelect = document.getElementById('edit-recurrence');
             const closeModalBtn = document.getElementById('close-modal-btn');
             const cancelEditBtn = document.getElementById('cancel-edit-btn');
-            
+
             const paymentModal = document.getElementById('payment-modal');
             const paymentForm = document.getElementById('payment-form');
             const closePaymentModalBtn = document.getElementById('close-payment-modal-btn');
@@ -504,7 +666,7 @@
             const confirmDeleteModal = document.getElementById('confirm-delete-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-            
+
             // New Choice Modals
             const deleteChoiceModal = document.getElementById('delete-choice-modal');
             const editChoiceModal = document.getElementById('edit-choice-modal');
@@ -532,7 +694,7 @@
                     allTransactions[index] = { ...allTransactions[index], ...updatedData };
                 }
             };
-            
+
             const deleteTransaction = (id) => {
                 allTransactions = allTransactions.filter(t => t.id !== id);
             };
@@ -558,7 +720,7 @@
 
             const handleRecurrenceChange = () => {
                 const recurrenceType = recurrenceSelect.value;
-                
+
                 const isInstallment = recurrenceType === 'installment';
                 installmentsGroup.classList.toggle('hidden', !isInstallment);
                 togglePaidInstallmentsField();
@@ -577,7 +739,7 @@
                     transactionDateInput.setAttribute('required', 'required');
                 } else {
                     transactionDateInput.removeAttribute('required');
-                    transactionDateInput.valueAsDate = new Date(); 
+                    transactionDateInput.valueAsDate = new Date();
                 }
             };
 
@@ -587,7 +749,7 @@
                     currency: 'BRL',
                 }).format(amount);
             };
-            
+
             const toggleModal = (modalEl, show) => {
                 if (!modalEl) return;
                 const container = modalEl.querySelector('.modal-container');
@@ -625,7 +787,7 @@
                     chartInstance.destroy();
                     chartInstance = null;
                 }
-                
+
                 if (totalIncome === 0 && totalPaidExpense === 0 && totalUnpaidExpense === 0) {
                     chartContainer.classList.add('flex', 'items-center', 'justify-center');
                     chartContainer.innerHTML = `<p class="text-slate-500 dark:text-slate-400">Sem dados para exibir o gráfico.</p>`;
@@ -673,7 +835,7 @@
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function (context) {
                                         let label = context.label || '';
                                         if (label) { label += ': '; }
                                         if (context.parsed !== null) { label += formatCurrency(context.parsed); }
@@ -688,13 +850,13 @@
 
             const renderTransactions = (transactions) => {
                 transactionListEl.innerHTML = '';
-                
+
                 if (transactions.length === 0) {
                     emptyState.style.display = 'block';
                     transactionListEl.appendChild(emptyState);
                     return;
                 }
-                
+
                 emptyState.style.display = 'none';
 
                 const groupedTransactions = transactions.reduce((acc, transaction) => {
@@ -721,7 +883,7 @@
 
                 sortedMonthKeys.forEach(monthKey => {
                     const monthTransactions = groupedTransactions[monthKey];
-                    
+
                     const headerLi = document.createElement('li');
                     headerLi.className = 'pt-4 pb-2';
                     headerLi.innerHTML = `<h3 class="text-md font-semibold text-slate-500 dark:text-slate-400 tracking-wider">${monthKey}</h3>`;
@@ -739,13 +901,13 @@
                         li.classList.toggle('transaction-paid', transaction.paid);
                         li.classList.toggle('transaction-projection', transaction.isProjection);
                         li.setAttribute('data-id', transaction.id);
-                        if(transaction.isProjection) {
+                        if (transaction.isProjection) {
                             li.setAttribute('data-projection-details', JSON.stringify(transaction));
                         }
                         if (transaction.groupId) {
                             li.setAttribute('data-group-id', transaction.groupId);
                         }
-                        
+
                         let paymentInfo = '';
                         if (transaction.paid && transaction.paymentMethod) {
                             const methods = { pix: 'Pix', debit: 'Débito', credit: 'Crédito', cash: 'Dinheiro' };
@@ -792,7 +954,7 @@
                     });
                 });
             };
-            
+
             const updateSummary = (transactionsToSummarize) => {
                 const income = transactionsToSummarize
                     .filter(t => t.type === 'income' && !t.isProjection)
@@ -816,7 +978,7 @@
 
             const generateProcessedTransactions = (transactions) => {
                 const today = new Date();
-                const projectionEndDate = new Date(today.getFullYear() + 1, 11, 31); 
+                const projectionEndDate = new Date(today.getFullYear() + 1, 11, 31);
                 let newProcessed = [...transactions];
                 const realTransactionSignatures = new Set();
                 transactions.forEach(t => {
@@ -848,14 +1010,14 @@
                 });
                 processedTransactions = newProcessed;
             };
-            
+
             const applyFilterAndRender = () => {
                 const now = new Date();
                 let transactionsForSummary = [];
                 let transactionsForList = [];
 
                 // CORREÇÃO: Define qual conjunto de dados será usado para os resumos e o gráfico
-                switch(currentFilter) {
+                switch (currentFilter) {
                     case 'month':
                         transactionsForSummary = processedTransactions.filter(t => {
                             const tDate = new Date(t.createdAt);
@@ -867,7 +1029,7 @@
                         transactionsForSummary = processedTransactions;
                         break;
                 }
-                
+
                 // A lista de transações a ser exibida parte da mesma base do resumo
                 transactionsForList = transactionsForSummary;
 
@@ -878,7 +1040,7 @@
 
                 // Atualiza a interface com os dados corretos
                 renderTransactions(transactionsForList);
-                updateSummary(transactionsForSummary); 
+                updateSummary(transactionsForSummary);
                 updateChart(transactionsForSummary);
             };
 
@@ -910,10 +1072,10 @@
                             id: groupId + '-' + i,
                             groupId: groupId,
                             description: `${description} (${i + 1}/${totalInstallments})`,
-                            amount: installmentAmount, 
-                            type: 'expense', 
-                            createdAt: transactionDate.toISOString(), 
-                            recurrence: 'installment', 
+                            amount: installmentAmount,
+                            type: 'expense',
+                            createdAt: transactionDate.toISOString(),
+                            recurrence: 'installment',
                             paid: isPaid,
                             paymentMethod: isPaid ? 'cash' : null,
                             creditCardName: null
@@ -923,10 +1085,10 @@
                     if (type === 'expense') { amount = -amount; }
                     addTransaction({
                         id: Date.now().toString(),
-                        description, amount, type, 
-                        createdAt: selectedDate.toISOString(), 
-                        recurrence, 
-                        paid: false 
+                        description, amount, type,
+                        createdAt: selectedDate.toISOString(),
+                        recurrence,
+                        paid: false
                     });
                 }
                 saveTransactionsToStorage();
@@ -1057,21 +1219,21 @@
 
                     if (isPaid) {
                         paymentForm.dataset.id = docId;
-                        if(li.dataset.projectionDetails) {
+                        if (li.dataset.projectionDetails) {
                             paymentForm.dataset.projectionDetails = li.dataset.projectionDetails;
                         }
                         toggleModal(paymentModal, true);
                         checkbox.checked = false;
                     } else {
                         if (!docId.startsWith('proj_')) {
-                           updateTransaction(docId, { paid: false, paymentMethod: null, creditCardName: null });
-                           saveTransactionsToStorage();
-                           updateUI();
+                            updateTransaction(docId, { paid: false, paymentMethod: null, creditCardName: null });
+                            saveTransactionsToStorage();
+                            updateUI();
                         }
                     }
                 }
             });
-            
+
             paymentForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const docId = paymentForm.dataset.id;
@@ -1108,7 +1270,7 @@
             });
 
             paymentForm.addEventListener('change', (e) => {
-                if(e.target.name === 'payment-method') {
+                if (e.target.name === 'payment-method') {
                     creditCardNameGroup.classList.toggle('hidden', e.target.value !== 'credit');
                 }
             });
@@ -1139,12 +1301,12 @@
                 updateUI();
                 toggleModal(editModal, false);
             });
-            
+
             recurrenceSelect.addEventListener('change', handleRecurrenceChange);
             typeRadios.forEach(radio => radio.addEventListener('change', togglePaidInstallmentsField));
 
             filterContainer.addEventListener('click', (e) => {
-                if(e.target.matches('.filter-btn')) {
+                if (e.target.matches('.filter-btn')) {
                     currentFilter = e.target.dataset.filter;
                     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
@@ -1153,7 +1315,7 @@
             });
 
             paymentTabsContainer.addEventListener('click', (e) => {
-                if(e.target.matches('.payment-tab')) {
+                if (e.target.matches('.payment-tab')) {
                     currentPaymentFilter = e.target.dataset.paymentFilter;
                     document.querySelectorAll('.payment-tab').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
@@ -1184,4 +1346,5 @@
         });
     </script>
 </body>
+
 </html>
