@@ -108,11 +108,43 @@ function GoalProgress({ title, current, goal, difference, progress, formatCurren
   })();
 
   const progressWidth = hasGoal ? `${progress}%` : '0%';
-  const barColor = exceeded
-    ? 'bg-red-500'
-    : positiveIsGood
-    ? 'bg-blue-500'
-    : 'bg-emerald-500';
+  const ratio = hasGoal && goal !== 0 ? current / goal : 0;
+  const statusClass = (() => {
+    if (!hasGoal) {
+      return 'text-slate-500 dark:text-slate-400';
+    }
+
+    if (positiveIsGood) {
+      return ratio >= 1 ? 'text-sky-400 dark:text-sky-300' : 'text-slate-500 dark:text-slate-400';
+    }
+
+    if (exceeded) {
+      return 'text-red-600 dark:text-red-400';
+    }
+
+    return 'text-slate-500 dark:text-slate-400';
+  })();
+
+  const barColor = (() => {
+    if (!hasGoal) {
+      return 'bg-slate-300';
+    }
+
+    if (positiveIsGood) {
+      return ratio >= 1 ? 'bg-sky-400' : 'bg-blue-800';
+    }
+
+    if (ratio <= 0.6) {
+      return 'bg-emerald-500';
+    }
+    if (ratio <= 0.9) {
+      return 'bg-amber-400';
+    }
+    if (ratio <= 1) {
+      return 'bg-orange-500';
+    }
+    return 'bg-rose-500';
+  })();
 
   return (
     <div className="space-y-2">
@@ -134,7 +166,7 @@ function GoalProgress({ title, current, goal, difference, progress, formatCurren
           aria-valuenow={Math.round(progress)}
         />
       </div>
-      <p className={`text-xs ${exceeded ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
+      <p className={`text-xs ${statusClass}`}>
         {statusMessage}
       </p>
     </div>
