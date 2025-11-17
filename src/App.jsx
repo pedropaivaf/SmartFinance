@@ -113,6 +113,7 @@ function App() {
   const [currentFilter, setCurrentFilter] = useState('total');
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [summaryOrder, setSummaryOrder] = useState(['income', 'expense', 'paid', 'balance']);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
   const [paymentModalState, setPaymentModalState] = useState({ open: false, transaction: null, projection: null });
@@ -120,12 +121,12 @@ function App() {
   const [editChoiceState, setEditChoiceState] = useState({ open: false, transaction: null });
   const [editAllValueState, setEditAllValueState] = useState({ open: false, groupId: null });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activePage, setActivePage] = useState('overview');
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.className =
-        'bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen px-3 sm:px-6 py-6 md:py-10 transition-colors duration-300';
+        'bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-200 min-h-screen px-3 sm:px-6 py-6 md:py-10 transition-colors duration-500';
     }
   }, []);
 
@@ -212,14 +213,7 @@ function App() {
     setIsDarkMode((prev) => !prev);
   };
 
-  const handleToggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
-
-  const closeMenu = () => setIsMenuOpen(false);
-
   const handleAddTransactions = (newTransactions) => {
-    closeMenu();
     setTransactions((prev) => [...prev, ...newTransactions]);
   };
 
@@ -436,62 +430,145 @@ function App() {
     setConfirmDeleteOpen(false);
   };
 
-  const asideClasses = `transform transition-transform duration-300 ease-out fixed inset-y-0 left-0 z-30 w-full max-w-xs overflow-y-auto bg-slate-50 dark:bg-slate-900/95 border-r border-slate-200 dark:border-slate-700 shadow-xl px-5 sm:px-6 py-6 space-y-6 md:static md:z-auto md:w-auto md:max-w-none md:overflow-visible md:bg-slate-50 md:dark:bg-slate-800/50 md:border-0 md:border-r md:dark:border-slate-700 md:shadow-none md:px-6 md:py-8 md:transform-none md:transition-none md:space-y-6 md:rounded-2xl md:col-span-2 lg:col-span-2 ${
-    isMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-  }`;
+  const panelClasses =
+    'bg-white/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/30 backdrop-blur-sm';
 
   return (
     <>
-      <header className="w-full max-w-6xl mx-auto px-3 sm:px-0 mb-4 md:mb-6">
-        <Header
-          isDarkMode={isDarkMode}
-          onToggleTheme={handleToggleTheme}
-          logoSrc={logoBlue}
-          onToggleMenu={handleToggleMenu}
-          isMenuOpen={isMenuOpen}
-        />
-      </header>
-
-      {isMenuOpen && (
-        <button
-          type="button"
-          className="fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-sm md:hidden"
-          onClick={() => setIsMenuOpen(false)}
-          aria-label="Fechar painel de navegação"
-        />
-      )}
-
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 gap-6 md:gap-8 md:grid-cols-5">
-        <aside className={asideClasses}>
-          <GoalsSection
-            goals={goals}
-            onGoalChange={handleGoalChange}
-            summaryValues={summaryValues}
-            formatCurrency={formatCurrency}
+      <main className="w-full max-w-md mx-auto px-3 sm:px-0 space-y-5 sm:space-y-6 md:space-y-8 pb-24">
+        <section
+          id="page-overview"
+          data-page="overview"
+          className={`page-section space-y-5 ${activePage === 'overview' ? '' : 'hidden'}`}
+        >
+          <Header
+            isDarkMode={isDarkMode}
+            onToggleTheme={handleToggleTheme}
+            logoSrc={logoBlue}
           />
-          <SummaryCards
-            totalIncome={summaryValues.income}
-            totalExpense={summaryValues.totalExpense}
-            totalPaid={summaryValues.paidExpense}
-            balance={summaryValues.balance}
-            formatCurrency={formatCurrency}
-          />
-          <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
-        </aside>
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Visão geral</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Suas métricas organizadas para facil visualização.</h2>
+            </div>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Segure e arraste os cards para alterar a ordem.</p>
+            <SummaryCards
+              totalIncome={summaryValues.income}
+              totalExpense={summaryValues.totalExpense}
+              totalPaid={summaryValues.paidExpense}
+              balance={summaryValues.balance}
+              formatCurrency={formatCurrency}
+              cardOrder={summaryOrder}
+              onReorder={setSummaryOrder}
+            />
+          </div>
+        </section>
 
-        <main className="col-span-1 md:col-span-3 lg:col-span-3 bg-white dark:bg-slate-800 rounded-2xl shadow-lg md:shadow-none p-5 sm:p-6 md:p-8 flex flex-col gap-6">
-          <ChartSection transactions={summaryTransactions} isDarkMode={isDarkMode} />
-          <FilterBar currentFilter={currentFilter} onChange={setCurrentFilter} />
-          <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
-          <TransactionList
-            transactions={listTransactions}
-            onTogglePaid={handleTogglePaid}
-            onEdit={handleEditRequest}
-            onDelete={handleDeleteTransactionRequest}
-            formatCurrency={(value) => formatCurrency(value)}
-          />
-        </main>
-      </div>
+        <section
+          id="page-graphs-goals"
+          data-page="graphs-goals"
+          className={`page-section space-y-5 ${activePage === 'graphs-goals' ? '' : 'hidden'}`}
+        >
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+            <ChartSection transactions={summaryTransactions} isDarkMode={isDarkMode} />
+          </div>
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+            <GoalsSection
+              goals={goals}
+              onGoalChange={handleGoalChange}
+              summaryValues={summaryValues}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+        </section>
+
+        <section
+          id="page-history"
+          data-page="history"
+          className={`page-section space-y-5 ${activePage === 'history' ? '' : 'hidden'}`}
+        >
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Histórico</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Transações por período</h3>
+              </div>
+            </div>
+            <div className="rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4">
+              <FilterBar currentFilter={currentFilter} onChange={setCurrentFilter} />
+            </div>
+            <div className="rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4">
+              <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
+            </div>
+            <TransactionList
+              transactions={listTransactions}
+              onTogglePaid={handleTogglePaid}
+              onEdit={handleEditRequest}
+              onDelete={handleDeleteTransactionRequest}
+              formatCurrency={(value) => formatCurrency(value)}
+            />
+          </div>
+        </section>
+
+        <section
+          id="page-new-transaction"
+          data-page="new-transaction"
+          className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
+        >
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Ação principal</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Nova transação</h3>
+              </div>
+            </div>
+            <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
+          </div>
+        </section>
+      </main>
+
+      <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30">
+        <div className="mx-auto max-w-md bg-slate-900/90 dark:bg-slate-900/90 border-t border-white/10 backdrop-blur px-2 py-1 flex justify-between gap-1">
+          {[
+            { target: 'overview', label: 'Inicio', icon: (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 12l8-8 8 8v6a2 2 0 01-2 2H6a2 2 0 01-2-2z" />
+            ) },
+            { target: 'graphs-goals', label: 'Gráfico/Metas', icon: (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
+            ) },
+            { target: 'history', label: 'Histórico', icon: (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            ) },
+            { target: 'new-transaction', label: 'Nova', icon: (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
+            ) },
+          ].map(({ target, label, icon }) => {
+            const isActive = activePage === target;
+            return (
+              <button
+                key={target}
+                type="button"
+                className={`nav-tab flex-1 flex flex-col items-center justify-center gap-0.5 py-1 text-xs transition ${
+                  isActive ? 'text-sky-400' : 'text-slate-400'
+                }`}
+                data-target={target}
+                onClick={() => setActivePage(target)}
+              >
+                <span
+                  className={`h-8 w-8 rounded-full border flex items-center justify-center ${
+                    isActive ? 'border-sky-500/60 bg-sky-500/20' : 'border-slate-600 bg-slate-800/60'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    {icon}
+                  </svg>
+                </span>
+                <span className={isActive ? 'font-semibold' : ''}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       <EditTransactionModal
         isOpen={editModalState.open}

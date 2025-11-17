@@ -1,31 +1,15 @@
 import React from 'react';
 
-function Header({ isDarkMode, onToggleTheme, logoSrc, onToggleMenu, isMenuOpen }) {
+function Header({ isDarkMode, onToggleTheme, logoSrc }) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center justify-between gap-4 rounded-3xl bg-white/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 px-4 sm:px-6 py-4 shadow-md shadow-slate-900/5 dark:shadow-black/30 backdrop-blur-sm">
       <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          type="button"
-          className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-600 p-2 text-slate-600 dark:text-slate-300 sm:hidden"
-          onClick={onToggleMenu}
-          aria-label={isMenuOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-5 w-5 transition-transform ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
         <img src={logoSrc} alt="Logo do Smart Finance" className="w-12 h-12 sm:w-14 sm:h-14" />
         <div className="text-left">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Smart Finance</h1>
+          <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Dashboard</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white leading-tight">Smart Finance</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Controle suas finanças de forma inteligente e acompanhe suas metas.
+            Tudo em um lugar, mais limpo para o seu dia a dia.
           </p>
         </div>
       </div>
@@ -33,7 +17,7 @@ function Header({ isDarkMode, onToggleTheme, logoSrc, onToggleMenu, isMenuOpen }
         id="theme-toggle"
         type="button"
         onClick={onToggleTheme}
-        className="self-center sm:self-auto text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5"
+        className="shrink-0 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/70 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-full p-2.5 transition"
         aria-label="Alternar entre tema claro e escuro"
       >
         <span className="sr-only">Alternar tema</span>
