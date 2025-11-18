@@ -9,7 +9,7 @@ function Header({ isDarkMode, onToggleTheme, logoSrc }) {
           <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Dashboard</p>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white leading-tight">Smart Finance</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Tudo em um lugar, mais limpo para o seu dia a dia.
+            Organize suas finanças de forma inteligente
           </p>
         </div>
       </div>

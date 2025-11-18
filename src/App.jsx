@@ -516,12 +516,7 @@ function App() {
           className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Ação principal</p>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Nova transação</h3>
-              </div>
-            </div>
+            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Ação principal</p>
             <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
           </div>
         </section>
