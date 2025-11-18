@@ -178,7 +178,8 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               type="date"
               value={transactionDate}
               onChange={(event) => setTransactionDate(event.target.value)}
-              className={inputBase}
+              className={`${inputBase} text-left`}
+              style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
               required
               aria-describedby="date-helper"
             />
@@ -232,7 +233,8 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
                 type="date"
                 value={installmentStartDate}
                 onChange={(event) => setInstallmentStartDate(event.target.value)}
-                className={inputBase}
+                className={`${inputBase} text-left`}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 required
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
