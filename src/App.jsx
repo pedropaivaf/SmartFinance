@@ -1,4 +1,23 @@
+/**
+ * SmartFinance - App Principal
+ *
+ * Versão 2.0.0 - Premium/Freemium
+ *
+ * Sistema de Feature Flags:
+ * - Altere em src/config.js o valor de SMARTFINANCE_CONFIG.plan para 'premium' ou 'free'
+ *
+ * Novos Recursos Premium:
+ * - Envelopes por categoria
+ * - Insights automáticos
+ * - Cartões de crédito e faturas
+ * - Próximos lançamentos e lembretes
+ * - Análises avançadas
+ * - Export e backup de dados
+ */
+
 import React, { useEffect, useMemo, useState } from 'react';
+
+// Componentes existentes
 import Header from './components/Header.jsx';
 import GoalsSection from './components/GoalsSection.jsx';
 import SummaryCards from './components/SummaryCards.jsx';
@@ -14,10 +33,29 @@ import DeleteChoiceModal from './components/DeleteChoiceModal.jsx';
 import EditChoiceModal from './components/EditChoiceModal.jsx';
 import EditAllValueModal from './components/EditAllValueModal.jsx';
 
-const logoBlue = '/LogoSFblue.png';
+// Novos componentes Premium
+import InsightsSection from './components/InsightsSection.jsx';
+import EnvelopesSection from './components/EnvelopesSection.jsx';
+import UpcomingBillsSection from './components/UpcomingBillsSection.jsx';
+import CreditCardsSection from './components/CreditCardsSection.jsx';
+import AdvancedAnalytics from './components/AdvancedAnalytics.jsx';
+import ExportSection from './components/ExportSection.jsx';
 
-const STORAGE_KEY = 'smartfinance_transactions';
-const GOALS_KEY = 'smartfinance_goals';
+// Services
+import {
+  loadTransactions,
+  saveTransactions,
+  loadGoals,
+  saveGoals,
+  loadEnvelopes,
+  saveEnvelopes,
+  loadCards,
+  saveCards,
+  loadTheme,
+  saveTheme,
+} from './services/storageService.js';
+
+const logoBlue = '/LogoSFblue.png';
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number.isFinite(value) ? value : 0);
@@ -70,8 +108,14 @@ const getInitialTransactions = () => {
   if (typeof window === 'undefined') {
     return [];
   }
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : [];
+  // Migração: tentar usar novo serviço, fallback para localStorage antigo
+  try {
+    const stored = localStorage.getItem('smartfinance_transactions');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading transactions:', error);
+    return [];
+  }
 };
 
 const getInitialGoals = () => {
@@ -79,7 +123,7 @@ const getInitialGoals = () => {
     return { incomeGoal: '', expenseGoal: '' };
   }
   try {
-    const stored = localStorage.getItem(GOALS_KEY);
+    const stored = localStorage.getItem('smartfinance_goals');
     if (!stored) {
       return { incomeGoal: '', expenseGoal: '' };
     }
@@ -107,6 +151,28 @@ const getInitialTheme = () => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
+const getInitialEnvelopes = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem('smartfinance_envelopes');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading envelopes:', error);
+    return [];
+  }
+};
+
+const getInitialCards = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem('smartfinance_cards');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading cards:', error);
+    return [];
+  }
+};
+
 function App() {
   const [transactions, setTransactions] = useState(getInitialTransactions);
   const [goals, setGoals] = useState(getInitialGoals);
@@ -114,6 +180,10 @@ function App() {
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
   const [summaryOrder, setSummaryOrder] = useState(['income', 'expense', 'paid', 'balance']);
+
+  // Estados premium
+  const [envelopes, setEnvelopes] = useState(getInitialEnvelopes);
+  const [cards, setCards] = useState(getInitialCards);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
   const [paymentModalState, setPaymentModalState] = useState({ open: false, transaction: null, projection: null });
@@ -144,7 +214,7 @@ function App() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+      localStorage.setItem('smartfinance_transactions', JSON.stringify(transactions));
     }
   }, [transactions]);
 
@@ -156,8 +226,21 @@ function App() {
       incomeGoal: goals.incomeGoal === '' ? '' : Number(goals.incomeGoal),
       expenseGoal: goals.expenseGoal === '' ? '' : Number(goals.expenseGoal),
     };
-    localStorage.setItem(GOALS_KEY, JSON.stringify(payload));
+    localStorage.setItem('smartfinance_goals', JSON.stringify(payload));
   }, [goals]);
+
+  // Salvar envelopes e cards
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('smartfinance_envelopes', JSON.stringify(envelopes));
+    }
+  }, [envelopes]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('smartfinance_cards', JSON.stringify(cards));
+    }
+  }, [cards]);
 
   const processedTransactions = useMemo(
     () => generateProcessedTransactions(transactions),
@@ -436,6 +519,7 @@ function App() {
   return (
     <>
       <main className="w-full max-w-md mx-auto px-3 sm:px-0 space-y-5 sm:space-y-6 md:space-y-8 pb-24">
+        {/* PÁGINA: VISÃO GERAL */}
         <section
           id="page-overview"
           data-page="overview"
@@ -462,8 +546,15 @@ function App() {
               onReorder={setSummaryOrder}
             />
           </div>
+
+          {/* Insights Automáticos */}
+          <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
+
+          {/* Próximos Lançamentos */}
+          <UpcomingBillsSection transactions={processedTransactions} />
         </section>
 
+        {/* PÁGINA: GRÁFICOS E METAS */}
         <section
           id="page-graphs-goals"
           data-page="graphs-goals"
@@ -472,6 +563,7 @@ function App() {
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <ChartSection transactions={summaryTransactions} isDarkMode={isDarkMode} />
           </div>
+
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <GoalsSection
               goals={goals}
@@ -480,8 +572,19 @@ function App() {
               formatCurrency={formatCurrency}
             />
           </div>
+
+          {/* Envelopes de Gastos */}
+          <EnvelopesSection
+            transactions={summaryTransactions}
+            envelopes={envelopes}
+            onSaveEnvelopes={setEnvelopes}
+          />
+
+          {/* Análises Avançadas */}
+          <AdvancedAnalytics transactions={summaryTransactions} />
         </section>
 
+        {/* PÁGINA: HISTÓRICO */}
         <section
           id="page-history"
           data-page="history"
@@ -508,8 +611,19 @@ function App() {
               formatCurrency={(value) => formatCurrency(value)}
             />
           </div>
+
+          {/* Cartões de Crédito */}
+          <CreditCardsSection
+            transactions={transactions}
+            cards={cards}
+            onSaveCards={setCards}
+          />
+
+          {/* Export e Backup */}
+          <ExportSection />
         </section>
 
+        {/* PÁGINA: NOVA TRANSAÇÃO */}
         <section
           id="page-new-transaction"
           data-page="new-transaction"
@@ -522,6 +636,7 @@ function App() {
         </section>
       </main>
 
+      {/* NAVEGAÇÃO INFERIOR */}
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30">
         <div className="mx-auto max-w-md bg-slate-900/90 dark:bg-slate-900/90 border-t border-white/10 backdrop-blur px-2 py-1 flex justify-between gap-1">
           {[
@@ -565,6 +680,7 @@ function App() {
         </div>
       </nav>
 
+      {/* MODAIS */}
       <EditTransactionModal
         isOpen={editModalState.open}
         transaction={editModalState.transaction}
