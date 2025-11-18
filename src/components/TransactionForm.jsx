@@ -2,6 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 const formatDate = (date) => date.toISOString().split('T')[0];
 
+const inputBase =
+  'w-full block text-sm px-3 py-3 rounded-xl border border-slate-300/80 dark:border-slate-700 ' +
+  'bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-slate-100 ' +
+  'placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 ' +
+  'focus:ring-sky-500 focus:border-sky-500 transition leading-tight';
+
 function TransactionForm({ onAddTransactions, onClearAll }) {
   const today = useMemo(() => formatDate(new Date()), []);
   const [description, setDescription] = useState('');
@@ -124,7 +130,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           Registre aqui suas movimentações financeiras, sejam elas entradas ou despesas.
         </p>
       </div>
-      <form id="transaction-form" className="mt-4 space-y-5" onSubmit={handleSubmit}>
+      <form id="transaction-form" className="mt-4 space-y-3" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="description" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
             Descrição
@@ -135,7 +141,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Ex.: Salário, aluguel, supermercado"
-            className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            className={inputBase}
             required
             aria-describedby="description-helper"
           />
@@ -155,7 +161,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               placeholder="250,50"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className={inputBase}
               required
               aria-describedby="amount-helper"
             />
@@ -172,7 +178,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               type="date"
               value={transactionDate}
               onChange={(event) => setTransactionDate(event.target.value)}
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className={`${inputBase} appearance-none`}
               required
               aria-describedby="date-helper"
             />
@@ -189,7 +195,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
             id="recurrence"
             value={recurrence}
             onChange={(event) => setRecurrence(event.target.value)}
-            className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            className={inputBase}
             aria-describedby="recurrence-helper"
           >
             <option value="single">Única</option>
@@ -213,7 +219,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
                 value={installments}
                 onChange={(event) => setInstallments(event.target.value)}
                 placeholder="Ex.: 6"
-                className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className={inputBase}
                 required
               />
             </div>
@@ -226,7 +232,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
                 type="date"
                 value={installmentStartDate}
                 onChange={(event) => setInstallmentStartDate(event.target.value)}
-                className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className={`${inputBase} appearance-none`}
                 required
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -247,7 +253,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               value={paidInstallments}
               onChange={(event) => setPaidInstallments(event.target.value)}
               placeholder="Ex.: 2"
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className={inputBase}
             />
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Informe quantas parcelas dessa compra já foram quitadas para manter o histórico coerente.
