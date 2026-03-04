@@ -1,12 +1,14 @@
 {
   "name": "smartfinance-react",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/pluggy-proxy.js",
+    "dev:full": "node server/pluggy-proxy.js & vite"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -14,8 +16,9 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "vite": "^7.1.7"
   }
 }
-
-

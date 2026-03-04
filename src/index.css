@@ -2,37 +2,50 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+  background: #94a3b880;
   border-radius: 10px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #47556980;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+/* ── Page transitions ──────────────────────────────────────────────────── */
+
+.page-section {
+  animation: pageFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Card entrance animations ──────────────────────────────────────────── */
+
 .list-item-enter {
-  animation: slideIn 0.3s ease-out forwards;
+  animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes slideIn {
@@ -40,12 +53,343 @@ body {
     opacity: 0;
     transform: translateX(-20px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
   }
 }
+
+/* Staggered card entrance */
+.card-animate {
+  animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.card-animate:nth-child(1) { animation-delay: 0ms; }
+.card-animate:nth-child(2) { animation-delay: 60ms; }
+.card-animate:nth-child(3) { animation-delay: 120ms; }
+.card-animate:nth-child(4) { animation-delay: 180ms; }
+.card-animate:nth-child(5) { animation-delay: 240ms; }
+
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Glassmorphism enhanced panels ─────────────────────────────────────── */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-panel {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Animated gradient border ──────────────────────────────────────────── */
+
+.gradient-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #38bdf8, #818cf8, #e879f9, #38bdf8);
+  background-size: 300% 300%;
+  animation: gradientShift 6s ease infinite;
+  z-index: -1;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 0.8;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── Shimmer loading effect ────────────────────────────────────────────── */
+
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 33%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 67%
+  );
+  background-size: 300% 100%;
+  animation: shimmerSlide 2s ease-in-out infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 33%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 67%
+  );
+  background-size: 300% 100%;
+  animation: shimmerSlide 2s ease-in-out infinite;
+}
+
+@keyframes shimmerSlide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Glow effects ──────────────────────────────────────────────────────── */
+
+.glow-sky {
+  box-shadow:
+    0 0 15px rgba(56, 189, 248, 0.15),
+    0 0 45px rgba(56, 189, 248, 0.05);
+}
+
+.dark .glow-sky {
+  box-shadow:
+    0 0 20px rgba(56, 189, 248, 0.2),
+    0 0 60px rgba(56, 189, 248, 0.08);
+}
+
+.glow-emerald {
+  box-shadow:
+    0 0 15px rgba(52, 211, 153, 0.15),
+    0 0 45px rgba(52, 211, 153, 0.05);
+}
+
+.glow-purple {
+  box-shadow:
+    0 0 15px rgba(168, 85, 247, 0.15),
+    0 0 45px rgba(168, 85, 247, 0.05);
+}
+
+/* ── FAB button enhanced ───────────────────────────────────────────────── */
+
+.fab-button {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  box-shadow:
+    0 4px 15px rgba(14, 165, 233, 0.4),
+    0 0 30px rgba(14, 165, 233, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fab-button:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 6px 25px rgba(14, 165, 233, 0.5),
+    0 0 50px rgba(14, 165, 233, 0.2);
+}
+
+.fab-button:active {
+  transform: scale(0.92);
+}
+
+.fab-active {
+  background: linear-gradient(135deg, #0284c7, #38bdf8, #7dd3fc);
+  background-size: 200% 200%;
+  animation: fabActiveGlow 2s ease infinite;
+  box-shadow:
+    0 0 20px rgba(14, 165, 233, 0.5),
+    0 0 40px rgba(56, 189, 248, 0.25),
+    inset 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+@keyframes fabActiveGlow {
+  0%, 100% {
+    background-position: 0% 50%;
+    box-shadow:
+      0 0 20px rgba(14, 165, 233, 0.5),
+      0 0 40px rgba(56, 189, 248, 0.25),
+      inset 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow:
+      0 0 25px rgba(14, 165, 233, 0.6),
+      0 0 50px rgba(56, 189, 248, 0.3),
+      inset 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.fab-pulse {
+  animation: fabPulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fabPulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 15px rgba(14, 165, 233, 0.4),
+      0 0 0 0 rgba(14, 165, 233, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 15px rgba(14, 165, 233, 0.4),
+      0 0 0 12px rgba(14, 165, 233, 0);
+  }
+}
+
+/* ── Nav bar glass ─────────────────────────────────────────────────────── */
+
+.nav-glass {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark .nav-glass {
+  background: rgba(2, 6, 23, 0.92);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-tab-active {
+  color: #38bdf8;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.4));
+}
+
+/* ── Header gradient text ──────────────────────────────────────────────── */
+
+.text-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Summary card enhancements ─────────────────────────────────────────── */
+
+.summary-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.summary-card:active {
+  transform: scale(0.97);
+}
+
+/* Amount value animation */
+.amount-value {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+/* ── Settings row tap effect ───────────────────────────────────────────── */
+
+.settings-row-tap {
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-row-tap:active {
+  transform: scale(0.985);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.dark .settings-row-tap:active {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── Animated toggle switch ────────────────────────────────────────────── */
+
+.toggle-switch {
+  transition: background-color 0.25s ease;
+}
+
+.toggle-switch .toggle-knob {
+  transition: transform 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ── Modal backdrop blur ───────────────────────────────────────────────── */
+
+.modal-overlay {
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-container {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* ── Subtle floating animation for hero elements ───────────────────────── */
+
+.float-subtle {
+  animation: floatSubtle 6s ease-in-out infinite;
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ── Gradient mesh background for panels ───────────────────────────────── */
+
+.mesh-gradient {
+  background:
+    radial-gradient(at 20% 20%, rgba(56, 189, 248, 0.06) 0, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(168, 85, 247, 0.04) 0, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(52, 211, 153, 0.03) 0, transparent 50%);
+}
+
+.dark .mesh-gradient {
+  background:
+    radial-gradient(at 20% 20%, rgba(56, 189, 248, 0.08) 0, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(168, 85, 247, 0.06) 0, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(52, 211, 153, 0.04) 0, transparent 50%);
+}
+
+/* ── Notification bell shake ───────────────────────────────────────────── */
+
+.bell-shake:hover {
+  animation: bellShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes bellShake {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(8deg); }
+  30% { transform: rotate(-8deg); }
+  45% { transform: rotate(5deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+
+/* ── Existing styles ───────────────────────────────────────────────────── */
 
 .custom-radio input:checked + label {
   border-color: #2563eb;
@@ -55,14 +399,6 @@ body {
 .custom-radio-expense input:checked + label {
   border-color: #dc2626;
   box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.4);
-}
-
-.modal-overlay {
-  transition: opacity 0.3s ease;
-}
-
-.modal-container {
-  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .transaction-paid {
@@ -99,3 +435,28 @@ body {
   background-color: #2563eb20;
 }
 
+/* Safe area for iPhone home indicator */
+#bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Smooth scroll behavior ────────────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Selection color ───────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(56, 189, 248, 0.25);
+  color: inherit;
+}
+
+/* ── Focus ring ────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
