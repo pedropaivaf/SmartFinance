@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from '../i18n/index.jsx';
 
 const formatDate = (date) => date.toISOString().split('T')[0];
 
@@ -9,6 +10,7 @@ const inputBase =
   'focus:ring-sky-500 focus:border-sky-500 transition leading-tight';
 
 function TransactionForm({ onAddTransactions, onClearAll }) {
+  const { t } = useTranslation();
   const today = useMemo(() => formatDate(new Date()), []);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -42,19 +44,17 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const trimmedDescription = description.trim();
-    if (!trimmedDescription) {
-      return;
-    }
+    if (!trimmedDescription) return;
 
     const numericAmount = parseFloat(amount);
     if (Number.isNaN(numericAmount) || numericAmount <= 0) {
-      alert('Por favor, informe um valor válido.');
+      alert(t('form.alert.invalidAmount'));
       return;
     }
 
     const selectedDate = new Date(`${transactionDate}T12:00:00`);
     if (Number.isNaN(selectedDate.getTime())) {
-      alert('Por favor, informe uma data válida.');
+      alert(t('form.alert.invalidDate'));
       return;
     }
 
@@ -66,17 +66,15 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
       const startDate = new Date(`${installmentStartDate}T12:00:00`);
 
       if (Number.isNaN(startDate.getTime())) {
-        alert('Informe uma data válida para o início das parcelas.');
+        alert(t('form.alert.invalidInstallmentDate'));
         return;
       }
-
       if (!Number.isInteger(totalInstallments) || totalInstallments < 2) {
-        alert('O número de parcelas deve ser maior ou igual a 2.');
+        alert(t('form.alert.minInstallments'));
         return;
       }
-
       if (paidInstallmentsCount > totalInstallments) {
-        alert('Parcelas pagas não podem ser maiores que o total de parcelas.');
+        alert(t('form.alert.paidExceedsTotal'));
         return;
       }
 
@@ -125,40 +123,38 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
   return (
     <>
       <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Nova Transação</h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Registre aqui suas movimentações financeiras, sejam elas entradas ou despesas.
-        </p>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t('form.title')}</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('form.subtitle')}</p>
       </div>
       <form id="transaction-form" className="mt-4 space-y-3" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="description" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-            Descrição
+            {t('form.description.label')}
           </label>
           <input
             id="description"
             type="text"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Ex.: Salário, aluguel, supermercado"
+            placeholder={t('form.description.placeholder')}
             className={inputBase}
             required
             aria-describedby="description-helper"
           />
           <p id="description-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Nome para identificar a transação
+            {t('form.description.helper')}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="amount" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-              Valor (R$)
+              {t('form.amount.label')}
             </label>
             <input
               id="amount"
               type="number"
               step="0.01"
-              placeholder="250,50"
+              placeholder={t('form.amount.placeholder')}
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
               className={inputBase}
@@ -166,12 +162,12 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               aria-describedby="amount-helper"
             />
             <p id="amount-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Informe o Valor da transação
+              {t('form.amount.helper')}
             </p>
           </div>
           <div>
             <label htmlFor="transaction-date" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-              Data
+              {t('form.date.label')}
             </label>
             <input
               id="transaction-date"
@@ -184,13 +180,13 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               aria-describedby="date-helper"
             />
             <p id="date-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Use a data de ocorrência da transação. Ela define em qual mês o lançamento aparecerá.
+              {t('form.date.helper')}
             </p>
           </div>
         </div>
         <div>
           <label htmlFor="recurrence" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-            Tipo de Recorrência
+            {t('form.recurrence.label')}
           </label>
           <select
             id="recurrence"
@@ -199,19 +195,19 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
             className={inputBase}
             aria-describedby="recurrence-helper"
           >
-            <option value="single">Única</option>
-            <option value="monthly">Mensal (recorrente)</option>
-            <option value="installment">Parcelada</option>
+            <option value="single">{t('form.recurrence.single')}</option>
+            <option value="monthly">{t('form.recurrence.monthly')}</option>
+            <option value="installment">{t('form.recurrence.installment')}</option>
           </select>
           <p id="recurrence-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Escolha "Mensal" para lançamentos recorrentes (ex.: salário) ou "Parcelada" para dividir uma despesa em parcelas.
+            {t('form.recurrence.helper')}
           </p>
         </div>
         {isInstallment && (
           <div className="space-y-4">
             <div>
               <label htmlFor="installments" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-                Número de Parcelas
+                {t('form.installments.label')}
               </label>
               <input
                 id="installments"
@@ -226,7 +222,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
             </div>
             <div>
               <label htmlFor="installment-start-date" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-                Início da Contagem das Parcelas
+                {t('form.installments.start')}
               </label>
               <input
                 id="installment-start-date"
@@ -238,7 +234,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
                 required
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Defina quando a primeira parcela vence. As próximas serão geradas automaticamente mês a mês.
+                {t('form.installments.startHelper')}
               </p>
             </div>
           </div>
@@ -246,7 +242,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
         {showPaidInstallments && (
           <div>
             <label htmlFor="paid-installments" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
-              Parcelas já pagas (opcional)
+              {t('form.installments.paid')}
             </label>
             <input
               id="paid-installments"
@@ -258,13 +254,13 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               className={inputBase}
             />
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Informe quantas parcelas dessa compra já foram quitadas para manter o histórico coerente.
+              {t('form.installments.paidHelper')}
             </p>
           </div>
         )}
-        <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4" aria-label="Tipo de lançamento">
+        <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4" aria-label={t('form.type.legend')}>
           <legend className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
-            Este lançamento é:
+            {t('form.type.legend')}
           </legend>
           <div className="custom-radio">
             <input
@@ -283,7 +279,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Renda
+              {t('form.type.income')}
             </label>
           </div>
           <div className="custom-radio custom-radio-expense">
@@ -303,18 +299,18 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
               </svg>
-              Despesa
+              {t('form.type.expense')}
             </label>
           </div>
           <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">
-            Rendas aumentam o saldo; despesas reduzem. Você pode alterar o tipo a qualquer momento na lista de lançamentos.
+            {t('form.type.helper')}
           </p>
         </fieldset>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300"
         >
-          Adicionar transação
+          {t('form.submit')}
         </button>
       </form>
       <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -324,10 +320,10 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           onClick={onClearAll}
           className="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300"
         >
-          Limpar todos os lançamentos
+          {t('form.clearAll')}
         </button>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 text-center">
-          remove todas as transações salvas
+          {t('form.clearAll.helper')}
         </p>
       </div>
     </>

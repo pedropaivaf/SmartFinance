@@ -40,6 +40,10 @@ import UpcomingBillsSection from './components/UpcomingBillsSection.jsx';
 import CreditCardsSection from './components/CreditCardsSection.jsx';
 import AdvancedAnalytics from './components/AdvancedAnalytics.jsx';
 import ExportSection from './components/ExportSection.jsx';
+import SettingsSection from './components/SettingsSection.jsx';
+
+// i18n
+import { LanguageProvider, useTranslation } from './i18n/index.jsx';
 
 // Services
 import {
@@ -54,8 +58,38 @@ import {
   loadTheme,
   saveTheme,
 } from './services/storageService.js';
+import {
+  loadNotificationPrefs,
+  runNotificationChecks,
+} from './services/notificationService.js';
 
 const logoBlue = '/LogoSFblue.png';
+
+function NavTab({ target, label, activePage, onNavigate, children }) {
+  const isActive = activePage === target;
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={() => onNavigate(target)}
+      className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 min-w-[44px] min-h-[44px] text-xs transition-all duration-200 focus:outline-none ${
+        isActive ? 'nav-tab-active' : 'text-slate-500 hover:text-slate-300'
+      }`}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={isActive ? 2.5 : 1.8}
+      >
+        {children}
+      </svg>
+      <span className={`transition-all duration-200 ${isActive ? 'font-semibold' : 'font-normal'}`}>{label}</span>
+    </button>
+  );
+}
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number.isFinite(value) ? value : 0);
@@ -173,7 +207,8 @@ const getInitialCards = () => {
   }
 };
 
-function App() {
+function AppContent() {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState(getInitialTransactions);
   const [goals, setGoals] = useState(getInitialGoals);
   const [currentFilter, setCurrentFilter] = useState('total');
@@ -241,6 +276,19 @@ function App() {
       localStorage.setItem('smartfinance_cards', JSON.stringify(cards));
     }
   }, [cards]);
+
+  // Run notification checks on app load
+  useEffect(() => {
+    const prefs = loadNotificationPrefs();
+    if (prefs.enabled) {
+      runNotificationChecks({ prefs, transactions, envelopes, onUpdatePrefs: () => {}, t });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Import transactions from Open Finance
+  const handleImportTransactions = (newTxs) => {
+    setTransactions((prev) => [...prev, ...newTxs]);
+  };
 
   const processedTransactions = useMemo(
     () => generateProcessedTransactions(transactions),
@@ -514,28 +562,24 @@ function App() {
   };
 
   const panelClasses =
-    'bg-white/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/30 backdrop-blur-sm';
+    'glass-panel mesh-gradient rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/30';
 
   return (
     <>
-      <main className="w-full max-w-md mx-auto px-3 sm:px-0 space-y-5 sm:space-y-6 md:space-y-8 pb-24">
+      <main className="w-full max-w-md mx-auto px-3 sm:px-0 space-y-5 sm:space-y-6 md:space-y-8 pb-28">
         {/* PÁGINA: VISÃO GERAL */}
         <section
           id="page-overview"
           data-page="overview"
           className={`page-section space-y-5 ${activePage === 'overview' ? '' : 'hidden'}`}
         >
-          <Header
-            isDarkMode={isDarkMode}
-            onToggleTheme={handleToggleTheme}
-            logoSrc={logoBlue}
-          />
+          <Header logoSrc={logoBlue} />
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Visão geral</p>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Suas métricas organizadas para facil visualização.</h2>
+              <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.overview.overline')}</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.overview.title')}</h2>
             </div>
-            <p className="text-xs text-slate-400 dark:text-slate-500">Segure e arraste os cards para alterar a ordem.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{t('page.overview.drag')}</p>
             <SummaryCards
               totalIncome={summaryValues.income}
               totalExpense={summaryValues.totalExpense}
@@ -593,16 +637,13 @@ function App() {
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Histórico</p>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Transações por período</h3>
+                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.history.overline')}</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.history.title')}</h3>
               </div>
             </div>
-            <div className="rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4">
-              <FilterBar currentFilter={currentFilter} onChange={setCurrentFilter} />
-            </div>
-            <div className="rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4">
-              <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
-            </div>
+            <FilterBar currentFilter={currentFilter} onChange={setCurrentFilter} />
+            <div className="border-b border-slate-100 dark:border-slate-700/50" />
+            <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
             <TransactionList
               transactions={listTransactions}
               onTogglePaid={handleTogglePaid}
@@ -630,53 +671,63 @@ function App() {
           className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
-            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Ação principal</p>
+            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.new.overline')}</p>
             <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
           </div>
+        </section>
+
+        {/* PÁGINA: CONFIGURAÇÕES */}
+        <section
+          id="page-settings"
+          data-page="settings"
+          className={`page-section space-y-5 ${activePage === 'settings' ? '' : 'hidden'}`}
+        >
+          <SettingsSection
+            isDarkMode={isDarkMode}
+            onToggleTheme={handleToggleTheme}
+            transactions={transactions}
+            onClearAll={handleClearAllRequest}
+            onImportTransactions={handleImportTransactions}
+          />
         </section>
       </main>
 
       {/* NAVEGAÇÃO INFERIOR */}
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30">
-        <div className="mx-auto max-w-md bg-slate-900/90 dark:bg-slate-900/90 border-t border-white/10 backdrop-blur px-2 py-1 flex justify-between gap-1">
-          {[
-            { target: 'overview', label: 'Inicio', icon: (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 12l8-8 8 8v6a2 2 0 01-2 2H6a2 2 0 01-2-2z" />
-            ) },
-            { target: 'graphs-goals', label: 'Gráfico/Metas', icon: (
+        <div className="mx-auto max-w-md relative">
+          {/* FAB — botão Nova flutuante */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
+            <button
+              type="button"
+              aria-label="Nova transação"
+              onClick={() => setActivePage('new-transaction')}
+              className={`fab-button flex items-center justify-center w-14 h-14 rounded-full focus:outline-none ${
+                activePage === 'new-transaction' ? 'fab-active ring-4 ring-sky-400/20' : 'fab-pulse'
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Tab bar */}
+          <div className="nav-glass flex items-center justify-around px-1 pt-1 pb-2">
+            <NavTab target="overview" label={t('nav.home')} activePage={activePage} onNavigate={setActivePage}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </NavTab>
+            <NavTab target="graphs-goals" label={t('nav.chart')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
-            ) },
-            { target: 'history', label: 'Histórico', icon: (
+            </NavTab>
+            {/* Espaço central para o FAB */}
+            <div className="w-14 flex-shrink-0" aria-hidden="true" />
+            <NavTab target="history" label={t('nav.history')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            ) },
-            { target: 'new-transaction', label: 'Nova', icon: (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
-            ) },
-          ].map(({ target, label, icon }) => {
-            const isActive = activePage === target;
-            return (
-              <button
-                key={target}
-                type="button"
-                className={`nav-tab flex-1 flex flex-col items-center justify-center gap-0.5 py-1 text-xs transition ${
-                  isActive ? 'text-sky-400' : 'text-slate-400'
-                }`}
-                data-target={target}
-                onClick={() => setActivePage(target)}
-              >
-                <span
-                  className={`h-8 w-8 rounded-full border flex items-center justify-center ${
-                    isActive ? 'border-sky-500/60 bg-sky-500/20' : 'border-slate-600 bg-slate-800/60'
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    {icon}
-                  </svg>
-                </span>
-                <span className={isActive ? 'font-semibold' : ''}>{label}</span>
-              </button>
-            );
-          })}
+            </NavTab>
+            <NavTab target="settings" label={t('nav.config')} activePage={activePage} onNavigate={setActivePage}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </NavTab>
+          </div>
         </div>
       </nav>
 
@@ -720,6 +771,14 @@ function App() {
         onSubmit={handleEditAllSubmit}
       />
     </>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 
