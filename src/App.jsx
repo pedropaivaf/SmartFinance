@@ -56,7 +56,7 @@ import {
 } from './services/supabaseService.js';
 
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
-import { setCurrentPlan } from './config.js';
+import { setCurrentPlan, getCurrentPlan } from './config.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 
 const logoBlue = '/LogoSFblue.png';
@@ -226,7 +226,7 @@ function AppContent() {
     dbSaveUserPreferences({
       theme: isDarkMode ? 'dark' : 'light',
       language: localStorage.getItem('smartfinance_language') || 'pt-BR',
-      plan: 'free',
+      plan: getCurrentPlan(),
       summaryOrder,
       notificationPrefs: { enabled: false },
       ...updates,
