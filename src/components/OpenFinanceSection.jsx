@@ -1,15 +1,16 @@
 /**
  * OpenFinanceSection — Full UI flow for Pluggy Open Finance integration
  *
- * States: idle → loading → widget → connected → importing → done
+ * States: idle → loading → widget → importing → done
  *
- * SECURITY NOTE:
- *   - connectToken is kept only in component state (memory), never persisted
- *   - All API calls go through /api/pluggy proxy (server-side auth)
- *   - Bank credentials never touch this app — they go directly to each bank via Pluggy
+ * Features:
+ *   - Auto-categorization of transactions
+ *   - Credit card transactions separated (unpaid, with card name)
+ *   - Checking account transactions (already paid)
+ *   - Grouped preview by type before importing
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
 import {
   getConnectToken,
@@ -25,27 +26,44 @@ import {
 const PLUGGY_WIDGET_URL = 'https://cdn.pluggy.ai/pluggy-connect/v2/pluggy-connect.js';
 
 export default function OpenFinanceSection({ existingTransactions = [], onImport }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
-  const [phase, setPhase] = useState('idle'); // idle | loading | widget | importing | done
+  const [phase, setPhase] = useState('idle');
   const [connectedBanks, setConnectedBanks] = useState(() => loadConnectedBanks());
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [error, setError] = useState('');
   const [importedCount, setImportedCount] = useState(0);
-  const widgetRef = useRef(null);
+  const [importStats, setImportStats] = useState(null);
   const pluggyConnectRef = useRef(null);
 
   // Load Pluggy Connect script once
   useEffect(() => {
-    const existing = document.getElementById('pluggy-connect-script');
-    if (existing) return;
+    if (document.getElementById('pluggy-connect-script')) return;
     const script = document.createElement('script');
     script.id = 'pluggy-connect-script';
     script.src = PLUGGY_WIDGET_URL;
     script.async = true;
     document.body.appendChild(script);
-    return () => { /* keep script in DOM */ };
   }, []);
+
+  // Group pending transactions for preview
+  const grouped = useMemo(() => {
+    if (!pendingTransactions.length) return null;
+    const creditCard = pendingTransactions.filter((tx) => tx.accountType === 'credit');
+    const checking = pendingTransactions.filter((tx) => tx.accountType !== 'credit');
+    const income = checking.filter((tx) => tx.type === 'income');
+    const expenses = checking.filter((tx) => tx.type === 'expense');
+
+    // Group credit card by card name
+    const cardGroups = {};
+    creditCard.forEach((tx) => {
+      const key = tx.creditCardName || 'Cartão';
+      if (!cardGroups[key]) cardGroups[key] = [];
+      cardGroups[key].push(tx);
+    });
+
+    return { income, expenses, cardGroups, creditCard, total: pendingTransactions.length };
+  }, [pendingTransactions]);
 
   const handleConnect = async () => {
     setError('');
@@ -54,7 +72,6 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
       const { connectToken } = await getConnectToken();
       setPhase('widget');
 
-      // Wait for PluggyConnect global to be available
       let attempts = 0;
       while (!window.PluggyConnect && attempts < 30) {
         await new Promise((r) => setTimeout(r, 200));
@@ -74,14 +91,16 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
           setPhase('idle');
         },
         onClose: () => {
-          if (phase !== 'done') setPhase('idle');
+          setPhase((prev) => prev === 'done' || prev === 'importing' ? prev : 'idle');
         },
       });
       pluggyConnectRef.current.init();
     } catch (err) {
-      const msg = err.message?.includes('Proxy error 503') || err.message?.includes('Failed to fetch')
+      const msg = err.message?.includes('503') || err.message?.includes('Failed to fetch')
         ? t('settings.openfinance.configMissing')
-        : t('settings.openfinance.error');
+        : err.message?.includes('credentials')
+          ? t('settings.openfinance.configMissing')
+          : t('settings.openfinance.error');
       setError(msg);
       setPhase('idle');
     }
@@ -94,13 +113,14 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
 
       for (const account of accounts) {
         const txs = await fetchTransactions(account.id);
-        txs.forEach((tx) => allTransactions.push(mapPluggyTransaction(tx, item.connector?.name ?? '')));
+        txs.forEach((tx) =>
+          allTransactions.push(mapPluggyTransaction(tx, item.connector?.name ?? '', account))
+        );
       }
 
       const newTxs = deduplicateTransactions(allTransactions, existingTransactions);
       setPendingTransactions(newTxs);
 
-      // Save connected bank info (no tokens — just display metadata)
       const bankInfo = {
         itemId: item.id,
         name: item.connector?.name ?? 'Banco',
@@ -113,6 +133,7 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
 
       setPhase('done');
     } catch (err) {
+      console.error('Open Finance import error:', err);
       setError(t('settings.openfinance.error'));
       setPhase('idle');
     }
@@ -120,8 +141,13 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
 
   const handleImport = () => {
     if (!pendingTransactions.length) return;
+    const creditCount = pendingTransactions.filter((tx) => tx.accountType === 'credit').length;
+    const incomeCount = pendingTransactions.filter((tx) => tx.type === 'income').length;
+    const expenseCount = pendingTransactions.filter((tx) => tx.type === 'expense' && tx.accountType !== 'credit').length;
+
     onImport(pendingTransactions);
     setImportedCount(pendingTransactions.length);
+    setImportStats({ creditCount, incomeCount, expenseCount });
     setPendingTransactions([]);
   };
 
@@ -134,6 +160,12 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
       setPhase('idle');
     }
   };
+
+  const formatCurrency = (val) =>
+    new Intl.NumberFormat(lang, { style: 'currency', currency: 'BRL' }).format(Math.abs(val));
+
+  const formatDate = (iso) =>
+    new Date(iso).toLocaleDateString(lang, { day: '2-digit', month: 'short' });
 
   return (
     <div className="space-y-4">
@@ -156,7 +188,7 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
       {connectedBanks.length > 0 && (
         <div className="space-y-2">
           {connectedBanks.map((bank) => (
-            <div key={bank.itemId} className="flex items-center justify-between px-4 py-3 bg-white/90 dark:bg-slate-800/80 rounded-2xl shadow-sm">
+            <div key={bank.itemId} className="flex items-center justify-between px-4 py-3 glass-panel rounded-2xl">
               <div className="flex items-center gap-3">
                 {bank.logo
                   ? <img src={bank.logo} alt={bank.name} className="w-8 h-8 rounded-full object-contain" />
@@ -167,11 +199,8 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
                   <p className="text-xs text-emerald-600 dark:text-emerald-400">{t('settings.openfinance.connected')}</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => handleDisconnect(bank.itemId)}
-                className="text-xs text-red-500 dark:text-red-400 hover:underline"
-              >
+              <button type="button" onClick={() => handleDisconnect(bank.itemId)}
+                className="text-xs text-red-500 dark:text-red-400 hover:underline">
                 {t('settings.openfinance.disconnect')}
               </button>
             </div>
@@ -179,41 +208,107 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
         </div>
       )}
 
-      {/* Import result */}
-      {phase === 'done' && importedCount > 0 && (
-        <div className="px-3 py-2.5 bg-sky-50 dark:bg-sky-950/30 rounded-xl">
-          <p className="text-xs text-sky-700 dark:text-sky-300">{t('settings.openfinance.success', { count: importedCount })}</p>
+      {/* Import success stats */}
+      {phase === 'done' && importedCount > 0 && importStats && (
+        <div className="px-4 py-3 bg-sky-50 dark:bg-sky-950/30 rounded-xl space-y-1.5">
+          <p className="text-sm font-semibold text-sky-700 dark:text-sky-300">
+            {t('settings.openfinance.success', { count: importedCount })}
+          </p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {importStats.incomeCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                {importStats.incomeCount} entradas
+              </span>
+            )}
+            {importStats.expenseCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">
+                {importStats.expenseCount} despesas
+              </span>
+            )}
+            {importStats.creditCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
+                {importStats.creditCount} fatura cartão
+              </span>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Pending transactions to import */}
-      {phase === 'done' && pendingTransactions.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('settings.openfinance.review')}</p>
-          <div className="max-h-48 overflow-y-auto space-y-1 rounded-xl bg-white/90 dark:bg-slate-800/80 shadow-sm divide-y divide-slate-100 dark:divide-slate-700/50">
-            {pendingTransactions.slice(0, 20).map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between px-3 py-2.5">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{tx.description}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
-                </div>
-                <p className={`text-sm font-semibold flex-shrink-0 ml-2 ${tx.type === 'income' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {tx.type === 'income' ? '+' : '-'} R$ {Math.abs(tx.amount).toFixed(2)}
-                </p>
-              </div>
-            ))}
-            {pendingTransactions.length > 20 && (
-              <p className="px-3 py-2 text-xs text-slate-400 dark:text-slate-500">
-                + {pendingTransactions.length - 20} mais transações
+      {/* Importing spinner */}
+      {phase === 'importing' && (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <svg className="animate-spin h-8 w-8 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Importando transações...</p>
+        </div>
+      )}
+
+      {/* Pending transactions — grouped preview */}
+      {phase === 'done' && grouped && grouped.total > 0 && (
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {t('settings.openfinance.review')} ({grouped.total})
+          </p>
+
+          {/* Income */}
+          {grouped.income.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-blue-600 dark:text-blue-400 px-1 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                </svg>
+                Entradas ({grouped.income.length})
               </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={handleImport}
-            className="w-full py-3 rounded-2xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-colors"
-          >
-            {t('settings.openfinance.confirmImport', { count: pendingTransactions.length })}
+              <div className="rounded-xl glass-panel divide-y divide-slate-100/80 dark:divide-slate-700/40 max-h-32 overflow-y-auto">
+                {grouped.income.map((tx) => (
+                  <TxRow key={tx.id} tx={tx} formatCurrency={formatCurrency} formatDate={formatDate} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Expenses (checking) */}
+          {grouped.expenses.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-red-600 dark:text-red-400 px-1 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                </svg>
+                Despesas ({grouped.expenses.length})
+              </p>
+              <div className="rounded-xl glass-panel divide-y divide-slate-100/80 dark:divide-slate-700/40 max-h-40 overflow-y-auto">
+                {grouped.expenses.map((tx) => (
+                  <TxRow key={tx.id} tx={tx} formatCurrency={formatCurrency} formatDate={formatDate} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Credit card groups */}
+          {Object.entries(grouped.cardGroups).map(([cardName, txs]) => (
+            <div key={cardName} className="space-y-1">
+              <p className="text-xs font-medium text-violet-600 dark:text-violet-400 px-1 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                {cardName} — Fatura ({txs.length})
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
+                  Pendente
+                </span>
+              </p>
+              <div className="rounded-xl glass-panel divide-y divide-slate-100/80 dark:divide-slate-700/40 max-h-40 overflow-y-auto">
+                {txs.map((tx) => (
+                  <TxRow key={tx.id} tx={tx} formatCurrency={formatCurrency} formatDate={formatDate} />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <button type="button" onClick={handleImport}
+            className="w-full py-3 rounded-2xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-colors">
+            {t('settings.openfinance.confirmImport', { count: grouped.total })}
           </button>
         </div>
       )}
@@ -226,16 +321,12 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
 
       {/* Connect button */}
       {(phase === 'idle' || phase === 'loading') && (
-        <button
-          type="button"
-          onClick={handleConnect}
-          disabled={phase === 'loading'}
+        <button type="button" onClick={handleConnect} disabled={phase === 'loading'}
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold transition-colors focus:outline-none ${
             phase === 'loading'
               ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-wait'
               : 'bg-emerald-500 hover:bg-emerald-400 text-white'
-          }`}
-        >
+          }`}>
           {phase === 'loading' ? (
             <>
               <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -266,6 +357,35 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Transaction row for preview
+function TxRow({ tx, formatCurrency, formatDate }) {
+  return (
+    <div className="flex items-center gap-2.5 px-3 py-2.5">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{tx.description}</p>
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDate(tx.createdAt)}</span>
+          {tx.category && tx.category !== 'Outros' && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+              {tx.category}
+            </span>
+          )}
+          {tx.paymentMethod === 'pix' && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">Pix</span>
+          )}
+        </div>
+      </div>
+      <p className={`text-sm font-semibold flex-shrink-0 ${
+        tx.type === 'income' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
+      }`}>
+        {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
+      </p>
     </div>
   );
 }
