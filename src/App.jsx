@@ -1,21 +1,4 @@
-/**
- * SmartFinance - App Principal
- *
- * Versão 2.0.0 - Premium/Freemium
- *
- * Sistema de Feature Flags:
- * - Altere em src/config.js o valor de SMARTFINANCE_CONFIG.plan para 'premium' ou 'free'
- *
- * Novos Recursos Premium:
- * - Envelopes por categoria
- * - Insights automáticos
- * - Cartões de crédito e faturas
- * - Próximos lançamentos e lembretes
- * - Análises avançadas
- * - Export e backup de dados
- */
-
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 // Componentes existentes
 import Header from './components/Header.jsx';
@@ -33,7 +16,7 @@ import DeleteChoiceModal from './components/DeleteChoiceModal.jsx';
 import EditChoiceModal from './components/EditChoiceModal.jsx';
 import EditAllValueModal from './components/EditAllValueModal.jsx';
 
-// Novos componentes Premium
+// Premium
 import InsightsSection from './components/InsightsSection.jsx';
 import EnvelopesSection from './components/EnvelopesSection.jsx';
 import UpcomingBillsSection from './components/UpcomingBillsSection.jsx';
@@ -42,26 +25,39 @@ import AdvancedAnalytics from './components/AdvancedAnalytics.jsx';
 import ExportSection from './components/ExportSection.jsx';
 import SettingsSection from './components/SettingsSection.jsx';
 
-// i18n
-import { LanguageProvider, useTranslation } from './i18n/index.jsx';
+// Auth & pages
+import LoginPage from './components/LoginPage.jsx';
+import RegisterPage from './components/RegisterPage.jsx';
+import ForgotPasswordPage from './components/ForgotPasswordPage.jsx';
+import DesktopSidebar from './components/DesktopSidebar.jsx';
 
-// Services
+// i18n
+import { useTranslation } from './i18n/index.jsx';
+
+// Auth
+import { useAuth } from './contexts/AuthContext.jsx';
+
+// Supabase services
 import {
-  loadTransactions,
-  saveTransactions,
-  loadGoals,
-  saveGoals,
-  loadEnvelopes,
-  saveEnvelopes,
-  loadCards,
-  saveCards,
-  loadTheme,
-  saveTheme,
-} from './services/storageService.js';
-import {
-  loadNotificationPrefs,
-  runNotificationChecks,
-} from './services/notificationService.js';
+  dbLoadTransactions,
+  dbAddTransactions,
+  dbUpdateTransaction,
+  dbDeleteTransaction,
+  dbDeleteTransactionsByGroup,
+  dbClearAllTransactions,
+  dbLoadGoals,
+  dbSaveGoals,
+  dbLoadEnvelopes,
+  dbSaveEnvelopes,
+  dbLoadCards,
+  dbSaveCards,
+  dbLoadUserPreferences,
+  dbSaveUserPreferences,
+} from './services/supabaseService.js';
+
+import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
+import { setCurrentPlan } from './config.js';
+import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 
 const logoBlue = '/LogoSFblue.png';
 
@@ -102,9 +98,7 @@ const generateProcessedTransactions = (transactions) => {
 
   transactions.forEach((transaction) => {
     const date = new Date(transaction.createdAt);
-    if (Number.isNaN(date.getTime())) {
-      return;
-    }
+    if (Number.isNaN(date.getTime())) return;
     const signature = `${transaction.sourceOf || transaction.id}-${date.getFullYear()}-${date.getMonth()}`;
     signatures.add(signature);
   });
@@ -112,9 +106,7 @@ const generateProcessedTransactions = (transactions) => {
   transactions.forEach((transaction) => {
     if (transaction.recurrence === 'monthly') {
       const startDate = new Date(transaction.createdAt);
-      if (Number.isNaN(startDate.getTime())) {
-        return;
-      }
+      if (Number.isNaN(startDate.getTime())) return;
       const currentDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
       while (currentDate <= projectionEndDate) {
         const year = currentDate.getFullYear();
@@ -138,87 +130,22 @@ const generateProcessedTransactions = (transactions) => {
   return processed;
 };
 
-const getInitialTransactions = () => {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  // Migração: tentar usar novo serviço, fallback para localStorage antigo
-  try {
-    const stored = localStorage.getItem('smartfinance_transactions');
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    console.error('Error loading transactions:', error);
-    return [];
-  }
-};
-
-const getInitialGoals = () => {
-  if (typeof window === 'undefined') {
-    return { incomeGoal: '', expenseGoal: '' };
-  }
-  try {
-    const stored = localStorage.getItem('smartfinance_goals');
-    if (!stored) {
-      return { incomeGoal: '', expenseGoal: '' };
-    }
-    const parsed = JSON.parse(stored);
-    return {
-      incomeGoal:
-        parsed?.incomeGoal !== undefined && parsed?.incomeGoal !== null ? String(parsed.incomeGoal) : '',
-      expenseGoal:
-        parsed?.expenseGoal !== undefined && parsed?.expenseGoal !== null ? String(parsed.expenseGoal) : '',
-    };
-  } catch (error) {
-    console.error('Erro ao carregar metas salvas:', error);
-    return { incomeGoal: '', expenseGoal: '' };
-  }
-};
-
-const getInitialTheme = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  const stored = localStorage.getItem('color-theme');
-  if (stored) {
-    return stored === 'dark';
-  }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-};
-
-const getInitialEnvelopes = () => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem('smartfinance_envelopes');
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    console.error('Error loading envelopes:', error);
-    return [];
-  }
-};
-
-const getInitialCards = () => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem('smartfinance_cards');
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    console.error('Error loading cards:', error);
-    return [];
-  }
-};
-
 function AppContent() {
   const { t } = useTranslation();
-  const [transactions, setTransactions] = useState(getInitialTransactions);
-  const [goals, setGoals] = useState(getInitialGoals);
+  const { user, signOut } = useAuth();
+  const [transactions, setTransactions] = useState([]);
+  const [goals, setGoals] = useState({ incomeGoal: '', expenseGoal: '' });
   const [currentFilter, setCurrentFilter] = useState('total');
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
-  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const stored = localStorage.getItem('color-theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const [summaryOrder, setSummaryOrder] = useState(['income', 'expense', 'paid', 'balance']);
-
-  // Estados premium
-  const [envelopes, setEnvelopes] = useState(getInitialEnvelopes);
-  const [cards, setCards] = useState(getInitialCards);
+  const [envelopes, setEnvelopes] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
   const [paymentModalState, setPaymentModalState] = useState({ open: false, transaction: null, projection: null });
@@ -228,17 +155,48 @@ function AppContent() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [activePage, setActivePage] = useState('overview');
 
+  // Load data from Supabase on mount
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.body.className =
-        'bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-200 min-h-screen px-3 sm:px-6 py-6 md:py-10 transition-colors duration-500';
-    }
-  }, []);
+    if (!user) return;
+    let cancelled = false;
 
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
+    async function loadData() {
+      // Check for local data migration
+      if (hasLocalData()) {
+        await migrateLocalStorageToSupabase();
+      }
+
+      const [txns, goalsData, envData, cardsData, prefs] = await Promise.all([
+        dbLoadTransactions(),
+        dbLoadGoals(),
+        dbLoadEnvelopes(),
+        dbLoadCards(),
+        dbLoadUserPreferences(),
+      ]);
+
+      if (cancelled) return;
+
+      setTransactions(txns);
+      setGoals(goalsData);
+      setEnvelopes(envData);
+      setCards(cardsData);
+
+      if (prefs) {
+        if (prefs.theme === 'dark') setIsDarkMode(true);
+        else if (prefs.theme === 'light') setIsDarkMode(false);
+        if (prefs.summaryOrder) setSummaryOrder(prefs.summaryOrder);
+        if (prefs.plan) setCurrentPlan(prefs.plan);
+      }
+
+      setIsLoading(false);
     }
+
+    loadData();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Dark mode toggle
+  useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -247,48 +205,35 @@ function AppContent() {
     localStorage.setItem('color-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
+  // Body class
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('smartfinance_transactions', JSON.stringify(transactions));
-    }
-  }, [transactions]);
+    document.body.className =
+      'bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-200 min-h-screen transition-colors duration-500';
+  }, []);
 
+  // Notifications
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const payload = {
-      incomeGoal: goals.incomeGoal === '' ? '' : Number(goals.incomeGoal),
-      expenseGoal: goals.expenseGoal === '' ? '' : Number(goals.expenseGoal),
-    };
-    localStorage.setItem('smartfinance_goals', JSON.stringify(payload));
-  }, [goals]);
-
-  // Salvar envelopes e cards
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('smartfinance_envelopes', JSON.stringify(envelopes));
-    }
-  }, [envelopes]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('smartfinance_cards', JSON.stringify(cards));
-    }
-  }, [cards]);
-
-  // Run notification checks on app load
-  useEffect(() => {
+    if (isLoading) return;
     const prefs = loadNotificationPrefs();
     if (prefs.enabled) {
       runNotificationChecks({ prefs, transactions, envelopes, onUpdatePrefs: () => {}, t });
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Import transactions from Open Finance
-  const handleImportTransactions = (newTxs) => {
-    setTransactions((prev) => [...prev, ...newTxs]);
-  };
+  // --- Persistence helpers (fire-and-forget to Supabase) ---
+
+  const persistPreferences = useCallback((updates) => {
+    dbSaveUserPreferences({
+      theme: isDarkMode ? 'dark' : 'light',
+      language: localStorage.getItem('smartfinance_language') || 'pt-BR',
+      plan: 'free',
+      summaryOrder,
+      notificationPrefs: { enabled: false },
+      ...updates,
+    });
+  }, [isDarkMode, summaryOrder]);
+
+  // --- Processed transactions ---
 
   const processedTransactions = useMemo(
     () => generateProcessedTransactions(transactions),
@@ -313,25 +258,20 @@ function AppContent() {
   }, [processedTransactions, currentFilter]);
 
   const listTransactions = useMemo(() => {
-    if (currentPaymentFilter === 'all') {
-      return summaryTransactions;
-    }
+    if (currentPaymentFilter === 'all') return summaryTransactions;
     return summaryTransactions.filter((transaction) => transaction.paymentMethod === currentPaymentFilter);
   }, [summaryTransactions, currentPaymentFilter]);
 
   const summaryValues = useMemo(() => {
     const income = summaryTransactions
       .filter((transaction) => transaction.type === 'income' && !transaction.isProjection)
-      .reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
-
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
     const totalExpenseRaw = summaryTransactions
       .filter((transaction) => transaction.type === 'expense' && !transaction.isProjection)
-      .reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
-
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
     const paidExpenseRaw = summaryTransactions
       .filter((transaction) => transaction.type === 'expense' && transaction.paid && !transaction.isProjection)
-      .reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
-
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
     return {
       income,
       totalExpense: Math.abs(totalExpenseRaw),
@@ -340,24 +280,38 @@ function AppContent() {
     };
   }, [summaryTransactions]);
 
+  // --- Handlers ---
+
   const handleToggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      persistPreferences({ theme: next ? 'dark' : 'light' });
+      return next;
+    });
   };
 
   const handleAddTransactions = (newTransactions) => {
     setTransactions((prev) => [...prev, ...newTransactions]);
+    dbAddTransactions(newTransactions);
+  };
+
+  const handleImportTransactions = (newTxs) => {
+    setTransactions((prev) => [...prev, ...newTxs]);
+    dbAddTransactions(newTxs);
   };
 
   const handleGoalChange = (field, rawValue) => {
     setGoals((prev) => {
       if (rawValue === '') {
-        return { ...prev, [field]: '' };
+        const next = { ...prev, [field]: '' };
+        dbSaveGoals(next);
+        return next;
       }
       const numeric = Number(rawValue);
-      if (Number.isNaN(numeric) || numeric < 0) {
-        return prev;
-      }
-      return { ...prev, [field]: rawValue };
+      if (Number.isNaN(numeric) || numeric < 0) return prev;
+      const next = { ...prev, [field]: rawValue };
+      dbSaveGoals(next);
+      return next;
     });
   };
 
@@ -367,19 +321,34 @@ function AppContent() {
         setPaymentModalState({ open: true, transaction: null, projection: transaction });
       } else {
         const original = transactions.find((item) => item.id === transaction.id);
-        if (!original) {
-          return;
-        }
+        if (!original) return;
         setPaymentModalState({ open: true, transaction: original, projection: null });
       }
-    } else if (!transaction.isProjection) {
-      setTransactions((prev) =>
-        prev.map((item) =>
-          item.id === transaction.id
-            ? { ...item, paid: false, paymentMethod: null, creditCardName: null }
-            : item,
-        ),
-      );
+    } else {
+      if (transaction.isProjection) {
+        const projDate = new Date(transaction.createdAt);
+        const projYear = projDate.getFullYear();
+        const projMonth = projDate.getMonth();
+        setTransactions((prev) => {
+          const toDelete = prev.find((item) => {
+            if (item.isProjection) return false;
+            if (item.sourceOf !== transaction.sourceOf) return false;
+            const itemDate = new Date(item.createdAt);
+            return itemDate.getFullYear() === projYear && itemDate.getMonth() === projMonth;
+          });
+          if (toDelete) dbDeleteTransaction(toDelete.id);
+          return prev.filter((item) => !toDelete || item.id !== toDelete.id);
+        });
+      } else {
+        setTransactions((prev) =>
+          prev.map((item) =>
+            item.id === transaction.id
+              ? { ...item, paid: false, paymentMethod: null, creditCardName: null }
+              : item,
+          ),
+        );
+        dbUpdateTransaction(transaction.id, { paid: false, paymentMethod: null, creditCardName: null });
+      }
     }
   };
 
@@ -397,6 +366,7 @@ function AppContent() {
         description: projection.description,
         amount: projection.amount,
         type: projection.type,
+        category: projection.category,
         createdAt: new Date(projection.createdAt).toISOString(),
         recurrence: 'single',
         paid: true,
@@ -406,6 +376,7 @@ function AppContent() {
         groupId: projection.groupId,
       };
       setTransactions((prev) => [...prev, newTransaction]);
+      dbAddTransactions([newTransaction]);
     } else if (paymentModalState.transaction) {
       const transactionId = paymentModalState.transaction.id;
       setTransactions((prev) =>
@@ -415,41 +386,37 @@ function AppContent() {
             : item,
         ),
       );
+      dbUpdateTransaction(transactionId, { paid: true, paymentMethod, creditCardName: normalizedCreditName });
     }
 
     closePaymentModal();
   };
 
   const handleDeleteTransactionRequest = (transaction) => {
-    if (transaction.isProjection) {
-      return;
-    }
+    if (transaction.isProjection) return;
     const original = transactions.find((item) => item.id === transaction.id);
-    if (!original) {
-      return;
-    }
+    if (!original) return;
     if (original.recurrence === 'installment' && original.groupId) {
       setDeleteChoiceState({ open: true, transaction: original });
     } else {
       setTransactions((prev) => prev.filter((item) => item.id !== original.id));
+      dbDeleteTransaction(original.id);
     }
   };
 
   const handleDeleteSingle = () => {
     const target = deleteChoiceState.transaction;
-    if (!target) {
-      return;
-    }
+    if (!target) return;
     setTransactions((prev) => prev.filter((item) => item.id !== target.id));
+    dbDeleteTransaction(target.id);
     setDeleteChoiceState({ open: false, transaction: null });
   };
 
   const handleDeleteAll = () => {
     const target = deleteChoiceState.transaction;
-    if (!target) {
-      return;
-    }
+    if (!target) return;
     setTransactions((prev) => prev.filter((item) => item.groupId !== target.groupId));
+    dbDeleteTransactionsByGroup(target.groupId);
     setDeleteChoiceState({ open: false, transaction: null });
   };
 
@@ -458,13 +425,9 @@ function AppContent() {
   };
 
   const handleEditRequest = (transaction) => {
-    if (transaction.isProjection) {
-      return;
-    }
+    if (transaction.isProjection) return;
     const original = transactions.find((item) => item.id === transaction.id);
-    if (!original) {
-      return;
-    }
+    if (!original) return;
     if (original.recurrence === 'installment' && original.groupId) {
       setEditChoiceState({ open: true, transaction: original });
     } else {
@@ -474,9 +437,7 @@ function AppContent() {
 
   const handleEditSingle = () => {
     const target = editChoiceState.transaction;
-    if (!target) {
-      return;
-    }
+    if (!target) return;
     const original = transactions.find((item) => item.id === target.id);
     if (!original) {
       setEditChoiceState({ open: false, transaction: null });
@@ -488,9 +449,7 @@ function AppContent() {
 
   const handleEditAll = () => {
     const target = editChoiceState.transaction;
-    if (!target) {
-      return;
-    }
+    if (!target) return;
     setEditAllValueState({ open: true, groupId: target.groupId });
     setEditChoiceState({ open: false, transaction: null });
   };
@@ -502,44 +461,38 @@ function AppContent() {
   const handleEditSubmit = ({ id, description, amount, type, date, recurrence }) => {
     setTransactions((prev) =>
       prev.map((item) => {
-        if (item.id !== id) {
-          return item;
-        }
+        if (item.id !== id) return item;
         const signedAmount = type === 'expense' ? -Math.abs(amount) : Math.abs(amount);
         let updatedDescription = description;
-        if (
-          item.recurrence === 'installment' &&
-          !/\s\(\d+\/\d+\)$/u.test(description)
-        ) {
+        if (item.recurrence === 'installment' && !/\s\(\d+\/\d+\)$/u.test(description)) {
           const match = item.description.match(/\s(\(\d+\/\d+\))$/u);
-          if (match) {
-            updatedDescription = `${description} ${match[1]}`;
-          }
+          if (match) updatedDescription = `${description} ${match[1]}`;
         }
-        return {
-          ...item,
+        const updates = {
           description: updatedDescription,
           amount: signedAmount,
           type,
           createdAt: new Date(`${date}T12:00:00`).toISOString(),
           recurrence,
         };
+        dbUpdateTransaction(id, updates);
+        return { ...item, ...updates };
       }),
     );
     setEditModalState({ open: false, transaction: null });
   };
 
   const handleEditAllSubmit = (newValue) => {
-    if (!editAllValueState.groupId) {
-      return;
-    }
+    if (!editAllValueState.groupId) return;
     const negativeValue = -Math.abs(newValue);
     setTransactions((prev) =>
-      prev.map((item) =>
-        item.groupId === editAllValueState.groupId && !item.paid
-          ? { ...item, amount: negativeValue }
-          : item,
-      ),
+      prev.map((item) => {
+        if (item.groupId === editAllValueState.groupId && !item.paid) {
+          dbUpdateTransaction(item.id, { amount: negativeValue });
+          return { ...item, amount: negativeValue };
+        }
+        return item;
+      }),
     );
     setEditAllValueState({ open: false, groupId: null });
   };
@@ -554,6 +507,7 @@ function AppContent() {
 
   const handleConfirmDeleteAll = () => {
     setTransactions([]);
+    dbClearAllTransactions();
     setConfirmDeleteOpen(false);
   };
 
@@ -561,13 +515,47 @@ function AppContent() {
     setConfirmDeleteOpen(false);
   };
 
+  const handleSaveEnvelopes = (newEnvelopes) => {
+    setEnvelopes(newEnvelopes);
+    dbSaveEnvelopes(newEnvelopes);
+  };
+
+  const handleSaveCards = (newCards) => {
+    setCards(newCards);
+    dbSaveCards(newCards);
+  };
+
+  const handleSummaryReorder = (newOrder) => {
+    setSummaryOrder(newOrder);
+    persistPreferences({ summaryOrder: newOrder });
+  };
+
   const panelClasses =
     'glass-panel mesh-gradient rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/30';
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('app.loading') || 'Carregando...'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <main className="w-full max-w-md mx-auto px-3 sm:px-0 space-y-5 sm:space-y-6 md:space-y-8 pb-28">
-        {/* PÁGINA: VISÃO GERAL */}
+      {/* Desktop sidebar */}
+      <DesktopSidebar
+        activePage={activePage}
+        onNavigate={setActivePage}
+        userEmail={user?.email}
+        onSignOut={signOut}
+      />
+
+      <main className="w-full mx-auto px-3 sm:px-6 lg:pl-72 lg:pr-8 max-w-md lg:max-w-6xl pb-28 lg:pb-8 space-y-5 sm:space-y-6 pt-6 lg:pt-10">
+        {/* OVERVIEW */}
         <section
           id="page-overview"
           data-page="overview"
@@ -587,48 +575,43 @@ function AppContent() {
               balance={summaryValues.balance}
               formatCurrency={formatCurrency}
               cardOrder={summaryOrder}
-              onReorder={setSummaryOrder}
+              onReorder={handleSummaryReorder}
             />
           </div>
-
-          {/* Insights Automáticos */}
-          <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
-
-          {/* Próximos Lançamentos */}
-          <UpcomingBillsSection transactions={processedTransactions} />
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+            <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
+            <UpcomingBillsSection transactions={processedTransactions} />
+          </div>
         </section>
 
-        {/* PÁGINA: GRÁFICOS E METAS */}
+        {/* GRAPHS & GOALS */}
         <section
           id="page-graphs-goals"
           data-page="graphs-goals"
           className={`page-section space-y-5 ${activePage === 'graphs-goals' ? '' : 'hidden'}`}
         >
-          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
-            <ChartSection transactions={summaryTransactions} isDarkMode={isDarkMode} />
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-5 lg:space-y-0">
+            <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+              <ChartSection transactions={summaryTransactions} isDarkMode={isDarkMode} />
+            </div>
+            <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+              <GoalsSection
+                goals={goals}
+                onGoalChange={handleGoalChange}
+                summaryValues={summaryValues}
+                formatCurrency={formatCurrency}
+              />
+            </div>
           </div>
-
-          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
-            <GoalsSection
-              goals={goals}
-              onGoalChange={handleGoalChange}
-              summaryValues={summaryValues}
-              formatCurrency={formatCurrency}
-            />
-          </div>
-
-          {/* Envelopes de Gastos */}
           <EnvelopesSection
             transactions={summaryTransactions}
             envelopes={envelopes}
-            onSaveEnvelopes={setEnvelopes}
+            onSaveEnvelopes={handleSaveEnvelopes}
           />
-
-          {/* Análises Avançadas */}
           <AdvancedAnalytics transactions={summaryTransactions} />
         </section>
 
-        {/* PÁGINA: HISTÓRICO */}
+        {/* HISTORY */}
         <section
           id="page-history"
           data-page="history"
@@ -652,31 +635,27 @@ function AppContent() {
               formatCurrency={(value) => formatCurrency(value)}
             />
           </div>
-
-          {/* Cartões de Crédito */}
           <CreditCardsSection
             transactions={transactions}
             cards={cards}
-            onSaveCards={setCards}
+            onSaveCards={handleSaveCards}
           />
-
-          {/* Export e Backup */}
           <ExportSection />
         </section>
 
-        {/* PÁGINA: NOVA TRANSAÇÃO */}
+        {/* NEW TRANSACTION */}
         <section
           id="page-new-transaction"
           data-page="new-transaction"
           className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
         >
-          <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-2xl`}>
             <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.new.overline')}</p>
             <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
           </div>
         </section>
 
-        {/* PÁGINA: CONFIGURAÇÕES */}
+        {/* SETTINGS */}
         <section
           id="page-settings"
           data-page="settings"
@@ -688,18 +667,19 @@ function AppContent() {
             transactions={transactions}
             onClearAll={handleClearAllRequest}
             onImportTransactions={handleImportTransactions}
+            userEmail={user?.email}
+            onSignOut={signOut}
           />
         </section>
       </main>
 
-      {/* NAVEGAÇÃO INFERIOR */}
-      <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30">
+      {/* BOTTOM NAV — mobile only */}
+      <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30 lg:hidden">
         <div className="mx-auto max-w-md relative">
-          {/* FAB — botão Nova flutuante */}
           <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
             <button
               type="button"
-              aria-label="Nova transação"
+              aria-label="Nova transacao"
               onClick={() => setActivePage('new-transaction')}
               className={`fab-button flex items-center justify-center w-14 h-14 rounded-full focus:outline-none ${
                 activePage === 'new-transaction' ? 'fab-active ring-4 ring-sky-400/20' : 'fab-pulse'
@@ -710,8 +690,6 @@ function AppContent() {
               </svg>
             </button>
           </div>
-
-          {/* Tab bar */}
           <div className="nav-glass flex items-center justify-around px-1 pt-1 pb-2">
             <NavTab target="overview" label={t('nav.home')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -719,7 +697,6 @@ function AppContent() {
             <NavTab target="graphs-goals" label={t('nav.chart')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
             </NavTab>
-            {/* Espaço central para o FAB */}
             <div className="w-14 flex-shrink-0" aria-hidden="true" />
             <NavTab target="history" label={t('nav.history')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -731,40 +708,35 @@ function AppContent() {
         </div>
       </nav>
 
-      {/* MODAIS */}
+      {/* MODALS */}
       <EditTransactionModal
         isOpen={editModalState.open}
         transaction={editModalState.transaction}
         onClose={() => setEditModalState({ open: false, transaction: null })}
         onSubmit={handleEditSubmit}
       />
-
       <PaymentModal
         isOpen={paymentModalState.open}
         onClose={closePaymentModal}
         onConfirm={handlePaymentConfirm}
       />
-
       <ConfirmDeleteModal
         isOpen={confirmDeleteOpen}
         onCancel={handleCancelDeleteAll}
         onConfirm={handleConfirmDeleteAll}
       />
-
       <DeleteChoiceModal
         isOpen={deleteChoiceState.open}
         onClose={closeDeleteChoiceModal}
         onDeleteSingle={handleDeleteSingle}
         onDeleteAll={handleDeleteAll}
       />
-
       <EditChoiceModal
         isOpen={editChoiceState.open}
         onClose={closeEditChoiceModal}
         onEditSingle={handleEditSingle}
         onEditAll={handleEditAll}
       />
-
       <EditAllValueModal
         isOpen={editAllValueState.open}
         onClose={closeEditAllModal}
@@ -775,11 +747,48 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
-  );
+  const { t } = useTranslation();
+  const { user, loading, signIn, signUp, signOut, resetPassword, updatePassword } = useAuth();
+  const [authPage, setAuthPage] = useState('login');
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="text-center space-y-4">
+          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('app.loading') || 'Carregando...'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    if (authPage === 'register') {
+      return (
+        <RegisterPage
+          onSignUp={signUp}
+          onSwitchToLogin={() => setAuthPage('login')}
+        />
+      );
+    }
+    if (authPage === 'forgot-password') {
+      return (
+        <ForgotPasswordPage
+          onResetPassword={resetPassword}
+          onSwitchToLogin={() => setAuthPage('login')}
+        />
+      );
+    }
+    return (
+      <LoginPage
+        onSignIn={signIn}
+        onSwitchToRegister={() => setAuthPage('register')}
+        onSwitchToForgotPassword={() => setAuthPage('forgot-password')}
+      />
+    );
+  }
+
+  return <AppContent />;
 }
 
 export default App;

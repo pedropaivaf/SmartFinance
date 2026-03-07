@@ -9,13 +9,24 @@
  *   - connectToken lives only in React state (memory), never localStorage
  */
 
+import { supabase } from './supabaseClient.js';
+import { dbLoadConnectedBanks, dbSaveConnectedBank, dbDeleteConnectedBank } from './supabaseService.js';
+
 const PROXY_BASE = '/api/pluggy';
 
-// ── Connected state (localStorage for UI, not tokens) ────────────────────────
+// ── Connected state (Supabase + localStorage fallback) ───────────────────────
 
 const CONNECTED_KEY = 'smartfinance_of_connected';
 
-export function loadConnectedBanks() {
+export async function loadConnectedBanks() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const banks = await dbLoadConnectedBanks();
+      if (banks.length > 0) return banks;
+    }
+  } catch { /* fallback to localStorage */ }
+
   try {
     const raw = localStorage.getItem(CONNECTED_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -24,9 +35,35 @@ export function loadConnectedBanks() {
   }
 }
 
-export function saveConnectedBanks(banks) {
+export async function saveConnectedBanks(banks) {
+  // Always save to localStorage as cache
   try {
     localStorage.setItem(CONNECTED_KEY, JSON.stringify(banks));
+  } catch { /* noop */ }
+
+  // Also save to Supabase if authenticated
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      for (const bank of banks) {
+        await dbSaveConnectedBank(bank);
+      }
+    }
+  } catch { /* noop — localStorage is the fallback */ }
+}
+
+export async function removeConnectedBank(itemId) {
+  // Remove from localStorage
+  try {
+    const raw = localStorage.getItem(CONNECTED_KEY);
+    const banks = raw ? JSON.parse(raw) : [];
+    localStorage.setItem(CONNECTED_KEY, JSON.stringify(banks.filter((b) => b.itemId !== itemId)));
+  } catch { /* noop */ }
+
+  // Remove from Supabase
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await dbDeleteConnectedBank(itemId);
   } catch { /* noop */ }
 }
 

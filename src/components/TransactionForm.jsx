@@ -20,6 +20,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
   const [installmentStartDate, setInstallmentStartDate] = useState(today);
   const [paidInstallments, setPaidInstallments] = useState('0');
   const [type, setType] = useState('income');
+  const [prepaidPaymentMethod, setPrepaidPaymentMethod] = useState('pix');
 
   useEffect(() => {
     setTransactionDate(today);
@@ -36,6 +37,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
     setRecurrence('single');
     setInstallments('');
     setPaidInstallments('0');
+    setPrepaidPaymentMethod('pix');
     const current = formatDate(new Date());
     setTransactionDate(current);
     setInstallmentStartDate(current);
@@ -95,7 +97,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           createdAt: installmentDate.toISOString(),
           recurrence: 'installment',
           paid: isPaid,
-          paymentMethod: isPaid ? 'cash' : null,
+          paymentMethod: isPaid ? prepaidPaymentMethod : null,
           creditCardName: null,
         });
       }
@@ -256,6 +258,24 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               {t('form.installments.paidHelper')}
             </p>
+          </div>
+        )}
+        {showPaidInstallments && parseInt(paidInstallments, 10) > 0 && (
+          <div>
+            <label htmlFor="prepaid-payment-method" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              {t('form.installments.paymentMethod') || 'Metodo de pagamento das parcelas pagas'}
+            </label>
+            <select
+              id="prepaid-payment-method"
+              value={prepaidPaymentMethod}
+              onChange={(event) => setPrepaidPaymentMethod(event.target.value)}
+              className={inputBase}
+            >
+              <option value="pix">Pix</option>
+              <option value="debit">{t('list.paymentMethods.debit') || 'Debito'}</option>
+              <option value="credit">{t('list.paymentMethods.credit') || 'Credito'}</option>
+              <option value="cash">{t('list.paymentMethods.cash') || 'Dinheiro'}</option>
+            </select>
           </div>
         )}
         <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4" aria-label={t('form.type.legend')}>

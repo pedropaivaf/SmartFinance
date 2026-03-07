@@ -126,7 +126,7 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
   };
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {orderedKeys.map((key, index) => {
         const card = cardsByKey[key];
         if (!card) return null;

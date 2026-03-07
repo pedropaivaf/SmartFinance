@@ -20,6 +20,7 @@ import {
   deduplicateTransactions,
   loadConnectedBanks,
   saveConnectedBanks,
+  removeConnectedBank,
   SUPPORTED_BANKS,
 } from '../services/openFinanceService.js';
 
@@ -29,12 +30,17 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
   const { t, lang } = useTranslation();
 
   const [phase, setPhase] = useState('idle');
-  const [connectedBanks, setConnectedBanks] = useState(() => loadConnectedBanks());
+  const [connectedBanks, setConnectedBanks] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [error, setError] = useState('');
   const [importedCount, setImportedCount] = useState(0);
   const [importStats, setImportStats] = useState(null);
   const pluggyConnectRef = useRef(null);
+
+  // Load connected banks (async — Supabase + localStorage fallback)
+  useEffect(() => {
+    loadConnectedBanks().then(setConnectedBanks).catch(() => {});
+  }, []);
 
   // Load Pluggy Connect script once
   useEffect(() => {
@@ -129,7 +135,7 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
       };
       const updated = [...connectedBanks.filter((b) => b.itemId !== item.id), bankInfo];
       setConnectedBanks(updated);
-      saveConnectedBanks(updated);
+      await saveConnectedBanks(updated);
 
       setPhase('done');
     } catch (err) {
@@ -151,10 +157,10 @@ export default function OpenFinanceSection({ existingTransactions = [], onImport
     setPendingTransactions([]);
   };
 
-  const handleDisconnect = (itemId) => {
+  const handleDisconnect = async (itemId) => {
     const updated = connectedBanks.filter((b) => b.itemId !== itemId);
     setConnectedBanks(updated);
-    saveConnectedBanks(updated);
+    await removeConnectedBank(itemId);
     if (phase === 'done' || phase === 'importing') {
       setPendingTransactions([]);
       setPhase('idle');

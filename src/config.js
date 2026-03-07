@@ -8,9 +8,18 @@
  * Para modo Free: altere plan para 'free'
  */
 
+let _dynamicPlan = null;
+
+export function setCurrentPlan(plan) {
+  _dynamicPlan = plan;
+}
+
+export function getCurrentPlan() {
+  return _dynamicPlan || SMARTFINANCE_CONFIG.plan;
+}
+
 export const SMARTFINANCE_CONFIG = {
-  // Plano atual do usuário: 'free' ou 'premium'
-  plan: 'free', // Altere para 'premium' para liberar todos os recursos
+  plan: 'free',
 
   // Preço do plano premium
   pricing: {
@@ -55,7 +64,7 @@ export const SMARTFINANCE_CONFIG = {
  * @returns {boolean}
  */
 export function hasFeature(featureName) {
-  const currentPlan = SMARTFINANCE_CONFIG.plan;
+  const currentPlan = getCurrentPlan();
 
   // Features free estão sempre disponíveis
   if (SMARTFINANCE_CONFIG.features.free.includes(featureName)) {
@@ -75,7 +84,7 @@ export function hasFeature(featureName) {
  * @returns {boolean}
  */
 export function isPremium() {
-  return SMARTFINANCE_CONFIG.plan === 'premium';
+  return getCurrentPlan() === 'premium';
 }
 
 /**

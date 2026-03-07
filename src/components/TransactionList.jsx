@@ -133,7 +133,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                     <p className={`font-semibold text-lg ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'} text-right whitespace-nowrap`}>
                       {`${sign} ${formatCurrency(amount)}`}
                     </p>
-                    <div className={`flex items-center ${isProjection ? 'invisible' : ''} gap-1`}>
+                    <div className={`flex items-center ${isProjection ? 'hidden' : ''} gap-1`}>
                       <button
                         type="button"
                         className="edit-btn p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
