@@ -24,7 +24,7 @@ import {
   SUPPORTED_BANKS,
 } from '../services/openFinanceService.js';
 
-const PLUGGY_WIDGET_URL = 'https://cdn.pluggy.ai/pluggy-connect/v2/pluggy-connect.js';
+const PLUGGY_WIDGET_URL = 'https://cdn.pluggy.ai/pluggy-connect.js';
 
 export default function OpenFinanceSection({ existingTransactions = [], onImport }) {
   const { t, lang } = useTranslation();
