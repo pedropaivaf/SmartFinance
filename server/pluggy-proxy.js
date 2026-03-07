@@ -1,19 +1,11 @@
 /**
  * Pluggy Open Finance Proxy Server
  *
- * This Express server handles authentication with Pluggy API so that
- * clientId/clientSecret never reach the frontend bundle.
- *
  * Endpoints:
- *   POST /api/pluggy/connect-token  → returns { connectToken }
- *   GET  /api/pluggy/accounts/:itemId → returns accounts[]
- *   GET  /api/pluggy/transactions/:accountId → returns transactions[]
- *
- * Environment variables (.env or .env.local):
- *   PLUGGY_CLIENT_ID
- *   PLUGGY_CLIENT_SECRET
- *   PLUGGY_ENV=sandbox          (sandbox | production)
- *   PORT=3001                   (optional)
+ *   POST /api/pluggy/connect-token       → { connectToken }
+ *   GET  /api/pluggy/accounts?itemId=X   → accounts[]
+ *   GET  /api/pluggy/transactions?accountId=X&from=Y&to=Z → transactions[]
+ *   GET  /api/pluggy/health              → status
  */
 
 import 'dotenv/config';
@@ -31,11 +23,9 @@ const {
   PORT = 3001,
 } = process.env;
 
-const BASE_URL = PLUGGY_ENV === 'production'
-  ? 'https://api.pluggy.ai'
-  : 'https://api.pluggy.ai'; // Pluggy uses same URL, sandbox is controlled by API key type
+const BASE_URL = 'https://api.pluggy.ai';
 
-// ── Helper: get API key (short-lived, cached 30 min) ────────────────────
+// ── Helper: get API key (cached 25 min) ──────────────────────────────────
 
 let cachedApiKey = null;
 let cacheExpiry = 0;
@@ -56,11 +46,11 @@ async function getApiKey() {
 
   const data = await res.json();
   cachedApiKey = data.apiKey;
-  cacheExpiry = Date.now() + 25 * 60 * 1000; // 25 min (token valid 30 min)
+  cacheExpiry = Date.now() + 25 * 60 * 1000;
   return cachedApiKey;
 }
 
-// ── Routes ──────────────────────────────────────────────────────────────
+// ── Routes ───────────────────────────────────────────────────────────────
 
 app.post('/api/pluggy/connect-token', async (_req, res) => {
   try {
@@ -91,10 +81,14 @@ app.post('/api/pluggy/connect-token', async (_req, res) => {
   }
 });
 
-app.get('/api/pluggy/accounts/:itemId', async (req, res) => {
+// Accounts — query param: ?itemId=XXX
+app.get('/api/pluggy/accounts', async (req, res) => {
   try {
     const apiKey = await getApiKey();
-    const response = await fetch(`${BASE_URL}/accounts?itemId=${req.params.itemId}`, {
+    const { itemId } = req.query;
+    if (!itemId) return res.status(400).json({ error: 'itemId required' });
+
+    const response = await fetch(`${BASE_URL}/accounts?itemId=${itemId}`, {
       headers: { 'X-API-KEY': apiKey },
     });
 
@@ -111,11 +105,14 @@ app.get('/api/pluggy/accounts/:itemId', async (req, res) => {
   }
 });
 
-app.get('/api/pluggy/transactions/:accountId', async (req, res) => {
+// Transactions — query params: ?accountId=XXX&from=YYYY-MM-DD&to=YYYY-MM-DD
+app.get('/api/pluggy/transactions', async (req, res) => {
   try {
     const apiKey = await getApiKey();
-    const { from, to } = req.query;
-    let url = `${BASE_URL}/transactions?accountId=${req.params.accountId}`;
+    const { accountId, from, to } = req.query;
+    if (!accountId) return res.status(400).json({ error: 'accountId required' });
+
+    let url = `${BASE_URL}/transactions?accountId=${accountId}&pageSize=500`;
     if (from) url += `&from=${from}`;
     if (to) url += `&to=${to}`;
 
@@ -136,8 +133,7 @@ app.get('/api/pluggy/transactions/:accountId', async (req, res) => {
   }
 });
 
-// ── Health check ────────────────────────────────────────────────────────
-
+// Health check
 app.get('/api/pluggy/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -145,8 +141,6 @@ app.get('/api/pluggy/health', (_req, res) => {
     env: PLUGGY_ENV,
   });
 });
-
-// ── Start ───────────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
   console.log(`Pluggy proxy running on http://localhost:${PORT}`);
