@@ -139,12 +139,11 @@ export function calculateCardSummary(transactions, card) {
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
-  // Transações deste cartão no mês atual
+  // Transações deste cartão (pagas ou não — todas contam na fatura)
   const cardTransactions = transactions.filter(t =>
     t.type === 'expense' &&
     t.paymentMethod === 'credit' &&
-    t.creditCardName === card.name &&
-    !t.paid
+    t.creditCardName === card.name
   );
 
   const currentMonthTotal = cardTransactions

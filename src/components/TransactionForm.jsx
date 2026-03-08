@@ -22,7 +22,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
   const [installments, setInstallments] = useState('');
   const [installmentStartDate, setInstallmentStartDate] = useState(today);
   const [paidInstallments, setPaidInstallments] = useState('0');
-  const [type, setType] = useState('income');
+  const [type, setType] = useState('expense');
   const [category, setCategory] = useState('');
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [prepaidPaymentMethod, setPrepaidPaymentMethod] = useState('pix');
@@ -319,26 +319,6 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
           <legend className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
             {t('form.type.legend')}
           </legend>
-          <div className="custom-radio">
-            <input
-              id="type-income"
-              type="radio"
-              name="type"
-              value="income"
-              className="sr-only"
-              checked={type === 'income'}
-              onChange={() => setType('income')}
-            />
-            <label
-              htmlFor="type-income"
-              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              {t('form.type.income')}
-            </label>
-          </div>
           <div className="custom-radio custom-radio-expense">
             <input
               id="type-expense"
@@ -357,6 +337,26 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
               </svg>
               {t('form.type.expense')}
+            </label>
+          </div>
+          <div className="custom-radio">
+            <input
+              id="type-income"
+              type="radio"
+              name="type"
+              value="income"
+              className="sr-only"
+              checked={type === 'income'}
+              onChange={() => setType('income')}
+            />
+            <label
+              htmlFor="type-income"
+              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {t('form.type.income')}
             </label>
           </div>
           <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">

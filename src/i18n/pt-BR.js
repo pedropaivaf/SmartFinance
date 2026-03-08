@@ -7,11 +7,14 @@ export default {
   // Nav
   'nav.home': 'Início',
   'nav.chart': 'Gráfico',
+  'nav.wallet': 'Carteira',
   'nav.history': 'Histórico',
   'nav.new': 'Nova',
   'nav.config': 'Config',
 
   // Pages
+  'page.wallet.overline': 'CARTEIRA',
+  'page.wallet.title': 'Cartões e exportação',
   'page.overview.overline': 'Visão geral',
   'page.overview.title': 'Suas métricas organizadas para fácil visualização.',
   'page.overview.drag': 'Segure e arraste os cards para alterar a ordem.',

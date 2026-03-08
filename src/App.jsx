@@ -73,7 +73,7 @@ function NavTab({ target, label, activePage, onNavigate, children }) {
       type="button"
       aria-label={label}
       onClick={() => onNavigate(target)}
-      className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 min-w-[44px] min-h-[44px] text-xs transition-all duration-200 focus:outline-none ${
+      className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1.5 min-w-[40px] min-h-[44px] text-[10px] transition-all duration-200 focus:outline-none ${
         isActive ? 'nav-tab-active' : 'text-slate-500 hover:text-slate-300'
       }`}
     >
@@ -884,6 +884,18 @@ function AppContent() {
               customCategories={customCategories}
             />
           </div>
+        </section>
+
+        {/* WALLET */}
+        <section
+          id="page-wallet"
+          data-page="wallet"
+          className={`page-section space-y-5 ${activePage === 'wallet' ? '' : 'hidden'}`}
+        >
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-2`}>
+            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.wallet.overline')}</p>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.wallet.title')}</h2>
+          </div>
           <CreditCardsSection
             transactions={transactions}
             cards={cards}
@@ -949,6 +961,9 @@ function AppContent() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
             </NavTab>
             <div className="w-14 flex-shrink-0" aria-hidden="true" />
+            <NavTab target="wallet" label={t('nav.wallet')} activePage={activePage} onNavigate={setActivePage}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </NavTab>
             <NavTab target="history" label={t('nav.history')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </NavTab>
