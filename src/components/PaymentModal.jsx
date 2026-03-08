@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function PaymentModal({ isOpen, onClose, onConfirm }) {
+function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [creditCardName, setCreditCardName] = useState('');
 
@@ -111,16 +111,30 @@ function PaymentModal({ isOpen, onClose, onConfirm }) {
               className={`pl-2 pt-2 ${paymentMethod === 'credit' ? '' : 'hidden'}`}
             >
               <label htmlFor="credit-card-name" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
-                Nome do Cartão (Opcional)
+                {cards.length > 0 ? 'Selecione o Cartão' : 'Nome do Cartão (Opcional)'}
               </label>
-              <input
-                id="credit-card-name"
-                type="text"
-                value={creditCardName}
-                onChange={(event) => setCreditCardName(event.target.value)}
-                placeholder="Ex: Nubank"
-                className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-              />
+              {cards.length > 0 ? (
+                <select
+                  id="credit-card-name"
+                  value={creditCardName}
+                  onChange={(event) => setCreditCardName(event.target.value)}
+                  className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                >
+                  <option value="">Selecione...</option>
+                  {cards.map((card) => (
+                    <option key={card.id} value={card.name}>{card.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="credit-card-name"
+                  type="text"
+                  value={creditCardName}
+                  onChange={(event) => setCreditCardName(event.target.value)}
+                  placeholder="Ex: Nubank"
+                  className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                />
+              )}
             </div>
             <div className="custom-radio">
               <input

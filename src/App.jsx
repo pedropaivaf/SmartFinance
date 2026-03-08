@@ -155,6 +155,7 @@ function AppContent() {
   const [envelopes, setEnvelopes] = useState([]);
   const [cards, setCards] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
+  const [billingCycleDay, setBillingCycleDay] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
@@ -197,6 +198,7 @@ function AppContent() {
         if (prefs.summaryOrder) setSummaryOrder(prefs.summaryOrder);
         if (prefs.plan) setCurrentPlan(prefs.plan);
         if (prefs.customCategories) setCustomCategories(prefs.customCategories);
+        if (prefs.notificationPrefs?.billingCycleDay) setBillingCycleDay(prefs.notificationPrefs.billingCycleDay);
       }
 
       setIsLoading(false);
@@ -254,15 +256,30 @@ function AppContent() {
   const summaryTransactions = useMemo(() => {
     if (currentFilter === 'month') {
       const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth();
+      // Billing cycle: if billingCycleDay > 1, the "month" runs from day X of prev month to day X-1 of current month
+      const cycleDay = billingCycleDay || 1;
+      let cycleStart, cycleEnd;
+      if (cycleDay === 1) {
+        // Standard calendar month
+        cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      } else {
+        // Custom cycle: e.g. day 20 means cycle is 20th of month to 19th of next month
+        if (now.getDate() >= cycleDay) {
+          cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
+          cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1, 23, 59, 59, 999);
+        } else {
+          cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
+          cycleEnd = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1, 23, 59, 59, 999);
+        }
+      }
+      const startTime = cycleStart.getTime();
+      const endTime = cycleEnd.getTime();
       return processedTransactions.filter((transaction) => {
         const date = new Date(transaction.createdAt);
-        return (
-          !Number.isNaN(date.getTime()) &&
-          date.getFullYear() === currentYear &&
-          date.getMonth() === currentMonth
-        );
+        if (Number.isNaN(date.getTime())) return false;
+        const t = date.getTime();
+        return t >= startTime && t <= endTime;
       });
     }
     if (currentFilter === 'range' && dateRange.from && dateRange.to) {
@@ -278,7 +295,7 @@ function AppContent() {
       });
     }
     return processedTransactions;
-  }, [processedTransactions, currentFilter, dateRange]);
+  }, [processedTransactions, currentFilter, dateRange, billingCycleDay]);
 
   const maxTransactionAmount = useMemo(() => {
     if (!summaryTransactions.length) return 1000;
@@ -345,6 +362,12 @@ function AppContent() {
       dbSaveUserPreferences({ customCategories: next });
       return next;
     });
+  };
+
+  const handleBillingCycleDayChange = (day) => {
+    const numDay = parseInt(day) || 1;
+    setBillingCycleDay(numDay);
+    dbSaveUserPreferences({ notificationPrefs: { billingCycleDay: numDay } });
   };
 
   const handleAddTransactions = (newTransactions) => {
@@ -895,6 +918,8 @@ function AppContent() {
             onImportTransactions={handleImportTransactions}
             userEmail={user?.email}
             onSignOut={signOut}
+            billingCycleDay={billingCycleDay}
+            onBillingCycleDayChange={handleBillingCycleDayChange}
           />
         </section>
       </main>
@@ -947,6 +972,7 @@ function AppContent() {
         isOpen={paymentModalState.open}
         onClose={closePaymentModal}
         onConfirm={handlePaymentConfirm}
+        cards={cards}
       />
       <ConfirmDeleteModal
         isOpen={confirmDeleteOpen}

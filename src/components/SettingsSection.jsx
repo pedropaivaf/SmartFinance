@@ -113,7 +113,7 @@ function Toggle({ checked, onChange }) {
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function SettingsSection({ isDarkMode, onToggleTheme, transactions = [], onClearAll, onImportTransactions, userEmail, onSignOut }) {
+export default function SettingsSection({ isDarkMode, onToggleTheme, transactions = [], onClearAll, onImportTransactions, userEmail, onSignOut, billingCycleDay = 1, onBillingCycleDayChange }) {
   const { t, lang } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
@@ -334,6 +334,33 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
             </span>
           }
           onClick={() => setShowLangPicker(true)}
+        />
+      </SettingsGroup>
+
+      {/* Ciclo de faturamento */}
+      <SettingsGroup title={t('settings.billingCycle.section')}>
+        <SettingsRow
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          }
+          iconBg="bg-amber-100 dark:bg-amber-900/40"
+          label={t('settings.billingCycle.label')}
+          sublabel={t('settings.billingCycle.desc')}
+          chevron={false}
+          right={
+            <select
+              value={billingCycleDay}
+              onChange={(e) => onBillingCycleDayChange(e.target.value)}
+              className="text-sm bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={1}>{t('settings.billingCycle.day1')}</option>
+              {Array.from({ length: 28 }, (_, i) => i + 2).map((d) => (
+                <option key={d} value={d}>{t('settings.billingCycle.dayN', { day: d })}</option>
+              ))}
+            </select>
+          }
         />
       </SettingsGroup>
 

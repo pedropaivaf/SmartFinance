@@ -62,8 +62,12 @@ export async function dbAddTransactions(transactions) {
   const rows = transactions.map((t) => {
     const row = toSnakeCase(t);
     row.user_id = userId;
-    // Remove projection fields that shouldn't be in DB
+    // Remove fields that don't exist in the DB schema
     delete row.is_projection;
+    delete row.account_type;
+    delete row.external_id;
+    delete row.bank_name;
+    delete row.source;
     return row;
   });
   const { error } = await supabase.from('transactions').insert(rows);
@@ -214,10 +218,14 @@ export async function dbSaveCards(cards) {
   if (!userId) return false;
   await supabase.from('credit_cards').delete().eq('user_id', userId);
   if (cards.length === 0) return true;
-  const rows = cards.map((c) => ({
-    ...toSnakeCase(c),
-    user_id: userId,
-  }));
+  const rows = cards.map((c) => {
+    const row = { ...toSnakeCase(c), user_id: userId };
+    // Remove fields that don't exist in the DB schema
+    delete row.brand;
+    delete row.current_invoice;
+    delete row.limit_available;
+    return row;
+  });
   const { error } = await supabase.from('credit_cards').insert(rows);
   if (error) {
     console.error('Error saving cards:', error);

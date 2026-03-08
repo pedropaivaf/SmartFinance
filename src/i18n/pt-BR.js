@@ -214,6 +214,13 @@ export default {
   'overview.recent.empty': 'Nenhuma transação ainda.',
   'overview.recent.viewAll': 'Ver todas',
 
+  // Billing cycle
+  'settings.billingCycle.section': 'CICLO MENSAL',
+  'settings.billingCycle.label': 'Dia de início do ciclo',
+  'settings.billingCycle.desc': 'Define quando seu mês financeiro começa',
+  'settings.billingCycle.day1': 'Dia 1 (padrão)',
+  'settings.billingCycle.dayN': 'Dia {day}',
+
   // Auth
   'app.loading': 'Carregando...',
   'auth.email': 'Email',

@@ -180,6 +180,13 @@ export default {
   'overview.recent.empty': 'Aucune transaction pour le moment.',
   'overview.recent.viewAll': 'Voir tout',
 
+  // Billing cycle
+  'settings.billingCycle.section': 'CYCLE MENSUEL',
+  'settings.billingCycle.label': 'Jour de début du cycle',
+  'settings.billingCycle.desc': 'Définit quand votre mois financier commence',
+  'settings.billingCycle.day1': 'Jour 1 (par défaut)',
+  'settings.billingCycle.dayN': 'Jour {day}',
+
   // Auth
   'app.loading': 'Chargement...',
   'auth.email': 'Email',
