@@ -178,6 +178,7 @@ export default {
   'auth.login.button': 'Se connecter',
   'auth.login.noAccount': "Vous n'avez pas de compte ?",
   'auth.login.createAccount': 'Créer un compte',
+  'auth.login.rememberMe': 'Se souvenir de moi',
   'auth.register.subtitle': 'Créez votre compte gratuit',
   'auth.register.button': 'Créer un compte',
   'auth.register.hasAccount': 'Vous avez déjà un compte ?',
