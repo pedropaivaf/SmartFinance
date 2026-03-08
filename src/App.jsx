@@ -73,21 +73,22 @@ function NavTab({ target, label, activePage, onNavigate, children }) {
       type="button"
       aria-label={label}
       onClick={() => onNavigate(target)}
-      className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1.5 min-w-[40px] min-h-[44px] text-[10px] transition-all duration-200 focus:outline-none ${
-        isActive ? 'nav-tab-active' : 'text-slate-500 hover:text-slate-300'
+      className={`nav-tab-item flex flex-col items-center justify-center gap-[3px] min-w-[48px] min-h-[44px] text-[10px] tracking-wide transition-all duration-300 focus:outline-none ${
+        isActive ? 'nav-tab-active' : 'text-slate-400 dark:text-slate-500'
       }`}
     >
+      {isActive && <span className="nav-tab-indicator" />}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`}
+        className={`h-[22px] w-[22px] transition-all duration-300 ${isActive ? 'scale-105' : ''}`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
-        strokeWidth={isActive ? 2.5 : 1.8}
+        strokeWidth={isActive ? 2.2 : 1.6}
       >
         {children}
       </svg>
-      <span className={`transition-all duration-200 ${isActive ? 'font-semibold' : 'font-normal'}`}>{label}</span>
+      <span className={`transition-all duration-300 leading-none ${isActive ? 'font-semibold opacity-100' : 'font-medium opacity-70'}`}>{label}</span>
     </button>
   );
 }
@@ -939,28 +940,31 @@ function AppContent() {
       {/* BOTTOM NAV — mobile only */}
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30 lg:hidden">
         <div className="mx-auto max-w-lg relative">
-          <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
+          {/* FAB - floating above nav */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-6 z-10">
             <button
               type="button"
               aria-label="Nova transacao"
               onClick={() => setActivePage('new-transaction')}
-              className={`fab-button flex items-center justify-center w-14 h-14 rounded-full focus:outline-none ${
+              className={`fab-button flex items-center justify-center w-[52px] h-[52px] rounded-full focus:outline-none ${
                 activePage === 'new-transaction' ? 'fab-active ring-4 ring-sky-400/20' : 'fab-pulse'
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
               </svg>
             </button>
           </div>
-          <div className="nav-glass flex items-center justify-around px-1 pt-1 pb-2">
+          {/* Nav bar */}
+          <div className="nav-glass grid grid-cols-[1fr_1fr_56px_1fr_1fr_1fr] items-end px-1 pt-2 pb-1">
             <NavTab target="overview" label={t('nav.home')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </NavTab>
             <NavTab target="graphs-goals" label={t('nav.chart')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
             </NavTab>
-            <div className="w-14 flex-shrink-0" aria-hidden="true" />
+            {/* Center spacer for FAB */}
+            <div className="flex flex-col items-center justify-end min-h-[44px]" aria-hidden="true" />
             <NavTab target="wallet" label={t('nav.wallet')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </NavTab>
