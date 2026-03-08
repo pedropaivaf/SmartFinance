@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
+import { getCategoryById } from '../data/categories';
+import { dotBg } from './CategoryPicker';
 
-function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatCurrency }) {
+function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatCurrency, customCategories = [] }) {
   const { t, lang } = useTranslation();
 
   const monthFormatter = useMemo(
@@ -127,6 +129,17 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                           {t('list.paidWith')} {paymentLabel}{creditInfo}
                         </p>
                       )}
+                      {transaction.category && (() => {
+                        const cat = getCategoryById(transaction.category, customCategories);
+                        if (!cat) return null;
+                        const dot = dotBg[cat.color] || dotBg.slate;
+                        return (
+                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
+                            {cat.label || t(`categories.${transaction.category}`)}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">

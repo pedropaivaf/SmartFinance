@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../i18n/index.jsx';
+import CategoryPicker, { dotBg } from './CategoryPicker';
+import { getCategoryById } from '../data/categories';
 
 const formatDateInput = (value) => {
   if (!value) return '';
@@ -7,11 +10,14 @@ const formatDateInput = (value) => {
   return date.toISOString().split('T')[0];
 };
 
-function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
+function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCategories = [], onAddCustomCategory }) {
+  const { t } = useTranslation();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
   const [type, setType] = useState('income');
+  const [category, setCategory] = useState('');
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [recurrence, setRecurrence] = useState('single');
 
   useEffect(() => {
@@ -20,6 +26,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
       setAmount('');
       setDate('');
       setType('income');
+      setCategory('');
       setRecurrence('single');
       return;
     }
@@ -32,6 +39,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
     setAmount(Math.abs(transaction.amount).toString());
     setDate(formatDateInput(transaction.createdAt));
     setType(transaction.type);
+    setCategory(transaction.category || '');
     setRecurrence(transaction.recurrence);
   }, [transaction, isOpen]);
 
@@ -65,6 +73,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
       description: trimmedDescription,
       amount: numericAmount,
       type,
+      category,
       date,
       recurrence,
     });
@@ -105,6 +114,32 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
               className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               required
             />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
+              {t('form.category.label')}
+            </label>
+            <button
+              type="button"
+              onClick={() => setCategoryPickerOpen(true)}
+              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition flex items-center gap-2 text-left text-sm"
+            >
+              {category ? (() => {
+                const cat = getCategoryById(category, customCategories);
+                const dot = dotBg[cat?.color] || dotBg.slate;
+                return (
+                  <>
+                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dot}`} />
+                    <span>{cat?.label || t(`categories.${category}`)}</span>
+                  </>
+                );
+              })() : (
+                <span className="text-slate-400 dark:text-slate-500">{t('form.category.placeholder')}</span>
+              )}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -203,6 +238,15 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit }) {
             </button>
           </div>
         </form>
+        <CategoryPicker
+          isOpen={categoryPickerOpen}
+          selected={category}
+          onSelect={setCategory}
+          onClose={() => setCategoryPickerOpen(false)}
+          transactionType={type}
+          customCategories={customCategories}
+          onAddCustomCategory={onAddCustomCategory}
+        />
       </div>
     </div>
   );

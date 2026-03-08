@@ -460,3 +460,50 @@ html {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ── Dual range slider ────────────────────────────────────────────────── */
+
+.dual-range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 24px;
+  outline: none;
+}
+
+.dual-range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dual-range-thumb::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+}
+
+.dual-range-thumb::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.dark .dual-range-thumb::-webkit-slider-thumb {
+  border-color: #1e293b;
+}
+
+.dark .dual-range-thumb::-moz-range-thumb {
+  border-color: #1e293b;
+}

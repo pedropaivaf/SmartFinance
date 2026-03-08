@@ -10,8 +10,12 @@ import PremiumBadge from './PremiumBadge';
 import PremiumCard from './PremiumCard';
 import { hasFeature } from '../config';
 import { compareCurrentVsPreviousMonth, getTopCategories } from '../utils/calculations';
+import { getCategoryById } from '../data/categories';
+import { dotBg } from './CategoryPicker';
+import { useTranslation } from '../i18n/index.jsx';
 
-export default function AdvancedAnalytics({ transactions }) {
+export default function AdvancedAnalytics({ transactions, customCategories = [] }) {
+  const { t } = useTranslation();
   const isPremium = hasFeature('advanced_charts');
 
   const comparison = useMemo(() => {
@@ -94,13 +98,20 @@ export default function AdvancedAnalytics({ transactions }) {
 
               return (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="w-6 h-6 flex items-center justify-center bg-slate-200 dark:bg-slate-700 rounded-full text-xs font-bold text-slate-600 dark:text-slate-300">
-                    {index + 1}
-                  </div>
+                  {(() => {
+                    const catDef = getCategoryById(cat.category, customCategories);
+                    const dot = dotBg[catDef?.color] || dotBg.slate;
+                    return (
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${dot}`} />
+                    );
+                  })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-slate-700 dark:text-slate-300 font-medium">
-                        {cat.category}
+                        {(() => {
+                          const catDef = getCategoryById(cat.category, customCategories);
+                          return catDef?.label || (catDef ? t(`categories.${cat.category}`) : cat.category);
+                        })()}
                       </span>
                       <span className="text-slate-900 dark:text-white font-bold">
                         R$ {cat.amount.toFixed(2)}

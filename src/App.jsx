@@ -25,6 +25,11 @@ import AdvancedAnalytics from './components/AdvancedAnalytics.jsx';
 import ExportSection from './components/ExportSection.jsx';
 import SettingsSection from './components/SettingsSection.jsx';
 
+// Overview sections
+import OverviewMiniChart from './components/OverviewMiniChart.jsx';
+import OverviewCategoryBreakdown from './components/OverviewCategoryBreakdown.jsx';
+import OverviewRecentTransactions from './components/OverviewRecentTransactions.jsx';
+
 // Auth & pages
 import LoginPage from './components/LoginPage.jsx';
 import RegisterPage from './components/RegisterPage.jsx';
@@ -139,7 +144,8 @@ function AppContent() {
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
   const [dateRange, setDateRange] = useState({ from: null, to: null });
   const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'income' | 'expense'
-  const [valueRange, setValueRange] = useState({ min: '', max: '' });
+  const [valueRange, setValueRange] = useState({ min: 0, max: 0 });
+  const [valueRangeActive, setValueRangeActive] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('color-theme');
     if (stored) return stored === 'dark';
@@ -148,6 +154,7 @@ function AppContent() {
   const [summaryOrder, setSummaryOrder] = useState(['income', 'expense', 'paid', 'balance']);
   const [envelopes, setEnvelopes] = useState([]);
   const [cards, setCards] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
@@ -189,6 +196,7 @@ function AppContent() {
         else if (prefs.theme === 'light') setIsDarkMode(false);
         if (prefs.summaryOrder) setSummaryOrder(prefs.summaryOrder);
         if (prefs.plan) setCurrentPlan(prefs.plan);
+        if (prefs.customCategories) setCustomCategories(prefs.customCategories);
       }
 
       setIsLoading(false);
@@ -272,6 +280,12 @@ function AppContent() {
     return processedTransactions;
   }, [processedTransactions, currentFilter, dateRange]);
 
+  const maxTransactionAmount = useMemo(() => {
+    if (!summaryTransactions.length) return 1000;
+    const max = Math.max(...summaryTransactions.map((tx) => Math.abs(tx.amount)));
+    return Math.ceil(max / 100) * 100 || 1000;
+  }, [summaryTransactions]);
+
   const listTransactions = useMemo(() => {
     let filtered = summaryTransactions;
 
@@ -286,17 +300,15 @@ function AppContent() {
     }
 
     // Value range filter
-    const minVal = parseFloat(valueRange.min);
-    const maxVal = parseFloat(valueRange.max);
-    if (!isNaN(minVal)) {
-      filtered = filtered.filter((tx) => Math.abs(tx.amount) >= minVal);
-    }
-    if (!isNaN(maxVal)) {
-      filtered = filtered.filter((tx) => Math.abs(tx.amount) <= maxVal);
+    if (valueRangeActive) {
+      filtered = filtered.filter((tx) => {
+        const abs = Math.abs(tx.amount);
+        return abs >= valueRange.min && abs <= valueRange.max;
+      });
     }
 
     return filtered;
-  }, [summaryTransactions, currentPaymentFilter, typeFilter, valueRange]);
+  }, [summaryTransactions, currentPaymentFilter, typeFilter, valueRange, valueRangeActive]);
 
   const summaryValues = useMemo(() => {
     const income = summaryTransactions
@@ -322,6 +334,15 @@ function AppContent() {
     setIsDarkMode((prev) => {
       const next = !prev;
       persistPreferences({ theme: next ? 'dark' : 'light' });
+      return next;
+    });
+  };
+
+  const handleAddCustomCategory = (cat) => {
+    setCustomCategories((prev) => {
+      if (prev.some((c) => c.id === cat.id)) return prev;
+      const next = [...prev, cat];
+      dbSaveUserPreferences({ customCategories: next });
       return next;
     });
   };
@@ -494,7 +515,7 @@ function AppContent() {
     setEditChoiceState({ open: false, transaction: null });
   };
 
-  const handleEditSubmit = ({ id, description, amount, type, date, recurrence }) => {
+  const handleEditSubmit = ({ id, description, amount, type, category, date, recurrence }) => {
     setTransactions((prev) =>
       prev.map((item) => {
         if (item.id !== id) return item;
@@ -508,6 +529,7 @@ function AppContent() {
           description: updatedDescription,
           amount: signedAmount,
           type,
+          category: category || '',
           createdAt: new Date(`${date}T12:00:00`).toISOString(),
           recurrence,
         };
@@ -614,13 +636,27 @@ function AppContent() {
               onReorder={handleSummaryReorder}
             />
           </div>
-          <div className="lg:grid lg:grid-cols-3 lg:gap-6 space-y-5 lg:space-y-0">
-            <div className="lg:col-span-2">
-              <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
-            </div>
-            <div className="lg:col-span-1">
-              <UpcomingBillsSection transactions={processedTransactions} />
-            </div>
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-5 lg:space-y-0">
+            <OverviewMiniChart
+              transactions={summaryTransactions}
+              isDarkMode={isDarkMode}
+              formatCurrency={formatCurrency}
+            />
+            <OverviewCategoryBreakdown
+              transactions={summaryTransactions}
+              formatCurrency={formatCurrency}
+              customCategories={customCategories}
+            />
+          </div>
+          <OverviewRecentTransactions
+            transactions={summaryTransactions}
+            formatCurrency={formatCurrency}
+            onNavigate={setActivePage}
+            customCategories={customCategories}
+          />
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-5 lg:space-y-0">
+            <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
+            <UpcomingBillsSection transactions={processedTransactions} />
           </div>
         </section>
 
@@ -648,7 +684,7 @@ function AppContent() {
             envelopes={envelopes}
             onSaveEnvelopes={handleSaveEnvelopes}
           />
-          <AdvancedAnalytics transactions={summaryTransactions} />
+          <AdvancedAnalytics transactions={summaryTransactions} customCategories={customCategories} />
         </section>
 
         {/* HISTORY */}
@@ -689,35 +725,129 @@ function AppContent() {
                   {type === 'all' ? 'Todos' : type === 'income' ? 'Recebidos' : 'Gastos'}
                 </button>
               ))}
-              {/* Value range */}
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="number"
-                  placeholder="De R$"
-                  value={valueRange.min}
-                  onChange={(e) => setValueRange((prev) => ({ ...prev, min: e.target.value }))}
-                  className="w-24 px-2 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-400"
-                />
-                <span className="text-xs text-slate-400">—</span>
-                <input
-                  type="number"
-                  placeholder="Até R$"
-                  value={valueRange.max}
-                  onChange={(e) => setValueRange((prev) => ({ ...prev, max: e.target.value }))}
-                  className="w-24 px-2 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-400"
-                />
-              </div>
+              {/* Value range slider */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!valueRangeActive) {
+                    setValueRange({ min: 0, max: maxTransactionAmount });
+                    setValueRangeActive(true);
+                  } else {
+                    setValueRangeActive(false);
+                  }
+                }}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                  valueRangeActive
+                    ? 'bg-sky-500 text-white'
+                    : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                }`}
+              >
+                Faixa de valor
+              </button>
               {/* Clear filters */}
-              {(typeFilter !== 'all' || valueRange.min || valueRange.max) && (
+              {(typeFilter !== 'all' || valueRangeActive) && (
                 <button
                   type="button"
-                  onClick={() => { setTypeFilter('all'); setValueRange({ min: '', max: '' }); }}
+                  onClick={() => { setTypeFilter('all'); setValueRangeActive(false); setValueRange({ min: 0, max: 0 }); }}
                   className="px-2 py-1.5 text-xs text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition"
                 >
                   Limpar filtros
                 </button>
               )}
             </div>
+            {/* Value range slider panel */}
+            {valueRangeActive && (() => {
+              const pctMin = (valueRange.min / maxTransactionAmount) * 100;
+              const pctMax = (valueRange.max / maxTransactionAmount) * 100;
+              const step = Math.max(1, Math.round(maxTransactionAmount / 100));
+
+              const getValueFromEvent = (e, trackEl) => {
+                if (!trackEl) return null;
+                const rect = trackEl.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+                return Math.round((pct * maxTransactionAmount) / step) * step;
+              };
+
+              const handleTrackInteraction = (e) => {
+                const track = e.currentTarget;
+                const val = getValueFromEvent(e, track);
+                if (val === null) return;
+
+                // Decide which thumb to move: the closest one
+                const distMin = Math.abs(val - valueRange.min);
+                const distMax = Math.abs(val - valueRange.max);
+                const movingMin = distMin <= distMax;
+
+                const update = (ev) => {
+                  const v = getValueFromEvent(ev, track);
+                  if (v === null) return;
+                  if (movingMin) {
+                    setValueRange((prev) => ({ ...prev, min: Math.min(v, prev.max) }));
+                  } else {
+                    setValueRange((prev) => ({ ...prev, max: Math.max(v, prev.min) }));
+                  }
+                };
+
+                update(e);
+
+                const onMove = (ev) => { ev.preventDefault(); update(ev); };
+                const onEnd = () => {
+                  document.removeEventListener('mousemove', onMove);
+                  document.removeEventListener('mouseup', onEnd);
+                  document.removeEventListener('touchmove', onMove);
+                  document.removeEventListener('touchend', onEnd);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend', onEnd);
+              };
+
+              return (
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl px-4 py-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="bg-white dark:bg-slate-700 rounded-lg px-2.5 py-1 shadow-sm">
+                      <span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{formatCurrency(valueRange.min)}</span>
+                    </div>
+                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">min — max</span>
+                    <div className="bg-white dark:bg-slate-700 rounded-lg px-2.5 py-1 shadow-sm">
+                      <span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{formatCurrency(valueRange.max)}</span>
+                    </div>
+                  </div>
+                  {/* Track */}
+                  <div
+                    className="relative h-10 flex items-center cursor-pointer select-none touch-none"
+                    onMouseDown={handleTrackInteraction}
+                    onTouchStart={handleTrackInteraction}
+                  >
+                    {/* Background track */}
+                    <div className="absolute inset-x-0 h-2 bg-slate-200 dark:bg-slate-600 rounded-full" />
+                    {/* Active range fill */}
+                    <div
+                      className="absolute h-2 bg-gradient-to-r from-sky-400 to-sky-500 rounded-full transition-[left,right] duration-75"
+                      style={{ left: `${pctMin}%`, right: `${100 - pctMax}%` }}
+                    />
+                    {/* Min thumb */}
+                    <div
+                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-slate-200 shadow-md border-2 border-sky-500 transition-[left] duration-75 active:scale-110"
+                      style={{ left: `${pctMin}%` }}
+                    />
+                    {/* Max thumb */}
+                    <div
+                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-slate-200 shadow-md border-2 border-sky-500 transition-[left] duration-75 active:scale-110"
+                      style={{ left: `${pctMax}%` }}
+                    />
+                  </div>
+                  {/* Scale labels */}
+                  <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 -mt-1">
+                    <span>R$ 0</span>
+                    <span>{formatCurrency(maxTransactionAmount / 2)}</span>
+                    <span>{formatCurrency(maxTransactionAmount)}</span>
+                  </div>
+                </div>
+              );
+            })()}
             {/* Result count */}
             <p className="text-xs text-slate-400 dark:text-slate-500">
               {listTransactions.length} transação{listTransactions.length !== 1 ? 'ões' : ''} encontrada{listTransactions.length !== 1 ? 's' : ''}
@@ -728,6 +858,7 @@ function AppContent() {
               onEdit={handleEditRequest}
               onDelete={handleDeleteTransactionRequest}
               formatCurrency={(value) => formatCurrency(value)}
+              customCategories={customCategories}
             />
           </div>
           <CreditCardsSection
@@ -746,7 +877,7 @@ function AppContent() {
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-3xl`}>
             <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.new.overline')}</p>
-            <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
+            <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} />
           </div>
         </section>
 
@@ -809,6 +940,8 @@ function AppContent() {
         transaction={editModalState.transaction}
         onClose={() => setEditModalState({ open: false, transaction: null })}
         onSubmit={handleEditSubmit}
+        customCategories={customCategories}
+        onAddCustomCategory={handleAddCustomCategory}
       />
       <PaymentModal
         isOpen={paymentModalState.open}

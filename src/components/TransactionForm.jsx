@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
+import CategoryPicker from './CategoryPicker';
+import { getCategoryById } from '../data/categories';
+import { dotBg } from './CategoryPicker';
 
 const formatDate = (date) => date.toISOString().split('T')[0];
 
@@ -9,7 +12,7 @@ const inputBase =
   'placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 ' +
   'focus:ring-sky-500 focus:border-sky-500 transition leading-tight';
 
-function TransactionForm({ onAddTransactions, onClearAll }) {
+function TransactionForm({ onAddTransactions, onClearAll, customCategories = [], onAddCustomCategory }) {
   const { t } = useTranslation();
   const today = useMemo(() => formatDate(new Date()), []);
   const [description, setDescription] = useState('');
@@ -20,6 +23,8 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
   const [installmentStartDate, setInstallmentStartDate] = useState(today);
   const [paidInstallments, setPaidInstallments] = useState('0');
   const [type, setType] = useState('income');
+  const [category, setCategory] = useState('');
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [prepaidPaymentMethod, setPrepaidPaymentMethod] = useState('pix');
 
   useEffect(() => {
@@ -34,6 +39,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
     setDescription('');
     setAmount('');
     setType('income');
+    setCategory('');
     setRecurrence('single');
     setInstallments('');
     setPaidInstallments('0');
@@ -94,6 +100,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           description: `${trimmedDescription} (${index + 1}/${totalInstallments})`,
           amount: installmentAmount,
           type: 'expense',
+          category: category || '',
           createdAt: installmentDate.toISOString(),
           recurrence: 'installment',
           paid: isPaid,
@@ -110,6 +117,7 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
         description: trimmedDescription,
         amount: signedAmount,
         type,
+        category: category || '',
         createdAt: transactionBaseDate.toISOString(),
         recurrence,
         paid: false,
@@ -145,6 +153,35 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           />
           <p id="description-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             {t('form.description.helper')}
+          </p>
+        </div>
+        <div>
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            {t('form.category.label')}
+          </label>
+          <button
+            type="button"
+            onClick={() => setCategoryPickerOpen(true)}
+            className={`${inputBase} flex items-center gap-2 text-left`}
+          >
+            {category ? (() => {
+              const cat = getCategoryById(category, customCategories);
+              const dot = dotBg[cat?.color] || dotBg.slate;
+              return (
+                <>
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dot}`} />
+                  <span>{cat?.label || t(`categories.${category}`)}</span>
+                </>
+              );
+            })() : (
+              <span className="text-slate-400 dark:text-slate-500">{t('form.category.placeholder')}</span>
+            )}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {t('form.category.helper')}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -346,6 +383,15 @@ function TransactionForm({ onAddTransactions, onClearAll }) {
           {t('form.clearAll.helper')}
         </p>
       </div>
+      <CategoryPicker
+        isOpen={categoryPickerOpen}
+        selected={category}
+        onSelect={setCategory}
+        onClose={() => setCategoryPickerOpen(false)}
+        transactionType={type}
+        customCategories={customCategories}
+        onAddCustomCategory={onAddCustomCategory}
+      />
     </>
   );
 }
