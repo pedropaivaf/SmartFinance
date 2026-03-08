@@ -137,6 +137,9 @@ function AppContent() {
   const [goals, setGoals] = useState({ incomeGoal: '', expenseGoal: '' });
   const [currentFilter, setCurrentFilter] = useState('total');
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'income' | 'expense'
+  const [valueRange, setValueRange] = useState({ min: '', max: '' });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('color-theme');
     if (stored) return stored === 'dark';
@@ -254,13 +257,46 @@ function AppContent() {
         );
       });
     }
+    if (currentFilter === 'range' && dateRange.from && dateRange.to) {
+      const fromTime = dateRange.from.getTime();
+      const toEnd = new Date(dateRange.to);
+      toEnd.setHours(23, 59, 59, 999);
+      const toTime = toEnd.getTime();
+      return processedTransactions.filter((transaction) => {
+        const date = new Date(transaction.createdAt);
+        if (Number.isNaN(date.getTime())) return false;
+        const time = date.getTime();
+        return time >= fromTime && time <= toTime;
+      });
+    }
     return processedTransactions;
-  }, [processedTransactions, currentFilter]);
+  }, [processedTransactions, currentFilter, dateRange]);
 
   const listTransactions = useMemo(() => {
-    if (currentPaymentFilter === 'all') return summaryTransactions;
-    return summaryTransactions.filter((transaction) => transaction.paymentMethod === currentPaymentFilter);
-  }, [summaryTransactions, currentPaymentFilter]);
+    let filtered = summaryTransactions;
+
+    // Payment method filter
+    if (currentPaymentFilter !== 'all') {
+      filtered = filtered.filter((tx) => tx.paymentMethod === currentPaymentFilter);
+    }
+
+    // Type filter (income/expense)
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter((tx) => tx.type === typeFilter);
+    }
+
+    // Value range filter
+    const minVal = parseFloat(valueRange.min);
+    const maxVal = parseFloat(valueRange.max);
+    if (!isNaN(minVal)) {
+      filtered = filtered.filter((tx) => Math.abs(tx.amount) >= minVal);
+    }
+    if (!isNaN(maxVal)) {
+      filtered = filtered.filter((tx) => Math.abs(tx.amount) <= maxVal);
+    }
+
+    return filtered;
+  }, [summaryTransactions, currentPaymentFilter, typeFilter, valueRange]);
 
   const summaryValues = useMemo(() => {
     const income = summaryTransactions
@@ -554,7 +590,7 @@ function AppContent() {
         onSignOut={signOut}
       />
 
-      <main className="w-full mx-auto px-3 sm:px-6 lg:pl-72 lg:pr-8 max-w-md lg:max-w-6xl pb-28 lg:pb-8 space-y-5 sm:space-y-6 pt-6 lg:pt-10">
+      <main className="w-full mx-auto px-3 sm:px-6 lg:pl-72 lg:pr-10 max-w-lg lg:max-w-full pb-28 lg:pb-8 space-y-5 sm:space-y-6 pt-6 lg:pt-10">
         {/* OVERVIEW */}
         <section
           id="page-overview"
@@ -578,9 +614,13 @@ function AppContent() {
               onReorder={handleSummaryReorder}
             />
           </div>
-          <div className="lg:grid lg:grid-cols-2 lg:gap-6">
-            <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
-            <UpcomingBillsSection transactions={processedTransactions} />
+          <div className="lg:grid lg:grid-cols-3 lg:gap-6 space-y-5 lg:space-y-0">
+            <div className="lg:col-span-2">
+              <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
+            </div>
+            <div className="lg:col-span-1">
+              <UpcomingBillsSection transactions={processedTransactions} />
+            </div>
           </div>
         </section>
 
@@ -624,9 +664,64 @@ function AppContent() {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.history.title')}</h3>
               </div>
             </div>
-            <FilterBar currentFilter={currentFilter} onChange={setCurrentFilter} />
+            <FilterBar
+              currentFilter={currentFilter}
+              onChange={setCurrentFilter}
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+            />
             <div className="border-b border-slate-100 dark:border-slate-700/50" />
             <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
+            {/* Advanced filters */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Type filter */}
+              {['all', 'income', 'expense'].map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setTypeFilter(type)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                    typeFilter === type
+                      ? type === 'income' ? 'bg-blue-500 text-white' : type === 'expense' ? 'bg-red-500 text-white' : 'bg-sky-500 text-white'
+                      : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {type === 'all' ? 'Todos' : type === 'income' ? 'Recebidos' : 'Gastos'}
+                </button>
+              ))}
+              {/* Value range */}
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  placeholder="De R$"
+                  value={valueRange.min}
+                  onChange={(e) => setValueRange((prev) => ({ ...prev, min: e.target.value }))}
+                  className="w-24 px-2 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                />
+                <span className="text-xs text-slate-400">—</span>
+                <input
+                  type="number"
+                  placeholder="Até R$"
+                  value={valueRange.max}
+                  onChange={(e) => setValueRange((prev) => ({ ...prev, max: e.target.value }))}
+                  className="w-24 px-2 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                />
+              </div>
+              {/* Clear filters */}
+              {(typeFilter !== 'all' || valueRange.min || valueRange.max) && (
+                <button
+                  type="button"
+                  onClick={() => { setTypeFilter('all'); setValueRange({ min: '', max: '' }); }}
+                  className="px-2 py-1.5 text-xs text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+            {/* Result count */}
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {listTransactions.length} transação{listTransactions.length !== 1 ? 'ões' : ''} encontrada{listTransactions.length !== 1 ? 's' : ''}
+            </p>
             <TransactionList
               transactions={listTransactions}
               onTogglePaid={handleTogglePaid}
@@ -649,7 +744,7 @@ function AppContent() {
           data-page="new-transaction"
           className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
         >
-          <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-2xl`}>
+          <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-3xl`}>
             <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.new.overline')}</p>
             <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} />
           </div>
@@ -675,7 +770,7 @@ function AppContent() {
 
       {/* BOTTOM NAV — mobile only */}
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30 lg:hidden">
-        <div className="mx-auto max-w-md relative">
+        <div className="mx-auto max-w-lg relative">
           <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-10">
             <button
               type="button"

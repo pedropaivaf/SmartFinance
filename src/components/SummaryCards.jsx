@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
 
 function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCurrency, cardOrder = [], onReorder }) {
   const { t } = useTranslation();
+  const [draggingKey, setDraggingKey] = useState(null);
+  const [dragOverKey, setDragOverKey] = useState(null);
 
   const cardsByKey = {
     income: {
@@ -69,19 +71,14 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
   };
 
   const orderedKeys = cardOrder.length ? cardOrder : ['income', 'expense', 'paid', 'balance'];
-
   const activeDragKey = useRef(null);
 
   const reorderKeys = (sourceKey, targetKey) => {
-    if (!onReorder || !sourceKey || !targetKey || sourceKey === targetKey) {
-      return;
-    }
+    if (!onReorder || !sourceKey || !targetKey || sourceKey === targetKey) return;
     const current = orderedKeys.filter((item) => cardsByKey[item]);
     const sourceIndex = current.indexOf(sourceKey);
     const targetIndex = current.indexOf(targetKey);
-    if (sourceIndex === -1 || targetIndex === -1) {
-      return;
-    }
+    if (sourceIndex === -1 || targetIndex === -1) return;
     const next = [...current];
     next.splice(sourceIndex, 1);
     next.splice(targetIndex, 0, sourceKey);
@@ -90,24 +87,38 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
 
   const handleDragStart = (event, key) => {
     activeDragKey.current = key;
+    setDraggingKey(key);
     event.dataTransfer.setData('text/plain', key);
     event.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (event) => {
+  const handleDragEnd = () => {
+    setDraggingKey(null);
+    setDragOverKey(null);
+    activeDragKey.current = null;
+  };
+
+  const handleDragOver = (event, key) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
+    if (key !== draggingKey) setDragOverKey(key);
   };
+
+  const handleDragLeave = () => setDragOverKey(null);
 
   const handleDrop = (event, targetKey) => {
     event.preventDefault();
     const sourceKey = event.dataTransfer.getData('text/plain');
     reorderKeys(sourceKey, targetKey);
+    setDraggingKey(null);
+    setDragOverKey(null);
     activeDragKey.current = null;
   };
 
   const handleTouchStart = (key) => {
     activeDragKey.current = key;
+    setDraggingKey(key);
+    try { navigator.vibrate?.(10); } catch {}
   };
 
   const handleTouchMove = (event) => {
@@ -116,13 +127,14 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     const targetCard = element?.closest('[data-card-key]');
     const targetKey = targetCard?.dataset?.cardKey;
-    if (activeDragKey.current && targetKey) {
-      reorderKeys(activeDragKey.current, targetKey);
-    }
+    if (targetKey && targetKey !== dragOverKey) setDragOverKey(targetKey);
+    if (activeDragKey.current && targetKey) reorderKeys(activeDragKey.current, targetKey);
   };
 
   const handleTouchEnd = () => {
     activeDragKey.current = null;
+    setDraggingKey(null);
+    setDragOverKey(null);
   };
 
   return (
@@ -130,21 +142,39 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
       {orderedKeys.map((key, index) => {
         const card = cardsByKey[key];
         if (!card) return null;
+        const isDragging = draggingKey === key;
+        const isDragOver = dragOverKey === key && draggingKey !== key;
+
         return (
           <div
             key={card.id}
             data-card-key={key}
-            className={`summary-card card-animate ${card.containerClass} p-4 rounded-2xl shadow-md ${card.glowClass} cursor-move backdrop-blur-sm`}
+            className={`summary-card card-animate ${card.containerClass} p-4 rounded-2xl shadow-md ${card.glowClass} cursor-grab active:cursor-grabbing backdrop-blur-sm
+              transition-all duration-300 ease-out
+              ${isDragging ? 'scale-[1.06] opacity-50 shadow-2xl rotate-[2deg] z-20 ring-2 ring-sky-400/50' : ''}
+              ${isDragOver ? 'ring-2 ring-sky-400 ring-offset-2 dark:ring-offset-slate-900 scale-[1.02] shadow-lg' : ''}
+              hover:shadow-lg hover:-translate-y-0.5
+            `}
             style={{ animationDelay: `${index * 60}ms` }}
             draggable
             onDragStart={(event) => handleDragStart(event, key)}
-            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragOver={(event) => handleDragOver(event, key)}
+            onDragLeave={handleDragLeave}
             onDrop={(event) => handleDrop(event, key)}
             onTouchStart={() => handleTouchStart(key)}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleTouchEnd}
           >
+            {/* Grip dots indicator */}
+            <div className="flex justify-center mb-1.5 opacity-25 hover:opacity-50 transition-opacity">
+              <div className="flex gap-[3px]">
+                <div className="w-1 h-1 rounded-full bg-slate-500 dark:bg-slate-400" />
+                <div className="w-1 h-1 rounded-full bg-slate-500 dark:bg-slate-400" />
+                <div className="w-1 h-1 rounded-full bg-slate-500 dark:bg-slate-400" />
+              </div>
+            </div>
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">{card.title}</h3>
