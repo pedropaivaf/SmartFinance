@@ -941,7 +941,7 @@ function AppContent() {
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30 lg:hidden">
         <div className="mx-auto max-w-lg relative">
           {/* FAB - floating above nav, centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-8 z-10">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-14 z-10">
             <button
               type="button"
               aria-label="Nova transacao"
