@@ -240,9 +240,7 @@ function AppContent() {
     dbSaveUserPreferences({
       theme: isDarkMode ? 'dark' : 'light',
       language: localStorage.getItem('smartfinance_language') || 'pt-BR',
-      plan: getCurrentPlan(),
       summaryOrder,
-      notificationPrefs: { enabled: false },
       ...updates,
     });
   }, [isDarkMode, summaryOrder]);

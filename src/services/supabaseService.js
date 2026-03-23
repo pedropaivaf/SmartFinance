@@ -246,29 +246,31 @@ export async function dbLoadUserPreferences() {
     return null;
   }
   if (!data) return null;
+  const notifPrefs = data.notification_prefs || {};
   return {
     theme: data.theme || 'light',
     language: data.language || 'pt-BR',
     plan: data.plan || 'free',
     summaryOrder: data.summary_order || ['income', 'expense', 'paid', 'balance'],
-    notificationPrefs: data.notification_prefs || { enabled: false },
+    notificationPrefs: notifPrefs,
+    customCategories: notifPrefs.customCategories || [],
   };
 }
 
 export async function dbSaveUserPreferences(prefs) {
   const userId = await getUserId();
   if (!userId) return false;
+  // Only include fields that were explicitly passed — never overwrite plan accidentally
+  const row = { user_id: userId, updated_at: new Date().toISOString() };
+  if (prefs.theme !== undefined) row.theme = prefs.theme;
+  if (prefs.language !== undefined) row.language = prefs.language;
+  if (prefs.plan !== undefined) row.plan = prefs.plan;
+  if (prefs.summaryOrder !== undefined) row.summary_order = prefs.summaryOrder;
+  if (prefs.notificationPrefs !== undefined) row.notification_prefs = prefs.notificationPrefs;
+  if (prefs.customCategories !== undefined) row.notification_prefs = { ...(row.notification_prefs || {}), customCategories: prefs.customCategories };
   const { error } = await supabase
     .from('user_preferences')
-    .upsert({
-      user_id: userId,
-      theme: prefs.theme,
-      language: prefs.language,
-      plan: prefs.plan,
-      summary_order: prefs.summaryOrder,
-      notification_prefs: prefs.notificationPrefs,
-      updated_at: new Date().toISOString(),
-    });
+    .upsert(row);
   if (error) {
     console.error('Error saving preferences:', error);
     return false;
