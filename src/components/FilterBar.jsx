@@ -22,8 +22,8 @@ function FilterBar({ currentFilter, onChange, dateRange, onDateRangeChange }) {
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Histórico de transações</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Histórico de transações</h2>
+        <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Analise os lançamentos do mês atual ou visualize todo o histórico registrado
         </p>
       </div>
@@ -34,8 +34,8 @@ function FilterBar({ currentFilter, onChange, dateRange, onDateRangeChange }) {
           onClick={handleClick}
           className={`filter-btn px-3 py-1.5 text-sm font-medium rounded-lg transition ${
             currentFilter === 'month'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+              ? 'bg-[#1B4965] dark:bg-[#5FA8D3] text-white shadow-sm'
+              : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
           }`}
         >
           Mês
@@ -46,8 +46,8 @@ function FilterBar({ currentFilter, onChange, dateRange, onDateRangeChange }) {
           onClick={handleClick}
           className={`filter-btn px-3 py-1.5 text-sm font-medium rounded-lg transition ${
             currentFilter === 'total'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+              ? 'bg-[#1B4965] dark:bg-[#5FA8D3] text-white shadow-sm'
+              : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
           }`}
         >
           Total

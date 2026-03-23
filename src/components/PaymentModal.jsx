@@ -35,17 +35,17 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
       id="payment-modal"
       role="dialog"
       aria-modal="true"
-      className="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={handleOverlayClick}
     >
-      <div className="modal-container w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8">
+      <div className="modal-container w-full max-w-sm bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Confirmar Pagamento</h2>
+          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Confirmar Pagamento</h2>
           <button
             id="close-payment-modal-btn"
             type="button"
             onClick={onClose}
-            className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+            className="text-[#6B6B6B] dark:text-[#A09A92] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -53,7 +53,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
           </button>
         </div>
         <form id="payment-form" className="space-y-4" onSubmit={handleSubmit}>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Selecione como esta despesa foi paga:</p>
+          <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">Selecione como esta despesa foi paga:</p>
           <div className="space-y-2">
             <div className="custom-radio">
               <input
@@ -67,7 +67,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
               />
               <label
                 htmlFor="payment-pix"
-                className="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full flex items-center gap-3 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
                 Pix
               </label>
@@ -84,9 +84,9 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
               />
               <label
                 htmlFor="payment-debit"
-                className="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full flex items-center gap-3 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
-                Cartão (Débito)
+                Cartao (Debito)
               </label>
             </div>
             <div className="custom-radio">
@@ -101,24 +101,24 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
               />
               <label
                 htmlFor="payment-credit"
-                className="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full flex items-center gap-3 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
-                Cartão (Crédito)
+                Cartao (Credito)
               </label>
             </div>
             <div
               id="credit-card-name-group"
               className={`pl-2 pt-2 ${paymentMethod === 'credit' ? '' : 'hidden'}`}
             >
-              <label htmlFor="credit-card-name" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
-                {cards.length > 0 ? 'Selecione o Cartão' : 'Nome do Cartão (Opcional)'}
+              <label htmlFor="credit-card-name" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+                {cards.length > 0 ? 'Selecione o Cartao' : 'Nome do Cartao (Opcional)'}
               </label>
               {cards.length > 0 ? (
                 <select
                   id="credit-card-name"
                   value={creditCardName}
                   onChange={(event) => setCreditCardName(event.target.value)}
-                  className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
                 >
                   <option value="">Selecione...</option>
                   {cards.map((card) => (
@@ -132,7 +132,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
                   value={creditCardName}
                   onChange={(event) => setCreditCardName(event.target.value)}
                   placeholder="Ex: Nubank"
-                  className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
                 />
               )}
             </div>
@@ -148,7 +148,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
               />
               <label
                 htmlFor="payment-cash"
-                className="w-full flex items-center gap-3 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full flex items-center gap-3 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
                 Dinheiro
               </label>
@@ -157,7 +157,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
           <div className="flex pt-4">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+              className="w-full bg-[#1B4965] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition"
             >
               Confirmar
             </button>
@@ -169,4 +169,3 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
 }
 
 export default PaymentModal;
-

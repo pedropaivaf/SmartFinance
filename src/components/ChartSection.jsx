@@ -54,12 +54,10 @@ function ChartSection({ transactions, isDarkMode }) {
           {
             label: 'Valor',
             data: [totals.income, totals.paidExpense, totals.unpaidExpense],
-            backgroundColor: [
-              'rgba(59, 130, 246, 0.8)',
-              'rgba(34, 197, 94, 0.8)',
-              'rgba(239, 68, 68, 0.8)',
-            ],
-            borderColor: isDarkMode ? '#1e293b' : '#f8fafc',
+            backgroundColor: isDarkMode
+              ? ['rgba(95, 168, 211, 0.8)', 'rgba(82, 183, 136, 0.8)', 'rgba(231, 111, 81, 0.8)']
+              : ['rgba(27, 73, 101, 0.8)', 'rgba(45, 106, 79, 0.8)', 'rgba(155, 34, 38, 0.8)'],
+            borderColor: isDarkMode ? '#1E1D1C' : '#FAFAF8',
             borderWidth: 4,
             hoverOffset: 8,
           },
@@ -73,7 +71,7 @@ function ChartSection({ transactions, isDarkMode }) {
           legend: {
             position: 'bottom',
             labels: {
-              color: isDarkMode ? '#cbd5e1' : '#475569',
+              color: isDarkMode ? '#A09A92' : '#6B6B6B',
               padding: 20,
               usePointStyle: true,
             },
@@ -101,15 +99,15 @@ function ChartSection({ transactions, isDarkMode }) {
     };
   }, [isDarkMode, totals]);
 
-  const containerClasses = `min-h-[14rem] sm:min-h-[18rem] bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg${
+  const containerClasses = `min-h-[14rem] sm:min-h-[18rem] bg-[#F4F3EF] dark:bg-[#1A1918] p-4 rounded-lg${
     totals.hasData ? '' : ' flex items-center justify-center'
   }`;
 
   return (
     <section className="space-y-2">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Visão Gráfica</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Visão Gráfica</h2>
+        <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Observe a proporção entre entradas, despesas pagas e o que ainda falta quitar
         </p>
       </div>
@@ -117,7 +115,7 @@ function ChartSection({ transactions, isDarkMode }) {
         {totals.hasData ? (
           <canvas id="financial-chart" ref={canvasRef} className="w-full h-full" />
         ) : (
-          <p className="text-slate-500 dark:text-slate-400 text-center px-4">
+          <p className="text-[#6B6B6B] dark:text-[#A09A92] text-center px-4">
             Sem dados por enquanto. Adicione uma renda ou despesa para ver a distribuição financeira.
           </p>
         )}

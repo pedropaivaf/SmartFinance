@@ -4,10 +4,10 @@ import { useTranslation } from '../i18n/index.jsx';
 const logoBlue = '/LogoSFblue.png';
 
 const inputBase =
-  'w-full block text-sm px-4 py-3.5 rounded-xl border border-slate-300/80 dark:border-slate-700 ' +
-  'bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-slate-100 ' +
-  'placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 ' +
-  'focus:ring-sky-500 focus:border-sky-500 transition leading-tight';
+  'w-full block text-sm px-4 py-3.5 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
+  'bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] ' +
+  'placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 ' +
+  'focus:ring-[#1B4965] focus:border-[#1B4965] transition leading-tight';
 
 function RegisterPage({ onSignUp, onSwitchToLogin }) {
   const { t } = useTranslation();
@@ -54,23 +54,23 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAFAF8] dark:bg-[#111110]">
         <div className="w-full max-w-sm text-center space-y-6">
           <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#2D6A4F] dark:text-[#52B788]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('auth.register.successTitle') || 'Conta criada!'}
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
             {t('auth.register.successMessage') || 'Verifique seu email para confirmar o cadastro, ou faca login diretamente.'}
           </p>
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3.5 px-4 rounded-xl transition duration-300 shadow-lg shadow-sky-500/25"
+            className="w-full bg-[#1B4965] hover:bg-[#153B52] text-white font-semibold py-3.5 px-4 rounded-xl transition duration-300 shadow-md"
           >
             {t('auth.register.goToLogin') || 'Ir para o login'}
           </button>
@@ -80,25 +80,25 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAFAF8] dark:bg-[#111110]">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
-          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-lg" />
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Smart Finance</h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-md" />
+          <h1 className="text-2xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
+          <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">
             {t('auth.register.subtitle') || 'Crie sua conta gratuita'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm text-center">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30 text-[#9B2226] dark:text-[#E76F51] text-sm text-center">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="register-email" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="register-email" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('auth.email') || 'Email'}
             </label>
             <input
@@ -114,7 +114,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
           </div>
 
           <div>
-            <label htmlFor="register-password" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="register-password" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('auth.password') || 'Senha'}
             </label>
             <div className="relative">
@@ -132,7 +132,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#9B9B9B] hover:text-[#6B6B6B] dark:hover:text-[#A09A92] transition"
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -149,7 +149,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
           </div>
 
           <div>
-            <label htmlFor="register-confirm-password" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="register-confirm-password" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('auth.confirmPassword') || 'Confirmar senha'}
             </label>
             <div className="relative">
@@ -167,7 +167,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#9B9B9B] hover:text-[#6B6B6B] dark:hover:text-[#A09A92] transition"
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -188,9 +188,9 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
               type="checkbox"
               checked={lgpdConsent}
               onChange={(e) => setLgpdConsent(e.target.checked)}
-              className="mt-0.5 h-5 w-5 rounded border-slate-400 dark:border-slate-500 text-sky-500 focus:ring-sky-500 cursor-pointer flex-shrink-0"
+              className="mt-0.5 h-5 w-5 rounded border-[#D4D0C8] dark:border-[#3A3835] text-[#1B4965] focus:ring-[#1B4965] cursor-pointer flex-shrink-0"
             />
-            <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            <span className="text-xs text-[#6B6B6B] dark:text-[#A09A92] leading-relaxed">
               {t('auth.register.lgpdConsent') || 'Concordo com os termos de uso e politica de privacidade. Seus dados sao protegidos conforme a LGPD.'}
             </span>
           </label>
@@ -198,18 +198,18 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-4 rounded-xl transition duration-300 shadow-lg shadow-sky-500/25"
+            className="w-full bg-[#1B4965] hover:bg-[#153B52] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-4 rounded-xl transition duration-300 shadow-md"
           >
             {loading ? (t('auth.loading') || 'Criando...') : (t('auth.register.button') || 'Criar conta')}
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-center text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           {t('auth.register.hasAccount') || 'Ja tem uma conta?'}{' '}
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="font-semibold text-sky-500 hover:text-sky-400 transition"
+            className="font-semibold text-[#1B4965] hover:text-[#153B52] dark:text-[#5FA8D3] dark:hover:text-[#4A93BD] transition"
           >
             {t('auth.register.goToLogin') || 'Fazer login'}
           </button>

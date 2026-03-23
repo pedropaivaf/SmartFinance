@@ -1,7 +1,7 @@
 /**
  * CreditCardsSection Component
  *
- * Gerenciamento de cartões de crédito e faturas
+ * Gerenciamento de cartoes de credito e faturas
  * Feature Premium
  */
 
@@ -23,7 +23,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
   const isPremium = hasFeature('credit_cards');
 
-  // Calcula summary de cada cartão
+  // Calcula summary de cada cartao
   const cardsWithSummary = useMemo(() => {
     return cards.map(card => {
       const summary = calculateCardSummary(transactions, card);
@@ -33,7 +33,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
   const handleAddCard = () => {
     if (!newCard.name || !newCard.limitTotal || !newCard.closingDay || !newCard.dueDay) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
+      alert('Por favor, preencha todos os campos obrigatorios.');
       return;
     }
 
@@ -52,7 +52,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
   };
 
   const handleDeleteCard = (id) => {
-    if (confirm('Deseja realmente excluir este cartão?')) {
+    if (confirm('Deseja realmente excluir este cartao?')) {
       onSaveCards(cards.filter(c => c.id !== id));
     }
   };
@@ -71,8 +71,8 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
   if (!isPremium) {
     return (
       <PremiumCard
-        title="Cartões e Faturas"
-        description="Cadastre seus cartões de crédito, acompanhe faturas em tempo real e controle seu limite disponível."
+        title="Cartoes e Faturas"
+        description="Cadastre seus cartoes de credito, acompanhe faturas em tempo real e controle seu limite disponivel."
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -83,40 +83,40 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
   }
 
   return (
-    <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-slate-200/80 dark:border-slate-700">
+    <div className="bg-white/90 dark:bg-[#1E1D1C]/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-[#E8E5E0] dark:border-[#2D2B28]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-            Cartões de Crédito
+          <h2 className="text-xl font-semibold text-[#1A1A1A] dark:text-[#E8E4DF]">
+            Cartoes de Credito
           </h2>
           <PremiumBadge size="xs" />
         </div>
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+          className="bg-[#1B4965] hover:bg-[#153B52] text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
         >
           {isAdding ? 'Cancelar' : '+ Novo'}
         </button>
       </div>
 
       {isAdding && (
-        <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="mb-4 p-4 bg-[#F4F3EF] dark:bg-[#111110]/50 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28]">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Nome do Cartão *
+              <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
+                Nome do Cartao *
               </label>
               <input
                 type="text"
                 value={newCard.name}
                 onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
                 placeholder="Ex: Nubank, Inter, C6"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 rounded-lg border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4965]"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
                   Limite Total (R$) *
                 </label>
                 <input
@@ -125,11 +125,11 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                   value={newCard.limitTotal}
                   onChange={(e) => setNewCard({ ...newCard, limitTotal: e.target.value })}
                   placeholder="5000"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4965]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
                   Bandeira
                 </label>
                 <input
@@ -137,13 +137,13 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                   value={newCard.brand}
                   onChange={(e) => setNewCard({ ...newCard, brand: e.target.value })}
                   placeholder="Visa, Master..."
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4965]"
                 />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
                   Dia de Fechamento *
                 </label>
                 <input
@@ -153,11 +153,11 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                   value={newCard.closingDay}
                   onChange={(e) => setNewCard({ ...newCard, closingDay: e.target.value })}
                   placeholder="10"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4965]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
                   Dia de Vencimento *
                 </label>
                 <input
@@ -167,23 +167,23 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                   value={newCard.dueDay}
                   onChange={(e) => setNewCard({ ...newCard, dueDay: e.target.value })}
                   placeholder="17"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4965]"
                 />
               </div>
             </div>
             <button
               onClick={handleAddCard}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              className="w-full bg-[#2D6A4F] hover:bg-[#245840] text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              Adicionar Cartão
+              Adicionar Cartao
             </button>
           </div>
         </div>
       )}
 
       {cardsWithSummary.length === 0 ? (
-        <p className="text-center text-slate-500 dark:text-slate-400 py-8 text-sm">
-          Nenhum cartão cadastrado. Clique em "+ Novo" para começar.
+        <p className="text-center text-[#9B9B9B] dark:text-[#6B6560] py-8 text-sm">
+          Nenhum cartao cadastrado. Clique em "+ Novo" para comecar.
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -201,7 +201,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <p className="text-xs opacity-75 mb-1">{card.brand || 'Cartão'}</p>
+                      <p className="text-xs opacity-75 mb-1">{card.brand || 'Cartao'}</p>
                       <h3 className="font-bold text-lg">{card.name}</h3>
                     </div>
                     <button
@@ -222,7 +222,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
                     <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="opacity-75">Limite Disponível</span>
+                        <span className="opacity-75">Limite Disponivel</span>
                         <span className="font-medium">{usagePercent.toFixed(0)}% usado</span>
                       </div>
                       <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -243,7 +243,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
                     {usagePercent >= 80 && (
                       <p className="text-xs bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-1.5 mt-2">
-                        ⚠️ Atenção: você já usou {usagePercent.toFixed(0)}% do limite!
+                        ⚠️ Atencao: voce ja usou {usagePercent.toFixed(0)}% do limite!
                       </p>
                     )}
                   </div>
