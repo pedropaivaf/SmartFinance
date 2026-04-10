@@ -24,7 +24,7 @@ function DeleteChoiceModal({ isOpen, onClose, onDeleteSingle, onDeleteAll }) {
           <svg className="mx-auto h-12 w-12 text-[#9B2226]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mt-4">Excluir Parcela</h2>
+          <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF] mt-4">Excluir Parcela</h2>
           <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92] mt-2">
             Voce esta excluindo uma transacao parcelada. O que deseja fazer?
           </p>

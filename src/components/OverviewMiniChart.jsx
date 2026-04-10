@@ -97,7 +97,7 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
 
   return (
     <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-5 sm:p-6">
-      <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
+      <h3 className="text-lg font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
         {t('overview.miniChart.title')}
       </h3>
       <div className="h-48 sm:h-56">

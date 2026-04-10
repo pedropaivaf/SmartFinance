@@ -99,7 +99,7 @@ export default function EnvelopesSection({ transactions, envelopes, onSaveEnvelo
     <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+          <h2 className="text-xl font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
             Envelopes de Gastos
           </h2>
           <PremiumBadge size="xs" />
@@ -162,7 +162,7 @@ export default function EnvelopesSection({ transactions, envelopes, onSaveEnvelo
               className="p-4 bg-[#F4F3EF] dark:bg-[#111110] rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28]"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+                <h3 className="font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
                   {env.name}
                 </h3>
                 <button

@@ -133,7 +133,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
   return (
     <>
       <div className="border-t border-[#E8E5E0] dark:border-[#2D2B28] pt-6">
-        <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('form.title')}</h2>
+        <h2 className="text-xl font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('form.title')}</h2>
         <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A09A92]">{t('form.subtitle')}</p>
       </div>
       <form id="transaction-form" className="mt-4 space-y-3" onSubmit={handleSubmit}>

@@ -22,7 +22,7 @@ function FilterBar({ currentFilter, onChange, dateRange, onDateRangeChange }) {
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Histórico de transações</h2>
+        <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Histórico de transações</h2>
         <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Analise os lançamentos do mês atual ou visualize todo o histórico registrado
         </p>

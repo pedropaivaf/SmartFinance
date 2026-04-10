@@ -40,7 +40,7 @@ function PaymentModal({ isOpen, onClose, onConfirm, cards = [] }) {
     >
       <div className="modal-container w-full max-w-sm bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Confirmar Pagamento</h2>
+          <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Confirmar Pagamento</h2>
           <button
             id="close-payment-modal-btn"
             type="button"

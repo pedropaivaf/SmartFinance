@@ -38,7 +38,7 @@ function ForgotPasswordPage({ onResetPassword, onSwitchToLogin }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+          <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('auth.reset.successTitle') || 'Email enviado!'}
           </h2>
           <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
@@ -61,7 +61,7 @@ function ForgotPasswordPage({ onResetPassword, onSwitchToLogin }) {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-md" />
-          <h1 className="text-2xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+          <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('auth.reset.title') || 'Recuperar senha'}
           </h1>
           <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">

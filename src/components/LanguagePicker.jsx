@@ -31,7 +31,7 @@ export default function LanguagePicker({ isOpen, onClose }) {
 
         {/* Title */}
         <div className="px-6 pt-3 pb-4 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
-          <h2 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF] text-center">
+          <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF] text-center">
             {t('language.picker.title')}
           </h2>
         </div>

@@ -15,7 +15,7 @@ function OverviewRecentTransactions({ transactions, formatCurrency, onNavigate, 
 
   return (
     <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-5 sm:p-6">
-      <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
+      <h3 className="text-lg font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
         {t('overview.recent.title')}
       </h3>
 
@@ -66,7 +66,7 @@ function OverviewRecentTransactions({ transactions, formatCurrency, onNavigate, 
                       )}
                     </div>
                   </div>
-                  <p className={`text-sm font-bold font-serif flex-shrink-0 ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'}`}>
+                  <p className={`text-sm font-bold font-display flex-shrink-0 ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'}`}>
                     {sign} {formatCurrency(amount)}
                   </p>
                 </div>

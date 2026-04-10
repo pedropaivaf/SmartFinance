@@ -139,7 +139,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
       <div className="modal-container w-full max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[80vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
-          <h3 className="text-base font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+          <h3 className="text-base font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('categories.picker.title')}
           </h3>
           <button

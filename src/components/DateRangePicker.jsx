@@ -60,7 +60,7 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
 
   return (
     <div>
-      <h4 className="text-sm font-serif text-[#1A1A1A] dark:text-[#E8E4DF] text-center mb-3">
+      <h4 className="text-sm font-display text-[#1A1A1A] dark:text-[#E8E4DF] text-center mb-3">
         {MONTHS_PT[month]} {year}
       </h4>
       <div className="grid grid-cols-7 gap-0.5 mb-1">

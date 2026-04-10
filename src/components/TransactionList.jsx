@@ -50,7 +50,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('list.empty.title')}</h3>
+            <h3 className="mt-2 text-sm font-medium font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('list.empty.title')}</h3>
             <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A09A92]">{t('list.empty.subtitle')}</p>
           </li>
         </ul>
@@ -64,7 +64,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
         {groupedTransactions.map(({ key, items }) => (
           <React.Fragment key={key}>
             <li className="pt-4 pb-2">
-              <h3 className="text-md font-semibold font-serif text-[#6B6B6B] dark:text-[#A09A92] tracking-wider capitalize">{key}</h3>
+              <h3 className="text-md font-semibold font-display text-[#6B6B6B] dark:text-[#A09A92] tracking-wider capitalize">{key}</h3>
             </li>
             {items.map((transaction) => {
               const isIncome = transaction.type === 'income';
@@ -143,7 +143,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-                    <p className={`font-semibold font-serif text-lg ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'} text-right whitespace-nowrap`}>
+                    <p className={`font-semibold font-display text-lg ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'} text-right whitespace-nowrap`}>
                       {`${sign} ${formatCurrency(amount)}`}
                     </p>
                     <div className={`flex items-center ${isProjection ? 'hidden' : ''} gap-1`}>

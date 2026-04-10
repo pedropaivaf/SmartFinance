@@ -106,7 +106,7 @@ function ChartSection({ transactions, isDarkMode }) {
   return (
     <section className="space-y-2">
       <div>
-        <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Visão Gráfica</h2>
+        <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Visão Gráfica</h2>
         <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Observe a proporção entre entradas, despesas pagas e o que ainda falta quitar
         </p>

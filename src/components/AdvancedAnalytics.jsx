@@ -45,7 +45,7 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
   return (
     <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-6">
       <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+        <h2 className="text-xl font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
           Análises Avançadas
         </h2>
         <PremiumBadge size="xs" />
@@ -54,7 +54,7 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
       {/* Comparativo de Meses */}
       {comparison && (
         <div className="mb-6">
-          <h3 className="text-sm font-semibold font-serif text-[#1A1A1A] dark:text-[#A09A92] mb-3">
+          <h3 className="text-sm font-semibold font-display text-[#1A1A1A] dark:text-[#A09A92] mb-3">
             Mês Atual vs Anterior
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -88,7 +88,7 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
       {/* Top Categorias */}
       {topCategories.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold font-serif text-[#1A1A1A] dark:text-[#A09A92] mb-3">
+          <h3 className="text-sm font-semibold font-display text-[#1A1A1A] dark:text-[#A09A92] mb-3">
             Top 5 Categorias de Gastos
           </h3>
           <div className="space-y-2">

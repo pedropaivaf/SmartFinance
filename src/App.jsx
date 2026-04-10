@@ -15,6 +15,7 @@ import ConfirmDeleteModal from './components/ConfirmDeleteModal.jsx';
 import DeleteChoiceModal from './components/DeleteChoiceModal.jsx';
 import EditChoiceModal from './components/EditChoiceModal.jsx';
 import EditAllValueModal from './components/EditAllValueModal.jsx';
+import TransactionSuccessModal from './components/TransactionSuccessModal.jsx';
 
 // Premium
 import InsightsSection from './components/InsightsSection.jsx';
@@ -192,6 +193,7 @@ function AppContent() {
   const [editChoiceState, setEditChoiceState] = useState({ open: false, transaction: null });
   const [editAllValueState, setEditAllValueState] = useState({ open: false, groupId: null });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [successModal, setSuccessModal] = useState({ open: false, type: null });
   const [activePage, setActivePage] = useState('overview');
 
   // Load data from Supabase on mount
@@ -371,6 +373,8 @@ function AppContent() {
   const handleAddTransactions = (newTransactions) => {
     setTransactions((prev) => [...prev, ...newTransactions]);
     dbAddTransactions(newTransactions);
+    const txType = newTransactions[0]?.type || 'expense';
+    setSuccessModal({ open: true, type: txType });
   };
 
   const handleImportTransactions = (newTxs) => {
@@ -644,7 +648,7 @@ function AppContent() {
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
-              <h2 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
+              <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
               <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
                 {new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })}
               </p>
@@ -721,7 +725,7 @@ function AppContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.history.overline')}</p>
-                <h3 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.history.title')}</h3>
+                <h3 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.history.title')}</h3>
               </div>
             </div>
             <FilterBar
@@ -895,7 +899,7 @@ function AppContent() {
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-2`}>
             <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.wallet.overline')}</p>
-            <h2 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.wallet.title')}</h2>
+            <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.wallet.title')}</h2>
           </div>
           <CreditCardsSection
             transactions={transactions}
@@ -1012,6 +1016,15 @@ function AppContent() {
         isOpen={editAllValueState.open}
         onClose={closeEditAllModal}
         onSubmit={handleEditAllSubmit}
+      />
+      <TransactionSuccessModal
+        isOpen={successModal.open}
+        transactionType={successModal.type}
+        onClose={() => setSuccessModal({ open: false, type: null })}
+        onGoToHistory={() => {
+          setSuccessModal({ open: false, type: null });
+          setActivePage('history');
+        }}
       />
     </>
   );

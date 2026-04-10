@@ -170,7 +170,7 @@ function SummaryCards({ totalIncome, totalExpense, totalPaid, balance, formatCur
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9B9B9B] dark:text-[#6B6560] mb-1">{card.title}</h3>
-                <p id={card.id} className={`text-2xl font-serif amount-value ${card.valueClass} tracking-tight`}>
+                <p id={card.id} className={`text-2xl font-display amount-value ${card.valueClass} tracking-tight`}>
                   {formatCurrency(card.value)}
                 </p>
               </div>

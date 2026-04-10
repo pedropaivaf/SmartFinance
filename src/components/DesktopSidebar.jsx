@@ -44,7 +44,7 @@ function DesktopSidebar({ activePage, onNavigate, userEmail, onSignOut }) {
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
         <img src={logoBlue} alt="Smart Finance" className="h-10 w-10 rounded-xl shadow-sm" />
-        <span className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</span>
+        <span className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</span>
       </div>
 
       {/* Nav */}
