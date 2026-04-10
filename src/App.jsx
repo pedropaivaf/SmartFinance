@@ -136,8 +136,34 @@ const generateProcessedTransactions = (transactions) => {
   return processed;
 };
 
+const filterByCurrentMonth = (transactions, billingCycleDay) => {
+  const now = new Date();
+  const cycleDay = billingCycleDay || 1;
+  let cycleStart, cycleEnd;
+  if (cycleDay === 1) {
+    cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  } else {
+    if (now.getDate() >= cycleDay) {
+      cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
+      cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1, 23, 59, 59, 999);
+    } else {
+      cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
+      cycleEnd = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1, 23, 59, 59, 999);
+    }
+  }
+  const startTime = cycleStart.getTime();
+  const endTime = cycleEnd.getTime();
+  return transactions.filter((tx) => {
+    const date = new Date(tx.createdAt);
+    if (Number.isNaN(date.getTime())) return false;
+    const t = date.getTime();
+    return t >= startTime && t <= endTime;
+  });
+};
+
 function AppContent() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { user, signOut } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState({ incomeGoal: '', expenseGoal: '' });
@@ -254,32 +280,7 @@ function AppContent() {
 
   const summaryTransactions = useMemo(() => {
     if (currentFilter === 'month') {
-      const now = new Date();
-      // Billing cycle: if billingCycleDay > 1, the "month" runs from day X of prev month to day X-1 of current month
-      const cycleDay = billingCycleDay || 1;
-      let cycleStart, cycleEnd;
-      if (cycleDay === 1) {
-        // Standard calendar month
-        cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-      } else {
-        // Custom cycle: e.g. day 20 means cycle is 20th of month to 19th of next month
-        if (now.getDate() >= cycleDay) {
-          cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
-          cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1, 23, 59, 59, 999);
-        } else {
-          cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
-          cycleEnd = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1, 23, 59, 59, 999);
-        }
-      }
-      const startTime = cycleStart.getTime();
-      const endTime = cycleEnd.getTime();
-      return processedTransactions.filter((transaction) => {
-        const date = new Date(transaction.createdAt);
-        if (Number.isNaN(date.getTime())) return false;
-        const t = date.getTime();
-        return t >= startTime && t <= endTime;
-      });
+      return filterByCurrentMonth(processedTransactions, billingCycleDay);
     }
     if (currentFilter === 'range' && dateRange.from && dateRange.to) {
       const fromTime = dateRange.from.getTime();
@@ -295,6 +296,29 @@ function AppContent() {
     }
     return processedTransactions;
   }, [processedTransactions, currentFilter, dateRange, billingCycleDay]);
+
+  const overviewTransactions = useMemo(
+    () => filterByCurrentMonth(processedTransactions, billingCycleDay),
+    [processedTransactions, billingCycleDay],
+  );
+
+  const overviewValues = useMemo(() => {
+    const income = overviewTransactions
+      .filter((tx) => tx.type === 'income' && !tx.isProjection)
+      .reduce((acc, tx) => acc + tx.amount, 0);
+    const totalExpenseRaw = overviewTransactions
+      .filter((tx) => tx.type === 'expense' && !tx.isProjection)
+      .reduce((acc, tx) => acc + tx.amount, 0);
+    const paidExpenseRaw = overviewTransactions
+      .filter((tx) => tx.type === 'expense' && tx.paid && !tx.isProjection)
+      .reduce((acc, tx) => acc + tx.amount, 0);
+    return {
+      income,
+      totalExpense: Math.abs(totalExpenseRaw),
+      paidExpense: Math.abs(paidExpenseRaw),
+      balance: income + paidExpenseRaw,
+    };
+  }, [overviewTransactions]);
 
   const maxTransactionAmount = useMemo(() => {
     if (!summaryTransactions.length) return 1000;
@@ -646,13 +670,16 @@ function AppContent() {
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.overview.overline')}</p>
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.overview.title')}</h2>
+              <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
+                {new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })}
+              </p>
             </div>
             <p className="text-xs text-slate-400 dark:text-slate-500">{t('page.overview.drag')}</p>
             <SummaryCards
-              totalIncome={summaryValues.income}
-              totalExpense={summaryValues.totalExpense}
-              totalPaid={summaryValues.paidExpense}
-              balance={summaryValues.balance}
+              totalIncome={overviewValues.income}
+              totalExpense={overviewValues.totalExpense}
+              totalPaid={overviewValues.paidExpense}
+              balance={overviewValues.balance}
               formatCurrency={formatCurrency}
               cardOrder={summaryOrder}
               onReorder={handleSummaryReorder}
@@ -660,24 +687,24 @@ function AppContent() {
           </div>
           <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-5 lg:space-y-0">
             <OverviewMiniChart
-              transactions={summaryTransactions}
+              transactions={overviewTransactions}
               isDarkMode={isDarkMode}
               formatCurrency={formatCurrency}
             />
             <OverviewCategoryBreakdown
-              transactions={summaryTransactions}
+              transactions={overviewTransactions}
               formatCurrency={formatCurrency}
               customCategories={customCategories}
             />
           </div>
           <OverviewRecentTransactions
-            transactions={summaryTransactions}
+            transactions={overviewTransactions}
             formatCurrency={formatCurrency}
             onNavigate={setActivePage}
             customCategories={customCategories}
           />
           <div className="lg:grid lg:grid-cols-2 lg:gap-6 space-y-5 lg:space-y-0">
-            <InsightsSection transactions={summaryTransactions} envelopes={envelopes} />
+            <InsightsSection transactions={overviewTransactions} envelopes={envelopes} />
             <UpcomingBillsSection transactions={processedTransactions} />
           </div>
         </section>

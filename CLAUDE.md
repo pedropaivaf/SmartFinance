@@ -54,6 +54,26 @@ npm run preview  # Preview production build
 
 See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) for full design token reference.
 
+## Data Flow — Overview vs History
+
+The app has **two independent data pipelines** for calculations:
+
+| Pipeline | Scope | Used by |
+|----------|-------|---------|
+| `overviewTransactions` / `overviewValues` | **Current month only** (billing cycle aware) | Overview page: SummaryCards, MiniChart, CategoryBreakdown, RecentTransactions, Insights |
+| `summaryTransactions` / `summaryValues` | Controlled by `currentFilter` (`'total'` / `'month'` / `'range'`) | History page (FilterBar, TransactionList), Graphs & Goals page |
+
+Both pipelines use `filterByCurrentMonth(transactions, billingCycleDay)` — a shared helper that filters by the current billing cycle, respecting custom billing cycle day from settings.
+
+### Calculation formulas (same for both pipelines)
+
+```javascript
+income       = Σ(tx.amount)           where type === 'income'   && !isProjection  // positive
+totalExpense = Math.abs(Σ(tx.amount)) where type === 'expense'  && !isProjection  // positive for display
+paidExpense  = Math.abs(Σ(tx.amount)) where type === 'expense'  && paid && !isProjection
+balance      = income + paidExpenseRaw  // income minus paid expenses (paidExpenseRaw is negative)
+```
+
 ## Navigation System
 
 `activePage` state in App.jsx controls which page is visible via `hidden` class on `<section>` elements.

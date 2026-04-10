@@ -6,9 +6,12 @@
 App (src/App.jsx)
 ├── Header
 ├── Pages (controlled by activePage state)
-│   ├── overview
+│   ├── overview (uses overviewTransactions — current month only)
 │   │   ├── Header
 │   │   ├── SummaryCards
+│   │   ├── OverviewMiniChart
+│   │   ├── OverviewCategoryBreakdown
+│   │   ├── OverviewRecentTransactions
 │   │   ├── InsightsSection        [Premium]
 │   │   └── UpcomingBillsSection   [Premium]
 │   ├── graphs-goals
@@ -43,6 +46,8 @@ App (src/App.jsx)
 | `activePage` | string | Current visible page |
 | `transactions` | Transaction[] | Raw persisted transactions |
 | `processedTransactions` | Transaction[] | With monthly projections |
+| `overviewTransactions` | Transaction[] | Current month filtered (for Overview page) |
+| `overviewValues` | object | Income/expense/paid/balance for current month |
 | `goals` | Goals | Income/expense goals |
 | `envelopes` | Envelope[] | Budget envelopes (Premium) |
 | `cards` | Card[] | Credit cards (Premium) |
@@ -82,6 +87,14 @@ Defined in `src/services/storageService.js`:
 ## Monthly Projection System
 
 `generateProcessedTransactions()` in App.jsx creates virtual projections for `recurrence: 'monthly'` transactions up to 1 year ahead. Projections have `isProjection: true` and `paid: false`. They are NOT persisted — regenerated on each load from base transactions.
+
+## Data Pipelines
+
+`filterByCurrentMonth(transactions, billingCycleDay)` — shared helper that filters transactions by the current billing cycle.
+
+- **Overview page** uses `overviewTransactions` (always current month) → `overviewValues`
+- **History page** uses `summaryTransactions` (controlled by `currentFilter`: `'total'`/`'month'`/`'range'`) → `summaryValues`
+- **Graphs & Goals** uses `summaryTransactions` → `summaryValues`
 
 ## Transaction Data Model
 
