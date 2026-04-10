@@ -63,6 +63,7 @@ import {
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
 import { setCurrentPlan, getCurrentPlan } from './config.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
+import { calculateTotals } from './utils/calculations.js';
 
 const logoBlue = '/LogoSFblue.png';
 
@@ -74,7 +75,7 @@ function NavTab({ target, label, activePage, onNavigate, children }) {
       aria-label={label}
       onClick={() => onNavigate(target)}
       className={`nav-tab-item flex flex-col items-center justify-center gap-[3px] min-w-[48px] min-h-[44px] text-[10px] tracking-wide transition-all duration-300 focus:outline-none ${
-        isActive ? 'nav-tab-active' : 'text-slate-400 dark:text-slate-500'
+        isActive ? 'nav-tab-active' : 'text-[#9B9B9B] dark:text-[#6B6560]'
       }`}
     >
       {isActive && <span className="nav-tab-indicator" />}
@@ -248,7 +249,7 @@ function AppContent() {
   // Body class
   useEffect(() => {
     document.body.className =
-      'bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-200 min-h-screen transition-colors duration-500';
+      'bg-[#FAFAF8] dark:bg-[#111110] text-[#1A1A1A] dark:text-[#E8E4DF] min-h-screen transition-colors duration-500';
   }, []);
 
   // Notifications
@@ -302,23 +303,10 @@ function AppContent() {
     [processedTransactions, billingCycleDay],
   );
 
-  const overviewValues = useMemo(() => {
-    const income = overviewTransactions
-      .filter((tx) => tx.type === 'income' && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    const totalExpenseRaw = overviewTransactions
-      .filter((tx) => tx.type === 'expense' && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    const paidExpenseRaw = overviewTransactions
-      .filter((tx) => tx.type === 'expense' && tx.paid && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    return {
-      income,
-      totalExpense: Math.abs(totalExpenseRaw),
-      paidExpense: Math.abs(paidExpenseRaw),
-      balance: income + paidExpenseRaw,
-    };
-  }, [overviewTransactions]);
+  const overviewValues = useMemo(
+    () => calculateTotals(overviewTransactions),
+    [overviewTransactions],
+  );
 
   const maxTransactionAmount = useMemo(() => {
     if (!summaryTransactions.length) return 1000;
@@ -350,23 +338,10 @@ function AppContent() {
     return filtered;
   }, [summaryTransactions, currentPaymentFilter, typeFilter, valueRange, valueRangeActive]);
 
-  const summaryValues = useMemo(() => {
-    const income = summaryTransactions
-      .filter((transaction) => transaction.type === 'income' && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    const totalExpenseRaw = summaryTransactions
-      .filter((transaction) => transaction.type === 'expense' && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    const paidExpenseRaw = summaryTransactions
-      .filter((transaction) => transaction.type === 'expense' && transaction.paid && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    return {
-      income,
-      totalExpense: Math.abs(totalExpenseRaw),
-      paidExpense: Math.abs(paidExpenseRaw),
-      balance: income + paidExpenseRaw,
-    };
-  }, [summaryTransactions]);
+  const summaryValues = useMemo(
+    () => calculateTotals(summaryTransactions),
+    [summaryTransactions],
+  );
 
   // --- Handlers ---
 
@@ -635,14 +610,14 @@ function AppContent() {
   };
 
   const panelClasses =
-    'glass-panel mesh-gradient rounded-3xl shadow-xl shadow-slate-900/5 dark:shadow-black/30';
+    'bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28]';
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t('app.loading') || 'Carregando...'}</p>
+          <p className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">{t('app.loading') || 'Carregando...'}</p>
         </div>
       </div>
     );
@@ -668,13 +643,13 @@ function AppContent() {
           <Header logoSrc={logoBlue} />
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.overview.overline')}</p>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.overview.title')}</h2>
+              <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
+              <h2 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
               <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
                 {new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })}
               </p>
             </div>
-            <p className="text-xs text-slate-400 dark:text-slate-500">{t('page.overview.drag')}</p>
+            <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.drag')}</p>
             <SummaryCards
               totalIncome={overviewValues.income}
               totalExpense={overviewValues.totalExpense}
@@ -745,8 +720,8 @@ function AppContent() {
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.history.overline')}</p>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.history.title')}</h3>
+                <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.history.overline')}</p>
+                <h3 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.history.title')}</h3>
               </div>
             </div>
             <FilterBar
@@ -755,7 +730,7 @@ function AppContent() {
               dateRange={dateRange}
               onDateRangeChange={setDateRange}
             />
-            <div className="border-b border-slate-100 dark:border-slate-700/50" />
+            <div className="border-b border-[#E8E5E0] dark:border-[#2D2B28]" />
             <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />
             {/* Advanced filters */}
             <div className="flex flex-wrap items-center gap-2">
@@ -767,8 +742,8 @@ function AppContent() {
                   onClick={() => setTypeFilter(type)}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                     typeFilter === type
-                      ? type === 'income' ? 'bg-blue-500 text-white' : type === 'expense' ? 'bg-red-500 text-white' : 'bg-sky-500 text-white'
-                      : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                      ? type === 'income' ? 'bg-[#1B4965] text-white' : type === 'expense' ? 'bg-[#9B2226] text-white' : 'bg-[#1B4965] text-white'
+                      : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
                   }`}
                 >
                   {type === 'all' ? 'Todos' : type === 'income' ? 'Recebidos' : 'Gastos'}
@@ -787,8 +762,8 @@ function AppContent() {
                 }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                   valueRangeActive
-                    ? 'bg-sky-500 text-white'
-                    : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    ? 'bg-[#1B4965] text-white'
+                    : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
                 }`}
               >
                 Faixa de valor
@@ -798,7 +773,7 @@ function AppContent() {
                 <button
                   type="button"
                   onClick={() => { setTypeFilter('all'); setValueRangeActive(false); setValueRange({ min: 0, max: 0 }); }}
-                  className="px-2 py-1.5 text-xs text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition"
+                  className="px-2 py-1.5 text-xs text-[#9B9B9B] hover:text-[#9B2226] dark:hover:text-[#E76F51] transition"
                 >
                   Limpar filtros
                 </button>
@@ -854,14 +829,14 @@ function AppContent() {
               };
 
               return (
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl px-4 py-3 space-y-3">
+                <div className="bg-[#F4F3EF] dark:bg-[#1A1918] rounded-xl px-4 py-3 space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="bg-white dark:bg-slate-700 rounded-lg px-2.5 py-1 shadow-sm">
-                      <span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{formatCurrency(valueRange.min)}</span>
+                    <div className="bg-white dark:bg-[#2D2B28] rounded-lg px-2.5 py-1 shadow-sm">
+                      <span className="text-xs font-semibold text-[#1B4965] dark:text-[#5FA8D3]">{formatCurrency(valueRange.min)}</span>
                     </div>
-                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">min — max</span>
-                    <div className="bg-white dark:bg-slate-700 rounded-lg px-2.5 py-1 shadow-sm">
-                      <span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{formatCurrency(valueRange.max)}</span>
+                    <span className="text-[10px] font-medium text-[#9B9B9B] dark:text-[#6B6560] uppercase tracking-wider">min — max</span>
+                    <div className="bg-white dark:bg-[#2D2B28] rounded-lg px-2.5 py-1 shadow-sm">
+                      <span className="text-xs font-semibold text-[#1B4965] dark:text-[#5FA8D3]">{formatCurrency(valueRange.max)}</span>
                     </div>
                   </div>
                   {/* Track */}
@@ -871,25 +846,25 @@ function AppContent() {
                     onTouchStart={handleTrackInteraction}
                   >
                     {/* Background track */}
-                    <div className="absolute inset-x-0 h-2 bg-slate-200 dark:bg-slate-600 rounded-full" />
+                    <div className="absolute inset-x-0 h-2 bg-[#E8E5E0] dark:bg-[#3A3835] rounded-full" />
                     {/* Active range fill */}
                     <div
-                      className="absolute h-2 bg-gradient-to-r from-sky-400 to-sky-500 rounded-full transition-[left,right] duration-75"
+                      className="absolute h-2 bg-gradient-to-r from-[#1B4965] to-[#1B4965] rounded-full transition-[left,right] duration-75"
                       style={{ left: `${pctMin}%`, right: `${100 - pctMax}%` }}
                     />
                     {/* Min thumb */}
                     <div
-                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-slate-200 shadow-md border-2 border-sky-500 transition-[left] duration-75 active:scale-110"
+                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-[#E8E4DF] shadow-md border-2 border-[#1B4965] dark:border-[#5FA8D3] transition-[left] duration-75 active:scale-110"
                       style={{ left: `${pctMin}%` }}
                     />
                     {/* Max thumb */}
                     <div
-                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-slate-200 shadow-md border-2 border-sky-500 transition-[left] duration-75 active:scale-110"
+                      className="absolute w-6 h-6 -ml-3 rounded-full bg-white dark:bg-[#E8E4DF] shadow-md border-2 border-[#1B4965] dark:border-[#5FA8D3] transition-[left] duration-75 active:scale-110"
                       style={{ left: `${pctMax}%` }}
                     />
                   </div>
                   {/* Scale labels */}
-                  <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 -mt-1">
+                  <div className="flex justify-between text-[10px] text-[#9B9B9B] dark:text-[#6B6560] -mt-1">
                     <span>R$ 0</span>
                     <span>{formatCurrency(maxTransactionAmount / 2)}</span>
                     <span>{formatCurrency(maxTransactionAmount)}</span>
@@ -898,7 +873,7 @@ function AppContent() {
               );
             })()}
             {/* Result count */}
-            <p className="text-xs text-slate-400 dark:text-slate-500">
+            <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">
               {listTransactions.length} transação{listTransactions.length !== 1 ? 'ões' : ''} encontrada{listTransactions.length !== 1 ? 's' : ''}
             </p>
             <TransactionList
@@ -919,8 +894,8 @@ function AppContent() {
           className={`page-section space-y-5 ${activePage === 'wallet' ? '' : 'hidden'}`}
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-2`}>
-            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.wallet.overline')}</p>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('page.wallet.title')}</h2>
+            <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.wallet.overline')}</p>
+            <h2 className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.wallet.title')}</h2>
           </div>
           <CreditCardsSection
             transactions={transactions}
@@ -937,7 +912,7 @@ function AppContent() {
           className={`page-section space-y-5 ${activePage === 'new-transaction' ? '' : 'hidden'}`}
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-3xl`}>
-            <p className="text-xs uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">{t('page.new.overline')}</p>
+            <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.new.overline')}</p>
             <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} />
           </div>
         </section>
@@ -972,7 +947,7 @@ function AppContent() {
               aria-label="Nova transacao"
               onClick={() => setActivePage('new-transaction')}
               className={`fab-button flex items-center justify-center w-[50px] h-[50px] rounded-full focus:outline-none ${
-                activePage === 'new-transaction' ? 'fab-active ring-4 ring-sky-400/20' : 'fab-pulse'
+                activePage === 'new-transaction' ? 'fab-active ring-4 ring-[#1B4965]/20 dark:ring-[#5FA8D3]/20' : 'fab-pulse'
               }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -1049,10 +1024,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8] dark:bg-[#111110]">
         <div className="text-center space-y-4">
           <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t('app.loading') || 'Carregando...'}</p>
+          <p className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">{t('app.loading') || 'Carregando...'}</p>
         </div>
       </div>
     );

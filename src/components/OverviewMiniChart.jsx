@@ -56,12 +56,10 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
         ],
         datasets: [{
           data: [totals.income, totals.paidExpense, totals.unpaidExpense],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(34, 197, 94, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-          ],
-          borderColor: isDarkMode ? '#1e293b' : '#f8fafc',
+          backgroundColor: isDarkMode
+            ? ['rgba(95, 168, 211, 0.85)', 'rgba(82, 183, 136, 0.85)', 'rgba(231, 111, 81, 0.85)']
+            : ['rgba(27, 73, 101, 0.85)', 'rgba(45, 106, 79, 0.85)', 'rgba(155, 34, 38, 0.85)'],
+          borderColor: isDarkMode ? '#1E1D1C' : '#FFFFFF',
           borderWidth: 3,
           hoverOffset: 6,
         }],
@@ -74,7 +72,7 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
           legend: {
             position: 'bottom',
             labels: {
-              color: isDarkMode ? '#cbd5e1' : '#475569',
+              color: isDarkMode ? '#A09A92' : '#6B6B6B',
               padding: 12,
               usePointStyle: true,
               font: { size: 11 },
@@ -98,8 +96,8 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
   }, [isDarkMode, totals, t, formatCurrency]);
 
   return (
-    <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl p-5 sm:p-6">
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
+    <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-5 sm:p-6">
+      <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
         {t('overview.miniChart.title')}
       </h3>
       <div className="h-48 sm:h-56">
@@ -107,7 +105,7 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
           <canvas ref={canvasRef} className="w-full h-full" />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-slate-400 dark:text-slate-500 text-center px-4">
+            <p className="text-sm text-[#9B9B9B] dark:text-[#6B6560] text-center px-4">
               {t('overview.miniChart.empty')}
             </p>
           </div>

@@ -47,10 +47,10 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
         onClick={() => onDayClick(date)}
         onMouseEnter={() => onDayHover(date)}
         className={`relative h-9 w-full rounded-lg text-sm font-medium transition-all duration-150
-          ${isSelected ? 'bg-sky-500 text-white shadow-sm' : ''}
-          ${inRange && !isSelected ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300' : ''}
-          ${!isSelected && !inRange ? 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300' : ''}
-          ${isToday && !isSelected ? 'ring-1 ring-sky-400' : ''}
+          ${isSelected ? 'bg-[#1B4965] dark:bg-[#5FA8D3] text-white shadow-sm' : ''}
+          ${inRange && !isSelected ? 'bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]' : ''}
+          ${!isSelected && !inRange ? 'hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF]' : ''}
+          ${isToday && !isSelected ? 'ring-1 ring-[#1B4965] dark:ring-[#5FA8D3]' : ''}
         `}
       >
         {day}
@@ -60,12 +60,12 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 text-center mb-3">
+      <h4 className="text-sm font-serif text-[#1A1A1A] dark:text-[#E8E4DF] text-center mb-3">
         {MONTHS_PT[month]} {year}
       </h4>
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {WEEKDAYS_PT.map((wd) => (
-          <div key={wd} className="text-center text-[10px] font-medium text-slate-400 dark:text-slate-500 py-1">
+          <div key={wd} className="text-center text-[10px] font-medium text-[#9B9B9B] dark:text-[#6B6560] py-1">
             {wd}
           </div>
         ))}
@@ -158,8 +158,8 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition
           ${hasRange
-            ? 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 ring-1 ring-sky-300 dark:ring-sky-700'
-            : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+            ? 'bg-[#E8F0F4] text-[#1B4965] dark:bg-[#1B2B35] dark:text-[#5FA8D3] ring-1 ring-[#1B4965]/30 dark:ring-[#5FA8D3]/30'
+            : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
           }
         `}
       >
@@ -174,19 +174,19 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 w-[300px] sm:w-[580px]">
+        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl border border-[#E8E5E0] dark:border-[#2D2B28] p-4 sm:p-5 w-[300px] sm:w-[580px]">
           {/* Header nav */}
           <div className="flex items-center justify-between mb-4">
-            <button type="button" onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <button type="button" onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">
               {selecting ? 'Selecione a data final' : 'Selecione a data inicial'}
             </p>
-            <button type="button" onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <button type="button" onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -219,16 +219,16 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
             <button
               type="button"
               onClick={handleClear}
-              className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition"
+              className="text-sm text-[#9B9B9B] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF] transition"
             >
               Limpar
             </button>
             {hasRange && (
-              <span className="text-xs text-sky-600 dark:text-sky-400 font-medium">
+              <span className="text-xs text-[#1B4965] dark:text-[#5FA8D3] font-medium">
                 {formatShortDate(dateRange.from)} — {formatShortDate(dateRange.to)}
               </span>
             )}

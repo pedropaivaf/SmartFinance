@@ -7,10 +7,10 @@ import { dotBg } from './CategoryPicker';
 const formatDate = (date) => date.toISOString().split('T')[0];
 
 const inputBase =
-  'w-full block text-sm px-3 py-3 rounded-xl border border-slate-300/80 dark:border-slate-700 ' +
-  'bg-white/90 dark:bg-slate-800 text-slate-900 dark:text-slate-100 ' +
-  'placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 ' +
-  'focus:ring-sky-500 focus:border-sky-500 transition leading-tight';
+  'w-full block text-sm px-3 py-3 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
+  'bg-white dark:bg-[#1E1D1C] text-[#1A1A1A] dark:text-[#E8E4DF] ' +
+  'placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 ' +
+  'focus:ring-[#1B4965] focus:border-[#1B4965] transition leading-tight';
 
 function TransactionForm({ onAddTransactions, onClearAll, customCategories = [], onAddCustomCategory }) {
   const { t } = useTranslation();
@@ -132,13 +132,13 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
 
   return (
     <>
-      <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t('form.title')}</h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('form.subtitle')}</p>
+      <div className="border-t border-[#E8E5E0] dark:border-[#2D2B28] pt-6">
+        <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('form.title')}</h2>
+        <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A09A92]">{t('form.subtitle')}</p>
       </div>
       <form id="transaction-form" className="mt-4 space-y-3" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="description" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+          <label htmlFor="description" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
             {t('form.description.label')}
           </label>
           <input
@@ -151,12 +151,12 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
             required
             aria-describedby="description-helper"
           />
-          <p id="description-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p id="description-helper" className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             {t('form.description.helper')}
           </p>
         </div>
         <div>
-          <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+          <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
             {t('form.category.label')}
           </label>
           <button
@@ -174,19 +174,19 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
                 </>
               );
             })() : (
-              <span className="text-slate-400 dark:text-slate-500">{t('form.category.placeholder')}</span>
+              <span className="text-[#9B9B9B] dark:text-[#6B6560]">{t('form.category.placeholder')}</span>
             )}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-[#9B9B9B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             {t('form.category.helper')}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="amount" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="amount" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('form.amount.label')}
             </label>
             <input
@@ -200,12 +200,12 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
               required
               aria-describedby="amount-helper"
             />
-            <p id="amount-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p id="amount-helper" className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
               {t('form.amount.helper')}
             </p>
           </div>
           <div>
-            <label htmlFor="transaction-date" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="transaction-date" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('form.date.label')}
             </label>
             <input
@@ -218,13 +218,13 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
               required
               aria-describedby="date-helper"
             />
-            <p id="date-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p id="date-helper" className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
               {t('form.date.helper')}
             </p>
           </div>
         </div>
         <div>
-          <label htmlFor="recurrence" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+          <label htmlFor="recurrence" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
             {t('form.recurrence.label')}
           </label>
           <select
@@ -238,14 +238,14 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
             <option value="monthly">{t('form.recurrence.monthly')}</option>
             <option value="installment">{t('form.recurrence.installment')}</option>
           </select>
-          <p id="recurrence-helper" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p id="recurrence-helper" className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             {t('form.recurrence.helper')}
           </p>
         </div>
         {isInstallment && (
           <div className="space-y-4">
             <div>
-              <label htmlFor="installments" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label htmlFor="installments" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
                 {t('form.installments.label')}
               </label>
               <input
@@ -260,7 +260,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
               />
             </div>
             <div>
-              <label htmlFor="installment-start-date" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+              <label htmlFor="installment-start-date" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
                 {t('form.installments.start')}
               </label>
               <input
@@ -272,7 +272,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
                 style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 required
               />
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
                 {t('form.installments.startHelper')}
               </p>
             </div>
@@ -280,7 +280,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
         )}
         {showPaidInstallments && (
           <div>
-            <label htmlFor="paid-installments" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="paid-installments" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('form.installments.paid')}
             </label>
             <input
@@ -292,14 +292,14 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
               placeholder="Ex.: 2"
               className={inputBase}
             />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
               {t('form.installments.paidHelper')}
             </p>
           </div>
         )}
         {showPaidInstallments && parseInt(paidInstallments, 10) > 0 && (
           <div>
-            <label htmlFor="prepaid-payment-method" className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+            <label htmlFor="prepaid-payment-method" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('form.installments.paymentMethod') || 'Metodo de pagamento das parcelas pagas'}
             </label>
             <select
@@ -316,7 +316,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
           </div>
         )}
         <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4" aria-label={t('form.type.legend')}>
-          <legend className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
+          <legend className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1">
             {t('form.type.legend')}
           </legend>
           <div className="custom-radio custom-radio-expense">
@@ -331,7 +331,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
             />
             <label
               htmlFor="type-expense"
-              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
@@ -351,7 +351,7 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
             />
             <label
               htmlFor="type-income"
-              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+              className="w-full flex items-center justify-center gap-2 p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -359,27 +359,27 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
               {t('form.type.income')}
             </label>
           </div>
-          <p className="sm:col-span-2 text-xs text-slate-500 dark:text-slate-400">
+          <p className="sm:col-span-2 text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             {t('form.type.helper')}
           </p>
         </fieldset>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300"
+          className="w-full bg-[#1B4965] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition duration-300"
         >
           {t('form.submit')}
         </button>
       </form>
-      <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <div className="mt-6 pt-4 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
         <button
           id="clean-all-btn"
           type="button"
           onClick={onClearAll}
-          className="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300"
+          className="w-full bg-[#9B2226] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#7F1D1F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9B2226] transition duration-300"
         >
           {t('form.clearAll')}
         </button>
-        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 text-center">
+        <p className="mt-2 text-xs text-[#6B6B6B] dark:text-[#A09A92] text-center">
           {t('form.clearAll.helper')}
         </p>
       </div>

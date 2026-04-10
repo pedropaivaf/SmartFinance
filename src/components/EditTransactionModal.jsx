@@ -64,7 +64,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
     }
 
     if (!date) {
-      alert('Por favor, selecione uma data válida.');
+      alert('Por favor, selecione uma data valida.');
       return;
     }
 
@@ -84,17 +84,17 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
       id="edit-modal"
       role="dialog"
       aria-modal="true"
-      className="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={handleOverlayClick}
     >
-      <div className="modal-container w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 md:p-8">
+      <div className="modal-container w-full max-w-md bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Editar Transação</h2>
+          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Editar Transacao</h2>
           <button
             id="close-modal-btn"
             type="button"
             onClick={onClose}
-            className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+            className="text-[#6B6B6B] dark:text-[#A09A92] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -103,26 +103,26 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
         </div>
         <form id="edit-transaction-form" className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="edit-description" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
-              Descrição
+            <label htmlFor="edit-description" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+              Descricao
             </label>
             <input
               id="edit-description"
               type="text"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
               required
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
+            <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
               {t('form.category.label')}
             </label>
             <button
               type="button"
               onClick={() => setCategoryPickerOpen(true)}
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition flex items-center gap-2 text-left text-sm"
+              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition flex items-center gap-2 text-left text-sm"
             >
               {category ? (() => {
                 const cat = getCategoryById(category, customCategories);
@@ -134,16 +134,16 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
                   </>
                 );
               })() : (
-                <span className="text-slate-400 dark:text-slate-500">{t('form.category.placeholder')}</span>
+                <span className="text-[#9B9B9B] dark:text-[#6B6560]">{t('form.category.placeholder')}</span>
               )}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-[#9B9B9B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="edit-amount" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
+              <label htmlFor="edit-amount" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
                 Valor (R$)
               </label>
               <input
@@ -152,12 +152,12 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
                 step="0.01"
                 value={amount}
                 onChange={(event) => setAmount(event.target.value)}
-                className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
                 required
               />
             </div>
             <div>
-              <label htmlFor="edit-date" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
+              <label htmlFor="edit-date" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
                 Data
               </label>
               <input
@@ -165,7 +165,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
                 type="date"
                 value={date}
                 onChange={(event) => setDate(event.target.value)}
-                className="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
                 required
               />
             </div>
@@ -183,7 +183,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
               />
               <label
                 htmlFor="edit-type-income"
-                className="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full text-center p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
                 Renda
               </label>
@@ -200,23 +200,23 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
               />
               <label
                 htmlFor="edit-type-expense"
-                className="w-full text-center p-3 border-2 border-slate-300 dark:border-slate-600 rounded-md cursor-pointer font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition duration-200"
+                className="w-full text-center p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
               >
                 Despesa
               </label>
             </div>
           </div>
           <div>
-            <label htmlFor="edit-recurrence" className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
-              Tipo de Recorrência
+            <label htmlFor="edit-recurrence" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+              Tipo de Recorrencia
             </label>
             <select
               id="edit-recurrence"
               value={recurrence}
               onChange={(event) => setRecurrence(event.target.value)}
-              className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] rounded-md bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF]"
             >
-              <option value="single">Única</option>
+              <option value="single">Unica</option>
               <option value="monthly">Mensal (Recorrente)</option>
               <option value="installment">Parcelada</option>
             </select>
@@ -226,15 +226,15 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
               id="cancel-edit-btn"
               type="button"
               onClick={onClose}
-              className="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold py-3 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition"
+              className="w-full bg-[#F4F3EF] dark:bg-[#2D2B28] text-[#1A1A1A] dark:text-[#E8E4DF] font-semibold py-3 px-4 rounded-lg hover:bg-[#E8E5E0] dark:hover:bg-[#3A3835] transition"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+              className="w-full bg-[#1B4965] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition"
             >
-              Salvar Alterações
+              Salvar Alteracoes
             </button>
           </div>
         </form>
@@ -253,4 +253,3 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
 }
 
 export default EditTransactionModal;
-

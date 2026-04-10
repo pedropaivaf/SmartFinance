@@ -17,11 +17,11 @@ function SettingsGroup({ title, children }) {
   return (
     <div className="space-y-1.5 card-animate">
       {title && (
-        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-slate-500/80 dark:text-slate-400/80">
+        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-[#1B4965] dark:text-[#5FA8D3]">
           {title}
         </p>
       )}
-      <div className="glass-panel rounded-2xl shadow-md shadow-slate-900/5 dark:shadow-black/20 overflow-hidden divide-y divide-slate-100/80 dark:divide-slate-700/40">
+      <div className="glass-panel rounded-2xl shadow-md shadow-[#1A1A1A]/5 dark:shadow-black/20 overflow-hidden divide-y divide-[#E8E5E0]/80 dark:divide-[#2D2B28]/60">
         {children}
       </div>
     </div>
@@ -36,7 +36,7 @@ function SettingsRow({ icon, iconBg, label, sublabel, right, onClick, chevron = 
       onClick={onClick}
       className={`settings-row-tap w-full flex items-center gap-3 px-4 py-3.5 min-h-[52px] text-left transition-all duration-150 focus:outline-none ${
         onClick
-          ? 'hover:bg-slate-50/80 dark:hover:bg-slate-700/30 active:bg-slate-100/80 dark:active:bg-slate-700/50'
+          ? 'hover:bg-[#F4F3EF]/80 dark:hover:bg-[#1A1918]/60 active:bg-[#F4F3EF] dark:active:bg-[#1A1918]'
           : ''
       }`}
     >
@@ -46,7 +46,7 @@ function SettingsRow({ icon, iconBg, label, sublabel, right, onClick, chevron = 
             iconBg ||
             (danger
               ? 'bg-red-100 dark:bg-red-900/40'
-              : 'bg-slate-100 dark:bg-slate-700/60')
+              : 'bg-[#F4F3EF] dark:bg-[#1A1918]')
           }`}
         >
           {icon}
@@ -56,23 +56,23 @@ function SettingsRow({ icon, iconBg, label, sublabel, right, onClick, chevron = 
         <p
           className={`text-sm font-medium ${
             danger
-              ? 'text-red-500 dark:text-red-400'
-              : 'text-slate-800 dark:text-slate-100'
+              ? 'text-[#9B2226] dark:text-[#E76F51]'
+              : 'text-[#1A1A1A] dark:text-[#E8E4DF]'
           }`}
         >
           {label}
         </p>
         {sublabel && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{sublabel}</p>
+          <p className="text-xs text-[#6B6B6B] dark:text-[#A09A92] truncate mt-0.5">{sublabel}</p>
         )}
       </div>
       {right && (
-        <div className="flex-shrink-0 text-slate-400 dark:text-slate-500 text-sm">{right}</div>
+        <div className="flex-shrink-0 text-[#9B9B9B] dark:text-[#6B6560] text-sm">{right}</div>
       )}
       {chevron && onClick && !right && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 text-slate-300 dark:text-slate-600 flex-shrink-0"
+          className="h-4 w-4 text-[#D4D0C8] dark:text-[#3A3835] flex-shrink-0"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -98,8 +98,8 @@ function Toggle({ checked, onChange }) {
       onClick={onChange}
       className={`toggle-switch relative w-12 h-7 rounded-full focus:outline-none ${
         checked
-          ? 'bg-gradient-to-r from-sky-500 to-sky-400 shadow-sm shadow-sky-500/30'
-          : 'bg-slate-300 dark:bg-slate-600'
+          ? 'bg-[#1B4965] shadow-sm shadow-[#1B4965]/30'
+          : 'bg-[#D4D0C8] dark:bg-[#3A3835]'
       }`}
     >
       <span
@@ -240,7 +240,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
     <div className="space-y-6 pb-4">
       {/* Page title */}
       <div className="px-1 pt-1">
-        <h2 className="text-2xl font-bold text-gradient tracking-tight">{t('settings.title')}</h2>
+        <h2 className="text-2xl font-bold font-serif text-gradient tracking-tight">{t('settings.title')}</h2>
       </div>
 
       {/* Conta do usuario */}
@@ -248,18 +248,18 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
         <SettingsGroup title={t('settings.user.section') || 'Conta'}>
           <SettingsRow
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             }
-            iconBg="bg-sky-100 dark:bg-sky-900/40"
+            iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
             label={userEmail}
             sublabel={t('settings.user.loggedIn') || 'Conectado'}
             chevron={false}
           />
           <SettingsRow
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#9B2226] dark:text-[#E76F51]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
             }
@@ -286,7 +286,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
             premium ? (
               <span className="text-xs font-semibold text-amber-500">{t('common.premium')}</span>
             ) : (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-sky-500 text-white font-semibold">{t('common.free')}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#1B4965] text-white font-semibold">{t('common.free')}</span>
             )
           }
           chevron={false}
@@ -294,11 +294,11 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
         {!premium && (
           <SettingsRow
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             }
-            iconBg="bg-sky-100 dark:bg-sky-900/40"
+            iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
             label={t('settings.account.upgrade')}
             sublabel={`R$ ${SMARTFINANCE_CONFIG.pricing.monthly.toFixed(2)}${t('settings.account.upgradeDesc')}`}
             onClick={() => alert(t('settings.account.soon'))}
@@ -310,11 +310,11 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.appearance.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" viewBox="0 0 20 20" fill="currentColor">
               <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
             </svg>
           }
-          iconBg="bg-indigo-100 dark:bg-indigo-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.appearance.darkMode')}
           sublabel={isDarkMode ? t('settings.appearance.darkOn') : t('settings.appearance.darkOff')}
           right={<Toggle checked={isDarkMode} onChange={onToggleTheme} />}
@@ -322,14 +322,14 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
             </svg>
           }
-          iconBg="bg-blue-100 dark:bg-blue-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.appearance.language')}
           right={
-            <span className="text-sm text-slate-400 dark:text-slate-500">
+            <span className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">
               {currentLangFlag} {currentLangName}
             </span>
           }
@@ -341,11 +341,11 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.billingCycle.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           }
-          iconBg="bg-amber-100 dark:bg-amber-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.billingCycle.label')}
           sublabel={t('settings.billingCycle.desc')}
           chevron={false}
@@ -353,7 +353,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
             <select
               value={billingCycleDay}
               onChange={(e) => onBillingCycleDayChange(e.target.value)}
-              className="text-sm bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-blue-500"
+              className="text-sm bg-[#F4F3EF] dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-lg px-3 py-1.5 border-0 focus:ring-2 focus:ring-[#1B4965]"
             >
               <option value={1}>{t('settings.billingCycle.day1')}</option>
               {Array.from({ length: 28 }, (_, i) => i + 2).map((d) => (
@@ -368,17 +368,17 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.integrations.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#2D6A4F] dark:text-[#52B788]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
           }
-          iconBg="bg-emerald-100 dark:bg-emerald-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.openfinance.title')}
           sublabel={t('settings.openfinance.desc')}
           onClick={() => setShowOpenFinance(!showOpenFinance)}
           right={
             showOpenFinance ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#9B9B9B]" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
             ) : undefined
@@ -400,11 +400,11 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.notifications.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           }
-          iconBg="bg-orange-100 dark:bg-orange-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.notifications.enable')}
           sublabel={t('settings.notifications.enableDesc')}
           right={<Toggle checked={notifPrefs.enabled} onChange={handleToggleNotifications} />}
@@ -414,7 +414,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
         {/* Permission denied warning */}
         {notifPermission === 'denied' && (
           <div className="px-4 py-2.5">
-            <p className="text-xs text-red-500 dark:text-red-400">{t('settings.notifications.permissionDenied')}</p>
+            <p className="text-xs text-[#9B2226] dark:text-[#E76F51]">{t('settings.notifications.permissionDenied')}</p>
           </div>
         )}
         {notifPermission === 'unsupported' && (
@@ -452,40 +452,40 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.data.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           }
-          iconBg="bg-blue-100 dark:bg-blue-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.data.exportJson')}
           sublabel={t('settings.data.exportJsonDesc')}
           onClick={isExporting ? undefined : handleExportJSON}
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#2D6A4F] dark:text-[#52B788]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           }
-          iconBg="bg-green-100 dark:bg-green-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.data.exportCsv')}
           sublabel={t('settings.data.exportCsvDesc')}
           onClick={isExporting ? undefined : handleExportCSV}
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
           }
-          iconBg="bg-violet-100 dark:bg-violet-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.data.import')}
           sublabel={t('settings.data.importDesc')}
           onClick={handleImport}
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#9B2226] dark:text-[#E76F51]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           }
@@ -500,13 +500,13 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <SettingsGroup title={t('settings.about.section')}>
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           }
           label={t('settings.about.version')}
           right={
-            <span className="text-sm text-slate-400 dark:text-slate-500">
+            <span className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">
               v{SMARTFINANCE_CONFIG.version}
             </span>
           }
@@ -514,18 +514,18 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#1B4965] dark:text-[#5FA8D3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
           }
-          iconBg="bg-sky-100 dark:bg-sky-900/40"
+          iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.about.feedback')}
           sublabel={t('settings.about.feedbackDesc')}
           onClick={() => window.open('mailto:feedback@smartfinance.app')}
         />
         <SettingsRow
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           }
