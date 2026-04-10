@@ -46,10 +46,6 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
       <div id="transaction-list-container" className="flex-grow overflow-y-auto pr-2">
         <ul id="transaction-list" className="space-y-1">
           <li id="empty-state" className="text-center py-10">
-            <svg className="mx-auto h-12 w-12 text-[#9B9B9B] dark:text-[#6B6560]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
-            </svg>
             <h3 className="mt-2 text-sm font-medium font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('list.empty.title')}</h3>
             <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A09A92]">{t('list.empty.subtitle')}</p>
           </li>
