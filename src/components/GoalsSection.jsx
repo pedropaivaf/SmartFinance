@@ -25,14 +25,14 @@ function GoalsSection({ goals, onGoalChange, summaryValues, formatCurrency }) {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Metas de orçamento</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <h2 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Metas de orçamento</h2>
+        <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Defina objetivos mensais para renda e gastos. O painel abaixo mostra o quanto já foi atingido.
         </p>
       </div>
       <form className="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Definição de metas">
-        <label className="flex flex-col gap-2 bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 rounded-lg p-4 shadow-sm">
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Meta de renda mensal</span>
+        <label className="flex flex-col gap-2 bg-white dark:bg-[#1E1D1C] border border-[#E8E5E0] dark:border-[#2D2B28] rounded-lg p-4 shadow-sm">
+          <span className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92]">Meta de renda mensal</span>
           <input
             type="number"
             min="0"
@@ -40,14 +40,14 @@ function GoalsSection({ goals, onGoalChange, summaryValues, formatCurrency }) {
             value={goals.incomeGoal}
             onChange={handleChange('incomeGoal')}
             placeholder="Ex.: 5000"
-            className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-2 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] p-2 text-[#1A1A1A] dark:text-[#E8E4DF] focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]"
           />
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             Use este valor para visualizar se a renda do período está dentro do esperado.
           </span>
         </label>
-        <label className="flex flex-col gap-2 bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 rounded-lg p-4 shadow-sm">
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Meta de gastos mensais</span>
+        <label className="flex flex-col gap-2 bg-white dark:bg-[#1E1D1C] border border-[#E8E5E0] dark:border-[#2D2B28] rounded-lg p-4 shadow-sm">
+          <span className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92]">Meta de gastos mensais</span>
           <input
             type="number"
             min="0"
@@ -55,9 +55,9 @@ function GoalsSection({ goals, onGoalChange, summaryValues, formatCurrency }) {
             value={goals.expenseGoal}
             onChange={handleChange('expenseGoal')}
             placeholder="Ex.: 3000"
-            className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-2 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] p-2 text-[#1A1A1A] dark:text-[#E8E4DF] focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]"
           />
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-xs text-[#6B6B6B] dark:text-[#A09A92]">
             Compare o quanto já foi gasto com o limite que você deseja respeitar no mês.
           </span>
         </label>
@@ -111,31 +111,31 @@ function GoalProgress({ title, current, goal, difference, progress, formatCurren
   const ratio = hasGoal && goal !== 0 ? current / goal : 0;
   const statusClass = (() => {
     if (!hasGoal) {
-      return 'text-slate-500 dark:text-slate-400';
+      return 'text-[#6B6B6B] dark:text-[#A09A92]';
     }
 
     if (positiveIsGood) {
-      return ratio >= 1 ? 'text-sky-400 dark:text-sky-300' : 'text-slate-500 dark:text-slate-400';
+      return ratio >= 1 ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#6B6B6B] dark:text-[#A09A92]';
     }
 
     if (exceeded) {
-      return 'text-red-600 dark:text-red-400';
+      return 'text-[#9B2226] dark:text-[#E76F51]';
     }
 
-    return 'text-slate-500 dark:text-slate-400';
+    return 'text-[#6B6B6B] dark:text-[#A09A92]';
   })();
 
   const barColor = (() => {
     if (!hasGoal) {
-      return 'bg-slate-300';
+      return 'bg-[#D4D0C8]';
     }
 
     if (positiveIsGood) {
-      return ratio >= 1 ? 'bg-sky-400' : 'bg-blue-800';
+      return ratio >= 1 ? 'bg-[#1B4965] dark:bg-[#5FA8D3]' : 'bg-[#153B52] dark:bg-[#4A93BD]';
     }
 
     if (ratio <= 0.6) {
-      return 'bg-emerald-500';
+      return 'bg-[#2D6A4F] dark:bg-[#52B788]';
     }
     if (ratio <= 0.9) {
       return 'bg-amber-400';
@@ -143,20 +143,20 @@ function GoalProgress({ title, current, goal, difference, progress, formatCurren
     if (ratio <= 1) {
       return 'bg-orange-500';
     }
-    return 'bg-rose-500';
+    return 'bg-[#9B2226] dark:bg-[#E76F51]';
   })();
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-slate-700 dark:text-slate-200">{title}</span>
+        <span className="font-medium text-[#1A1A1A] dark:text-[#E8E4DF]">{title}</span>
         {goal > 0 && (
-          <span className="text-slate-500 dark:text-slate-400">
+          <span className="text-[#6B6B6B] dark:text-[#A09A92]">
             {formatCurrency(current)} / {formatCurrency(goal)}
           </span>
         )}
       </div>
-      <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-700">
+      <div className="h-2 w-full rounded-full bg-[#E8E5E0] dark:bg-[#2D2B28]">
         <div
           className={`${barColor} h-2 rounded-full transition-all duration-500`}
           style={{ width: progressWidth }}

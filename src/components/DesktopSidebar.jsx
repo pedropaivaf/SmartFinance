@@ -40,11 +40,11 @@ function DesktopSidebar({ activePage, onNavigate, userEmail, onSignOut }) {
   const { t } = useTranslation();
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50">
+    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 z-40 bg-[#FAFAF8] dark:bg-[#111110] border-r border-[#E8E5E0] dark:border-[#2D2B28]">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-200/50 dark:border-slate-700/50">
-        <img src={logoBlue} alt="Smart Finance" className="h-10 w-10 rounded-xl shadow-md" />
-        <span className="text-lg font-bold text-slate-900 dark:text-white">Smart Finance</span>
+      <div className="flex items-center gap-3 px-6 py-6 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
+        <img src={logoBlue} alt="Smart Finance" className="h-10 w-10 rounded-xl shadow-sm" />
+        <span className="text-lg font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</span>
       </div>
 
       {/* Nav */}
@@ -58,8 +58,8 @@ function DesktopSidebar({ activePage, onNavigate, userEmail, onSignOut }) {
               onClick={() => onNavigate(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]'
+                  : 'text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF]'
               }`}
             >
               <svg
@@ -79,16 +79,16 @@ function DesktopSidebar({ activePage, onNavigate, userEmail, onSignOut }) {
       </nav>
 
       {/* User info + sign out */}
-      <div className="px-4 py-4 border-t border-slate-200/50 dark:border-slate-700/50 space-y-3">
+      <div className="px-4 py-4 border-t border-[#E8E5E0] dark:border-[#2D2B28] space-y-3">
         {userEmail && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 truncate px-2">
+          <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560] truncate px-2">
             {userEmail}
           </p>
         )}
         <button
           type="button"
           onClick={onSignOut}
-          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-[#9B2226] dark:text-[#E76F51] hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

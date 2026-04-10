@@ -43,9 +43,9 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
   }
 
   return (
-    <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-slate-200/80 dark:border-slate-700">
+    <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-6">
       <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+        <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
           Análises Avançadas
         </h2>
         <PremiumBadge size="xs" />
@@ -54,29 +54,29 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
       {/* Comparativo de Meses */}
       {comparison && (
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          <h3 className="text-sm font-semibold font-serif text-[#1A1A1A] dark:text-[#A09A92] mb-3">
             Mês Atual vs Anterior
           </h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800">
-              <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">Receitas</p>
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+            <div className="p-4 bg-[#E8F0F4] dark:bg-[#1B2B35] rounded-xl border border-[#1B4965]/20 dark:border-[#5FA8D3]/20">
+              <p className="text-xs text-[#1B4965] dark:text-[#5FA8D3] mb-1">Receitas</p>
+              <p className="text-2xl font-bold text-[#1B4965] dark:text-[#5FA8D3]">
                 R$ {comparison.current.income.toFixed(2)}
               </p>
               {comparison.diff.income !== 0 && (
-                <p className={`text-xs mt-1 ${comparison.diff.income > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className={`text-xs mt-1 ${comparison.diff.income > 0 ? 'text-[#2D6A4F] dark:text-[#52B788]' : 'text-[#9B2226] dark:text-[#E76F51]'}`}>
                   {comparison.diff.income > 0 ? '+' : ''}R$ {comparison.diff.income.toFixed(2)}
                 </p>
               )}
             </div>
 
             <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800">
-              <p className="text-xs text-red-600 dark:text-red-400 mb-1">Despesas</p>
-              <p className="text-2xl font-bold text-red-700 dark:text-red-300">
+              <p className="text-xs text-[#9B2226] dark:text-[#E76F51] mb-1">Despesas</p>
+              <p className="text-2xl font-bold text-[#9B2226] dark:text-[#E76F51]">
                 R$ {comparison.current.expense.toFixed(2)}
               </p>
               {comparison.diff.expense !== 0 && (
-                <p className={`text-xs mt-1 ${comparison.diff.expense < 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className={`text-xs mt-1 ${comparison.diff.expense < 0 ? 'text-[#2D6A4F] dark:text-[#52B788]' : 'text-[#9B2226] dark:text-[#E76F51]'}`}>
                   {comparison.diff.expense > 0 ? '+' : ''}R$ {comparison.diff.expense.toFixed(2)}
                 </p>
               )}
@@ -88,7 +88,7 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
       {/* Top Categorias */}
       {topCategories.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          <h3 className="text-sm font-semibold font-serif text-[#1A1A1A] dark:text-[#A09A92] mb-3">
             Top 5 Categorias de Gastos
           </h3>
           <div className="space-y-2">
@@ -107,19 +107,19 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
                   })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-slate-700 dark:text-slate-300 font-medium">
+                      <span className="text-[#1A1A1A] dark:text-[#A09A92] font-medium">
                         {(() => {
                           const catDef = getCategoryById(cat.category, customCategories);
                           return catDef?.label || (catDef ? t(`categories.${cat.category}`) : cat.category);
                         })()}
                       </span>
-                      <span className="text-slate-900 dark:text-white font-bold">
+                      <span className="text-[#1A1A1A] dark:text-[#E8E4DF] font-bold">
                         R$ {cat.amount.toFixed(2)}
                       </span>
                     </div>
-                    <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-[#E8E5E0] dark:bg-[#2D2B28] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-[#1B4965] to-[#5FA8D3] dark:from-[#5FA8D3] dark:to-[#4A93BD] transition-all duration-300"
                         style={{ width: `${percent}%` }}
                       />
                     </div>
@@ -132,7 +132,7 @@ export default function AdvancedAnalytics({ transactions, customCategories = [] 
       )}
 
       {topCategories.length === 0 && (
-        <p className="text-center text-slate-500 dark:text-slate-400 py-8 text-sm">
+        <p className="text-center text-[#6B6B6B] dark:text-[#A09A92] py-8 text-sm">
           Adicione categorias às suas transações para ver as análises.
         </p>
       )}

@@ -40,9 +40,9 @@ export default function UpcomingBillsSection({ transactions }) {
   };
 
   const getUrgencyColor = (days) => {
-    if (days <= 3) return 'bg-red-100 dark:bg-red-950/30 border-red-300 dark:border-red-800 text-red-800 dark:text-red-200';
+    if (days <= 3) return 'bg-red-100 dark:bg-red-950/30 border-red-300 dark:border-red-800 text-[#9B2226] dark:text-[#E76F51]';
     if (days <= 7) return 'bg-amber-100 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200';
-    return 'bg-blue-100 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-200';
+    return 'bg-[#E8F0F4] dark:bg-[#1B2B35] border-[#1B4965]/20 dark:border-[#5FA8D3]/20 text-[#1B4965] dark:text-[#5FA8D3]';
   };
 
   if (!isPremium) {
@@ -60,16 +60,16 @@ export default function UpcomingBillsSection({ transactions }) {
   }
 
   return (
-    <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-slate-200/80 dark:border-slate-700">
+    <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-6">
       <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+        <h2 className="text-xl font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
           Próximos Lançamentos
         </h2>
         <PremiumBadge size="xs" />
       </div>
 
       {upcomingBills.length === 0 ? (
-        <p className="text-center text-slate-500 dark:text-slate-400 py-8 text-sm">
+        <p className="text-center text-[#6B6B6B] dark:text-[#A09A92] py-8 text-sm">
           Nenhum lançamento futuro nos próximos 30 dias.
         </p>
       ) : (
@@ -89,7 +89,7 @@ export default function UpcomingBillsSection({ transactions }) {
                         {bill.description}
                       </h3>
                       {bill.isProjection && (
-                        <span className="text-xs bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-[#F4F3EF] dark:bg-[#2D2B28] px-2 py-0.5 rounded-full">
                           Projeção
                         </span>
                       )}

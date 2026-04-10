@@ -43,8 +43,8 @@ function CategoryTag({ cat, label, isSelected, onClick }) {
       onClick={onClick}
       className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-150 min-h-[36px] ${
         isSelected
-          ? `ring-2 ${ring} bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm`
-          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95'
+          ? `ring-2 ${ring} bg-white dark:bg-[#2D2B28] text-[#1A1A1A] dark:text-[#E8E4DF] shadow-sm`
+          : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28] active:scale-95'
       }`}
     >
       <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dot}`} />
@@ -133,21 +133,21 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
 
   return (
     <div
-      className="modal-overlay fixed inset-0 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
+      className="modal-overlay fixed inset-0 bg-[#1A1A1A]/50 dark:bg-[#111110]/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
-      <div className="modal-container w-full max-w-md bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[80vh] flex flex-col overflow-hidden">
+      <div className="modal-container w-full max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[80vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
-          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+          <h3 className="text-base font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('categories.picker.title')}
           </h3>
           <button
             type="button"
             onClick={() => { setShowCreate(false); setSearch(''); onClose(); }}
-            className="p-2 -mr-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-2 -mr-2 rounded-full hover:bg-[#F4F3EF] dark:hover:bg-[#2D2B28] transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#9B9B9B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -160,7 +160,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('categories.picker.search')}
-            className="w-full text-sm px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700/80 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+            className="w-full text-sm px-4 py-2.5 rounded-xl bg-[#F4F3EF] dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 focus:ring-[#1B4965] transition"
           />
         </div>
 
@@ -168,7 +168,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
         <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4">
           {filteredGroups.map(({ group, items }) => (
             <div key={group}>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#9B9B9B] dark:text-[#6B6560] mb-2">
                 {t(`categories.group.${group}`)}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -186,19 +186,19 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
           ))}
 
           {filteredGroups.length === 0 && !showCreate && (
-            <p className="text-center text-slate-400 dark:text-slate-500 py-6 text-sm">
+            <p className="text-center text-[#9B9B9B] dark:text-[#6B6560] py-6 text-sm">
               {t('categories.picker.empty')}
             </p>
           )}
         </div>
 
         {/* Create custom category */}
-        <div className="border-t border-slate-200 dark:border-slate-700 px-5 py-3">
+        <div className="border-t border-[#E8E5E0] dark:border-[#2D2B28] px-5 py-3">
           {!showCreate ? (
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-xl transition"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#1B4965] dark:text-[#5FA8D3] hover:bg-[#E8F0F4] dark:hover:bg-[#1B2B35] rounded-xl transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -213,7 +213,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder={t('categories.picker.newName')}
-                  className="flex-1 text-sm px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700/80 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+                  className="flex-1 text-sm px-3 py-2.5 rounded-xl bg-[#F4F3EF] dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] placeholder:text-[#9B9B9B] focus:outline-none focus:ring-2 focus:ring-[#1B4965] transition"
                   maxLength={30}
                   autoFocus
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateCategory(); } }}
@@ -222,7 +222,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
                   type="button"
                   onClick={handleCreateCategory}
                   disabled={!newName.trim()}
-                  className="px-4 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="px-4 py-2.5 rounded-xl bg-[#1B4965] text-white text-sm font-medium hover:bg-[#153B52] disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
                   {t('categories.picker.add')}
                 </button>
@@ -234,7 +234,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
                     type="button"
                     onClick={() => setNewColor(c)}
                     className={`w-6 h-6 rounded-full transition-all ${dotBg[c]} ${
-                      newColor === c ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-800 ring-slate-400 scale-110' : 'hover:scale-110'
+                      newColor === c ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#1E1D1C] ring-[#9B9B9B] scale-110' : 'hover:scale-110'
                     }`}
                   />
                 ))}

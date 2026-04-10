@@ -15,8 +15,8 @@ function PaymentTabs({ currentPaymentFilter, onChange }) {
   };
 
   return (
-    <div id="payment-tabs-container" className="border-b border-slate-200 dark:border-slate-700 pb-2">
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+    <div id="payment-tabs-container" className="border-b border-[#E8E5E0] dark:border-[#2D2B28] pb-2">
+      <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92] mb-2">
         Explore os lançamentos por tipo de pagamento
       </p>
       <nav className="-mb-px flex gap-4 text-sm font-medium overflow-x-auto" aria-label="Filtro por método de pagamento">
@@ -26,7 +26,7 @@ function PaymentTabs({ currentPaymentFilter, onChange }) {
             type="button"
             data-payment-filter={tab.value}
             onClick={handleClick}
-            className={`payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 border-transparent ${
+            className={`payment-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-[#6B6B6B] hover:text-[#1A1A1A] dark:text-[#A09A92] dark:hover:text-[#E8E4DF] border-transparent ${
               currentPaymentFilter === tab.value ? 'active' : ''
             }`}
           >

@@ -10,7 +10,7 @@ import { getPremiumMessage } from '../config';
 
 export default function PremiumCard({ title, description, icon, onClick }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-600 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 p-6 transition-all hover:shadow-lg">
+    <div className="relative overflow-hidden rounded-2xl border-2 border-amber-300 dark:border-amber-600 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 p-6 transition-all hover:shadow-lg">
       <div className="absolute top-3 right-3">
         <PremiumBadge size="sm" />
       </div>
@@ -21,11 +21,11 @@ export default function PremiumCard({ title, description, icon, onClick }) {
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+      <h3 className="text-lg font-semibold text-[#1A1A1A] dark:text-[#E8E4DF] mb-2">
         {title}
       </h3>
 
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+      <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92] mb-4">
         {description}
       </p>
 

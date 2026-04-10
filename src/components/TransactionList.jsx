@@ -46,12 +46,12 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
       <div id="transaction-list-container" className="flex-grow overflow-y-auto pr-2">
         <ul id="transaction-list" className="space-y-1">
           <li id="empty-state" className="text-center py-10">
-            <svg className="mx-auto h-12 w-12 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
+            <svg className="mx-auto h-12 w-12 text-[#9B9B9B] dark:text-[#6B6560]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-200">{t('list.empty.title')}</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('list.empty.subtitle')}</p>
+            <h3 className="mt-2 text-sm font-medium font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">{t('list.empty.title')}</h3>
+            <p className="mt-1 text-sm text-[#6B6B6B] dark:text-[#A09A92]">{t('list.empty.subtitle')}</p>
           </li>
         </ul>
       </div>
@@ -64,7 +64,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
         {groupedTransactions.map(({ key, items }) => (
           <React.Fragment key={key}>
             <li className="pt-4 pb-2">
-              <h3 className="text-md font-semibold text-slate-500 dark:text-slate-400 tracking-wider capitalize">{key}</h3>
+              <h3 className="text-md font-semibold font-serif text-[#6B6B6B] dark:text-[#A09A92] tracking-wider capitalize">{key}</h3>
             </li>
             {items.map((transaction) => {
               const isIncome = transaction.type === 'income';
@@ -83,7 +83,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                   key={transaction.id}
                   data-id={transaction.id}
                   data-group-id={transaction.groupId || undefined}
-                  className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg list-item-enter gap-x-2 gap-y-1 ${
+                  className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between p-3 bg-[#F4F3EF] dark:bg-[#1A1918] rounded-lg list-item-enter gap-x-2 gap-y-1 ${
                     transaction.paid ? 'transaction-paid' : ''
                   } ${isProjection ? 'transaction-projection' : ''}`}
                 >
@@ -91,7 +91,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                     {!isIncome ? (
                       <input
                         type="checkbox"
-                        className="transaction-paid-checkbox h-5 w-5 rounded border-slate-400 dark:border-slate-500 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"
+                        className="transaction-paid-checkbox h-5 w-5 rounded border-[#D4D0C8] dark:border-[#3A3835] text-[#1B4965] focus:ring-[#1B4965] cursor-pointer flex-shrink-0"
                         data-id={transaction.id}
                         checked={Boolean(transaction.paid)}
                         onChange={(event) => onTogglePaid(transaction, event.target.checked)}
@@ -99,8 +99,8 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                     ) : (
                       <div className="h-5 w-5 flex-shrink-0" />
                     )}
-                    <span className={`p-2 rounded-full ${isIncome ? 'bg-blue-200/70 dark:bg-blue-900/60' : 'bg-red-200/70 dark:bg-red-900/60'}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <span className={`p-2 rounded-full ${isIncome ? 'bg-[#E8F0F4] dark:bg-[#1B2B35]' : 'bg-red-200/70 dark:bg-red-900/60'}`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                         {isIncome
                           ? <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                           : <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
@@ -108,24 +108,24 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                       </svg>
                     </span>
                     <div className="flex-grow min-w-0">
-                      <p className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 description-text truncate">
+                      <p className="font-semibold text-[#1A1A1A] dark:text-[#E8E4DF] flex items-center gap-2 description-text truncate">
                         {transaction.description}
                         {transaction.recurrence === 'monthly' && !isProjection && (
-                          <span className="text-xs flex-shrink-0 font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-200 px-2 py-0.5 rounded-full">
+                          <span className="text-xs flex-shrink-0 font-medium bg-[#E8F0F4] text-[#1B4965] dark:bg-[#1B2B35] dark:text-[#5FA8D3] px-2 py-0.5 rounded-full">
                             {t('list.badge.recurring')}
                           </span>
                         )}
                         {isProjection && (
-                          <span className="text-xs flex-shrink-0 font-medium bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">
+                          <span className="text-xs flex-shrink-0 font-medium bg-[#F4F3EF] text-[#6B6B6B] dark:bg-[#2D2B28] dark:text-[#A09A92] px-2 py-0.5 rounded-full">
                             {t('list.badge.projection')}
                           </span>
                         )}
                       </p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                      <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
                         {new Date(transaction.createdAt).toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang)}
                       </p>
                       {paymentLabel && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-xs text-[#6B6B6B] dark:text-[#A09A92] mt-0.5">
                           {t('list.paidWith')} {paymentLabel}{creditInfo}
                         </p>
                       )}
@@ -134,7 +134,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                         if (!cat) return null;
                         const dot = dotBg[cat.color] || dotBg.slate;
                         return (
-                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-[#6B6B6B] dark:text-[#A09A92] mt-0.5">
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
                             {cat.label || t(`categories.${transaction.category}`)}
                           </span>
@@ -143,13 +143,13 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-                    <p className={`font-semibold text-lg ${isIncome ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'} text-right whitespace-nowrap`}>
+                    <p className={`font-semibold font-serif text-lg ${isIncome ? 'text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B2226] dark:text-[#E76F51]'} text-right whitespace-nowrap`}>
                       {`${sign} ${formatCurrency(amount)}`}
                     </p>
                     <div className={`flex items-center ${isProjection ? 'hidden' : ''} gap-1`}>
                       <button
                         type="button"
-                        className="edit-btn p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        className="edit-btn p-2 rounded-lg text-[#6B6B6B] hover:text-[#1B4965] dark:hover:text-[#5FA8D3] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition-colors"
                         onClick={() => onEdit(transaction)}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -158,7 +158,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                       </button>
                       <button
                         type="button"
-                        className="delete-btn p-2 rounded-lg text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        className="delete-btn p-2 rounded-lg text-[#6B6B6B] hover:text-[#9B2226] dark:hover:text-[#E76F51] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition-colors"
                         onClick={() => onDelete(transaction)}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

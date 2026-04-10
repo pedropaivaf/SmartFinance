@@ -78,15 +78,15 @@ export default function InsightsSection({ transactions, envelopes = [] }) {
   }
 
   const typeColors = {
-    success: 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+    success: 'bg-[#E8F0F4] dark:bg-[#1B2B35] border-[#1B4965]/20 dark:border-[#5FA8D3]/20 text-[#2D6A4F] dark:text-[#52B788]',
     warning: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200',
-    info: 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
+    info: 'bg-[#E8F0F4] dark:bg-[#1B2B35] border-[#1B4965]/20 dark:border-[#5FA8D3]/20 text-[#1B4965] dark:text-[#5FA8D3]',
   };
 
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+        <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
           Insights Automáticos
         </h3>
         <PremiumBadge size="xs" />
