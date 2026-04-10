@@ -24,7 +24,6 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
   const today = new Date();
 
   const cells = [];
-  // Empty cells before first day
   for (let i = 0; i < firstDay; i++) {
     cells.push(<div key={`empty-${i}`} />);
   }
@@ -35,7 +34,6 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
     const isTo = isSameDay(date, rangeTo);
     const isSelected = isFrom || isTo;
 
-    // For highlighting range preview during selection
     const effectiveTo = rangeTo || (rangeFrom && hoverDate && hoverDate > rangeFrom ? hoverDate : null);
     const inRange = isInRange(date, rangeFrom, effectiveTo);
     const isToday = isSameDay(date, today);
@@ -46,7 +44,7 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
         type="button"
         onClick={() => onDayClick(date)}
         onMouseEnter={() => onDayHover(date)}
-        className={`relative h-9 w-full rounded-lg text-sm font-medium transition-all duration-150
+        className={`relative h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 min-h-[44px]
           ${isSelected ? 'bg-[#1B4965] dark:bg-[#5FA8D3] text-white shadow-sm' : ''}
           ${inRange && !isSelected ? 'bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]' : ''}
           ${!isSelected && !inRange ? 'hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF]' : ''}
@@ -60,7 +58,7 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
 
   return (
     <div>
-      <h4 className="text-sm font-display text-[#1A1A1A] dark:text-[#E8E4DF] text-center mb-3">
+      <h4 className="text-sm font-semibold text-[#1A1A1A] dark:text-[#E8E4DF] text-center mb-3">
         {MONTHS_PT[month]} {year}
       </h4>
       <div className="grid grid-cols-7 gap-0.5 mb-1">
@@ -79,23 +77,9 @@ function MonthGrid({ year, month, rangeFrom, rangeTo, hoverDate, onDayClick, onD
 
 function DateRangePicker({ dateRange, onDateRangeChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selecting, setSelecting] = useState(null); // null | { from: Date }
+  const [selecting, setSelecting] = useState(null);
   const [hoverDate, setHoverDate] = useState(null);
   const [viewDate, setViewDate] = useState(() => new Date());
-  const ref = useRef(null);
-
-  // Close on click outside
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setIsOpen(false);
-        setSelecting(null);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [isOpen]);
 
   const secondMonth = useMemo(() => {
     const d = new Date(viewDate);
@@ -105,10 +89,8 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
 
   const handleDayClick = (date) => {
     if (!selecting) {
-      // First click — set start date
       setSelecting({ from: date });
     } else {
-      // Second click — set end date
       let from = selecting.from;
       let to = date;
       if (to < from) {
@@ -151,8 +133,15 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
   };
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsOpen(false);
+      setSelecting(null);
+    }
+  };
+
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -174,64 +163,87 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl border border-[#E8E5E0] dark:border-[#2D2B28] p-4 sm:p-5 w-[300px] sm:w-[580px]">
-          {/* Header nav */}
-          <div className="flex items-center justify-between mb-4">
-            <button type="button" onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">
-              {selecting ? 'Selecione a data final' : 'Selecione a data inicial'}
-            </p>
-            <button type="button" onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Calendar grids */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-            <div className="flex-1">
-              <MonthGrid
-                year={viewDate.getFullYear()}
-                month={viewDate.getMonth()}
-                rangeFrom={rangeFrom}
-                rangeTo={rangeTo}
-                hoverDate={hoverDate}
-                onDayClick={handleDayClick}
-                onDayHover={setHoverDate}
-              />
+        <div
+          className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
+          onClick={handleOverlayClick}
+        >
+          <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-[#1E1D1C] z-10 flex justify-between items-center px-6 pt-6 pb-4 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
+              <div>
+                <h2 className="text-lg font-bold text-[#1A1A1A] dark:text-[#E8E4DF]">Selecionar Período</h2>
+                <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560] mt-0.5">
+                  {selecting ? 'Selecione a data final' : 'Selecione a data inicial'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); setSelecting(null); }}
+                className="p-2 -mr-2 rounded-full text-[#9B9B9B] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#2D2B28] transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <div className="hidden sm:block flex-1">
-              <MonthGrid
-                year={secondMonth.getFullYear()}
-                month={secondMonth.getMonth()}
-                rangeFrom={rangeFrom}
-                rangeTo={rangeTo}
-                hoverDate={hoverDate}
-                onDayClick={handleDayClick}
-                onDayHover={setHoverDate}
-              />
-            </div>
-          </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
-            <button
-              type="button"
-              onClick={handleClear}
-              className="text-sm text-[#9B9B9B] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF] transition"
-            >
-              Limpar
-            </button>
-            {hasRange && (
-              <span className="text-xs text-[#1B4965] dark:text-[#5FA8D3] font-medium">
-                {formatShortDate(dateRange.from)} — {formatShortDate(dateRange.to)}
-              </span>
-            )}
+            {/* Month navigation */}
+            <div className="flex items-center justify-between px-6 pt-4 pb-2">
+              <button type="button" onClick={prevMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {hasRange && (
+                <span className="text-xs text-[#1B4965] dark:text-[#5FA8D3] font-medium">
+                  {formatShortDate(dateRange.from)} — {formatShortDate(dateRange.to)}
+                </span>
+              )}
+              <button type="button" onClick={nextMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Calendar grids */}
+            <div className="px-6 pb-2">
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1">
+                  <MonthGrid
+                    year={viewDate.getFullYear()}
+                    month={viewDate.getMonth()}
+                    rangeFrom={rangeFrom}
+                    rangeTo={rangeTo}
+                    hoverDate={hoverDate}
+                    onDayClick={handleDayClick}
+                    onDayHover={setHoverDate}
+                  />
+                </div>
+                <div className="hidden sm:block flex-1">
+                  <MonthGrid
+                    year={secondMonth.getFullYear()}
+                    month={secondMonth.getMonth()}
+                    rangeFrom={rangeFrom}
+                    rangeTo={rangeTo}
+                    hoverDate={hoverDate}
+                    onDayClick={handleDayClick}
+                    onDayHover={setHoverDate}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="w-full py-3 rounded-xl bg-[#F4F3EF] dark:bg-[#2D2B28] text-[#1A1A1A] dark:text-[#E8E4DF] font-semibold text-sm hover:bg-[#E8E5E0] dark:hover:bg-[#3A3835] transition min-h-[44px]"
+              >
+                Limpar Período
+              </button>
+            </div>
           </div>
         </div>
       )}
