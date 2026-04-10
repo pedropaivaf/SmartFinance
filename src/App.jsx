@@ -63,6 +63,7 @@ import {
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
 import { setCurrentPlan, getCurrentPlan } from './config.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
+import { calculateTotals } from './utils/calculations.js';
 
 const logoBlue = '/LogoSFblue.png';
 
@@ -302,23 +303,10 @@ function AppContent() {
     [processedTransactions, billingCycleDay],
   );
 
-  const overviewValues = useMemo(() => {
-    const income = overviewTransactions
-      .filter((tx) => tx.type === 'income' && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    const totalExpenseRaw = overviewTransactions
-      .filter((tx) => tx.type === 'expense' && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    const paidExpenseRaw = overviewTransactions
-      .filter((tx) => tx.type === 'expense' && tx.paid && !tx.isProjection)
-      .reduce((acc, tx) => acc + tx.amount, 0);
-    return {
-      income,
-      totalExpense: Math.abs(totalExpenseRaw),
-      paidExpense: Math.abs(paidExpenseRaw),
-      balance: income + paidExpenseRaw,
-    };
-  }, [overviewTransactions]);
+  const overviewValues = useMemo(
+    () => calculateTotals(overviewTransactions),
+    [overviewTransactions],
+  );
 
   const maxTransactionAmount = useMemo(() => {
     if (!summaryTransactions.length) return 1000;
@@ -350,23 +338,10 @@ function AppContent() {
     return filtered;
   }, [summaryTransactions, currentPaymentFilter, typeFilter, valueRange, valueRangeActive]);
 
-  const summaryValues = useMemo(() => {
-    const income = summaryTransactions
-      .filter((transaction) => transaction.type === 'income' && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    const totalExpenseRaw = summaryTransactions
-      .filter((transaction) => transaction.type === 'expense' && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    const paidExpenseRaw = summaryTransactions
-      .filter((transaction) => transaction.type === 'expense' && transaction.paid && !transaction.isProjection)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    return {
-      income,
-      totalExpense: Math.abs(totalExpenseRaw),
-      paidExpense: Math.abs(paidExpenseRaw),
-      balance: income + paidExpenseRaw,
-    };
-  }, [summaryTransactions]);
+  const summaryValues = useMemo(
+    () => calculateTotals(summaryTransactions),
+    [summaryTransactions],
+  );
 
   // --- Handlers ---
 
