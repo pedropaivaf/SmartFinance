@@ -10,6 +10,12 @@ const formatDateInput = (value) => {
   return date.toISOString().split('T')[0];
 };
 
+const inputBase =
+  'w-full block text-sm px-3.5 py-3 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
+  'bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] ' +
+  'placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 ' +
+  'focus:ring-[#1B4965] focus:border-[#1B4965] transition leading-tight';
+
 function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCategories = [], onAddCustomCategory }) {
   const { t } = useTranslation();
   const [description, setDescription] = useState('');
@@ -64,7 +70,7 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
     }
 
     if (!date) {
-      alert('Por favor, selecione uma data valida.');
+      alert('Por favor, selecione uma data válida.');
       return;
     }
 
@@ -84,45 +90,54 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
       id="edit-modal"
       role="dialog"
       aria-modal="true"
-      className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
       onClick={handleOverlayClick}
     >
-      <div className="modal-container w-full max-w-md bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl p-6 md:p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Editar Transacao</h2>
+      <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[92vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white dark:bg-[#1E1D1C] z-10 flex justify-between items-center px-6 pt-6 pb-4 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
+          <div>
+            <h2 className="text-lg font-bold text-[#1A1A1A] dark:text-[#E8E4DF]">Editar Transação</h2>
+            <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560] mt-0.5">Altere os dados abaixo</p>
+          </div>
           <button
-            id="close-modal-btn"
             type="button"
             onClick={onClose}
-            className="text-[#6B6B6B] dark:text-[#A09A92] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF]"
+            className="p-2 -mr-2 rounded-full text-[#9B9B9B] hover:text-[#1A1A1A] dark:hover:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#2D2B28] transition min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <form id="edit-transaction-form" className="space-y-4" onSubmit={handleSubmit}>
+
+        {/* Form */}
+        <form className="px-6 py-5 space-y-5" onSubmit={handleSubmit}>
+          {/* Description */}
           <div>
-            <label htmlFor="edit-description" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
-              Descricao
+            <label htmlFor="edit-description" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
+              Descrição
             </label>
             <input
               id="edit-description"
               type="text"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
+              placeholder="Ex.: Salário, Aluguel..."
+              className={inputBase}
               required
             />
           </div>
+
+          {/* Category */}
           <div>
-            <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+            <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
               {t('form.category.label')}
             </label>
             <button
               type="button"
               onClick={() => setCategoryPickerOpen(true)}
-              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition flex items-center gap-2 text-left text-sm"
+              className={`${inputBase} flex items-center gap-2 text-left`}
             >
               {category ? (() => {
                 const cat = getCategoryById(category, customCategories);
@@ -141,9 +156,11 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
               </svg>
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Value + Date row */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="edit-amount" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+              <label htmlFor="edit-amount" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
                 Valor (R$)
               </label>
               <input
@@ -152,12 +169,13 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
                 step="0.01"
                 value={amount}
                 onChange={(event) => setAmount(event.target.value)}
-                className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
+                placeholder="0,00"
+                className={inputBase}
                 required
               />
             </div>
             <div>
-              <label htmlFor="edit-date" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
+              <label htmlFor="edit-date" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
                 Data
               </label>
               <input
@@ -165,79 +183,98 @@ function EditTransactionModal({ isOpen, transaction, onClose, onSubmit, customCa
                 type="date"
                 value={date}
                 onChange={(event) => setDate(event.target.value)}
-                className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF] rounded-md focus:ring-2 focus:ring-[#1B4965] focus:border-[#1B4965] transition"
+                className={`${inputBase} text-left`}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 required
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <div className="custom-radio">
-              <input
-                id="edit-type-income"
-                type="radio"
-                name="edit-type"
-                value="income"
-                className="sr-only"
-                checked={type === 'income'}
-                onChange={() => setType('income')}
-              />
-              <label
-                htmlFor="edit-type-income"
-                className="w-full text-center p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
-              >
-                Renda
-              </label>
-            </div>
-            <div className="custom-radio custom-radio-expense">
-              <input
-                id="edit-type-expense"
-                type="radio"
-                name="edit-type"
-                value="expense"
-                className="sr-only"
-                checked={type === 'expense'}
-                onChange={() => setType('expense')}
-              />
-              <label
-                htmlFor="edit-type-expense"
-                className="w-full text-center p-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-md cursor-pointer font-medium text-[#1A1A1A] dark:text-[#E8E4DF] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200"
-              >
-                Despesa
-              </label>
+
+          {/* Type toggle */}
+          <div>
+            <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
+              Tipo
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="custom-radio">
+                <input
+                  id="edit-type-income"
+                  type="radio"
+                  name="edit-type"
+                  value="income"
+                  className="sr-only"
+                  checked={type === 'income'}
+                  onChange={() => setType('income')}
+                />
+                <label
+                  htmlFor="edit-type-income"
+                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-xl cursor-pointer font-medium text-sm text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200 min-h-[44px]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Renda
+                </label>
+              </div>
+              <div className="custom-radio custom-radio-expense">
+                <input
+                  id="edit-type-expense"
+                  type="radio"
+                  name="edit-type"
+                  value="expense"
+                  className="sr-only"
+                  checked={type === 'expense'}
+                  onChange={() => setType('expense')}
+                />
+                <label
+                  htmlFor="edit-type-expense"
+                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#E8E5E0] dark:border-[#2D2B28] rounded-xl cursor-pointer font-medium text-sm text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition duration-200 min-h-[44px]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
+                  </svg>
+                  Despesa
+                </label>
+              </div>
             </div>
           </div>
+
+          {/* Recurrence */}
           <div>
-            <label htmlFor="edit-recurrence" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
-              Tipo de Recorrencia
+            <label htmlFor="edit-recurrence" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
+              Recorrência
             </label>
             <select
               id="edit-recurrence"
               value={recurrence}
               onChange={(event) => setRecurrence(event.target.value)}
-              className="w-full p-2 border border-[#E8E5E0] dark:border-[#2D2B28] rounded-md bg-white dark:bg-[#1A1918] text-[#1A1A1A] dark:text-[#E8E4DF]"
+              className={inputBase}
             >
-              <option value="single">Unica</option>
+              <option value="single">Única</option>
               <option value="monthly">Mensal (Recorrente)</option>
               <option value="installment">Parcelada</option>
             </select>
           </div>
-          <div className="flex gap-4 pt-2">
+
+          {/* Action buttons */}
+          <div className="flex gap-3 pt-1 pb-2">
             <button
-              id="cancel-edit-btn"
               type="button"
               onClick={onClose}
-              className="w-full bg-[#F4F3EF] dark:bg-[#2D2B28] text-[#1A1A1A] dark:text-[#E8E4DF] font-semibold py-3 px-4 rounded-lg hover:bg-[#E8E5E0] dark:hover:bg-[#3A3835] transition"
+              className="flex-1 bg-[#F4F3EF] dark:bg-[#2D2B28] text-[#1A1A1A] dark:text-[#E8E4DF] font-semibold py-3 px-4 rounded-xl hover:bg-[#E8E5E0] dark:hover:bg-[#3A3835] transition min-h-[44px] text-sm"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="w-full bg-[#1B4965] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition"
+              className="flex-1 text-white font-semibold py-3 px-4 rounded-xl hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition min-h-[44px] text-sm"
+              style={{ background: 'var(--accent)' }}
             >
-              Salvar Alteracoes
+              Salvar Alterações
             </button>
           </div>
         </form>
+
         <CategoryPicker
           isOpen={categoryPickerOpen}
           selected={category}

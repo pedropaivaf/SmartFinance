@@ -12,7 +12,7 @@ const inputBase =
   'placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 ' +
   'focus:ring-[#1B4965] focus:border-[#1B4965] transition leading-tight';
 
-function TransactionForm({ onAddTransactions, onClearAll, customCategories = [], onAddCustomCategory }) {
+function TransactionForm({ onAddTransactions, customCategories = [], onAddCustomCategory }) {
   const { t } = useTranslation();
   const today = useMemo(() => formatDate(new Date()), []);
   const [description, setDescription] = useState('');
@@ -370,19 +370,6 @@ function TransactionForm({ onAddTransactions, onClearAll, customCategories = [],
           {t('form.submit')}
         </button>
       </form>
-      <div className="mt-6 pt-4 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
-        <button
-          id="clean-all-btn"
-          type="button"
-          onClick={onClearAll}
-          className="w-full bg-[#9B2226] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#7F1D1F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9B2226] transition duration-300"
-        >
-          {t('form.clearAll')}
-        </button>
-        <p className="mt-2 text-xs text-[#6B6B6B] dark:text-[#A09A92] text-center">
-          {t('form.clearAll.helper')}
-        </p>
-      </div>
       <CategoryPicker
         isOpen={categoryPickerOpen}
         selected={category}

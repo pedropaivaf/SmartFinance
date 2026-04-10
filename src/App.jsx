@@ -917,7 +917,7 @@ function AppContent() {
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-3xl`}>
             <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.new.overline')}</p>
-            <TransactionForm onAddTransactions={handleAddTransactions} onClearAll={handleClearAllRequest} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} />
+            <TransactionForm onAddTransactions={handleAddTransactions} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} />
           </div>
         </section>
 
