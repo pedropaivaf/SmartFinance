@@ -86,7 +86,7 @@ export default function InsightsSection({ transactions, envelopes = [] }) {
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+        <h3 className="text-lg font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
           Insights Automáticos
         </h3>
         <PremiumBadge size="xs" />

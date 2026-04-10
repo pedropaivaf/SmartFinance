@@ -9,7 +9,7 @@ function Header({ logoSrc }) {
         <img src={logoSrc} alt="Logo do Smart Finance" className="w-11 h-11 sm:w-12 sm:h-12 drop-shadow-md" />
       </div>
       <div>
-        <h1 className="text-xl font-serif text-[#1A1A1A] dark:text-[#E8E4DF] leading-tight tracking-tight">
+        <h1 className="text-xl font-display text-[#1A1A1A] dark:text-[#E8E4DF] leading-tight tracking-tight">
           {t('app.name')}
         </h1>
         <p className="text-[11px] text-[#9B9B9B] dark:text-[#6B6560] tracking-wide">

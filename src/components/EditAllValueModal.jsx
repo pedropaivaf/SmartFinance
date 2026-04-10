@@ -38,7 +38,7 @@ function EditAllValueModal({ isOpen, onClose, onSubmit }) {
       onClick={handleOverlayClick}
     >
       <div className="modal-container w-full max-w-sm bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl p-6 md:p-8">
-        <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mb-4">Alterar Valor das Parcelas Futuras</h2>
+        <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF] mb-4">Alterar Valor das Parcelas Futuras</h2>
         <form id="edit-all-value-form" onSubmit={handleSubmit}>
           <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92] mb-4">
             Digite o novo valor para cada uma das parcelas futuras que ainda nao foram pagas. Esta acao nao pode ser desfeita.

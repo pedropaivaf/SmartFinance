@@ -25,7 +25,7 @@ function GoalsSection({ goals, onGoalChange, summaryValues, formatCurrency }) {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Metas de orçamento</h2>
+        <h2 className="text-lg font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Metas de orçamento</h2>
         <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
           Defina objetivos mensais para renda e gastos. O painel abaixo mostra o quanto já foi atingido.
         </p>

@@ -34,7 +34,7 @@ function LoginPage({ onSignIn, onSwitchToRegister, onSwitchToForgotPassword }) {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-md" />
-          <h1 className="text-2xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
+          <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
           <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">
             {t('auth.login.subtitle') || 'Entre para acessar suas financas'}
           </p>

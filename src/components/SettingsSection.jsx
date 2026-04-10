@@ -240,7 +240,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
     <div className="space-y-6 pb-4">
       {/* Page title */}
       <div className="px-1 pt-1">
-        <h2 className="text-2xl font-bold font-serif text-gradient tracking-tight">{t('settings.title')}</h2>
+        <h2 className="text-2xl font-bold font-display text-gradient tracking-tight">{t('settings.title')}</h2>
       </div>
 
       {/* Conta do usuario */}

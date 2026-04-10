@@ -14,7 +14,7 @@ function OverviewCategoryBreakdown({ transactions, formatCurrency, customCategor
 
   return (
     <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-5 sm:p-6">
-      <h3 className="text-lg font-semibold font-serif text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
+      <h3 className="text-lg font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF] mb-3">
         {t('overview.categories.title')}
       </h3>
 
@@ -41,7 +41,7 @@ function OverviewCategoryBreakdown({ transactions, formatCurrency, customCategor
                     <span className="text-[#6B6B6B] dark:text-[#A09A92] font-medium truncate">
                       {label}
                     </span>
-                    <span className="text-[#1A1A1A] dark:text-[#E8E4DF] font-bold font-serif flex-shrink-0 ml-2">
+                    <span className="text-[#1A1A1A] dark:text-[#E8E4DF] font-bold font-display flex-shrink-0 ml-2">
                       {formatCurrency(cat.amount)}
                     </span>
                   </div>

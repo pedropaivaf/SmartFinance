@@ -61,7 +61,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">
+          <h2 className="text-xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
             {t('auth.register.successTitle') || 'Conta criada!'}
           </h2>
           <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
@@ -84,7 +84,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-md" />
-          <h1 className="text-2xl font-bold font-serif text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
+          <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
           <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">
             {t('auth.register.subtitle') || 'Crie sua conta gratuita'}
           </p>
