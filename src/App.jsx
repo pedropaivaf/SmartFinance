@@ -435,11 +435,32 @@ function AppContent() {
   const handleTogglePaid = (transaction, isChecked) => {
     if (isChecked) {
       if (transaction.isProjection) {
-        setPaymentModalState({ open: true, transaction: null, projection: transaction });
+        // Materialize the projection as a real paid transaction, keeping original payment info
+        const newTransaction = {
+          id: Date.now().toString(),
+          description: transaction.description,
+          amount: transaction.amount,
+          type: transaction.type,
+          category: transaction.category,
+          createdAt: new Date(transaction.createdAt).toISOString(),
+          recurrence: 'single',
+          paid: true,
+          paymentMethod: transaction.paymentMethod || null,
+          creditCardName: transaction.creditCardName || null,
+          sourceOf: transaction.sourceOf,
+          groupId: transaction.groupId,
+        };
+        setTransactions((prev) => [...prev, newTransaction]);
+        dbAddTransactions([newTransaction]);
       } else {
         const original = transactions.find((item) => item.id === transaction.id);
         if (!original) return;
-        setPaymentModalState({ open: true, transaction: original, projection: null });
+        setTransactions((prev) =>
+          prev.map((item) =>
+            item.id === original.id ? { ...item, paid: true } : item,
+          ),
+        );
+        dbUpdateTransaction(original.id, { paid: true });
       }
     } else {
       if (transaction.isProjection) {
@@ -460,11 +481,11 @@ function AppContent() {
         setTransactions((prev) =>
           prev.map((item) =>
             item.id === transaction.id
-              ? { ...item, paid: false, paymentMethod: null, creditCardName: null }
+              ? { ...item, paid: false }
               : item,
           ),
         );
-        dbUpdateTransaction(transaction.id, { paid: false, paymentMethod: null, creditCardName: null });
+        dbUpdateTransaction(transaction.id, { paid: false });
       }
     }
   };

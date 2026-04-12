@@ -70,9 +70,9 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
               const paymentLabel = transaction.paid && transaction.paymentMethod
                 ? paymentLabels[transaction.paymentMethod] || 'N/A'
                 : null;
-              const creditInfo = transaction.paymentMethod === 'credit' && transaction.creditCardName
-                ? ` (${transaction.creditCardName})`
-                : '';
+              const cardName = (transaction.paymentMethod === 'credit' || transaction.paymentMethod === 'debit') && transaction.creditCardName
+                ? transaction.creditCardName
+                : null;
 
               return (
                 <li
@@ -122,7 +122,7 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                       </p>
                       {paymentLabel && (
                         <p className="text-xs text-[#6B6B6B] dark:text-[#A09A92] mt-0.5">
-                          {t('list.paidWith')} {paymentLabel}{creditInfo}
+                          {t('list.paidWith')}{cardName ? ` ${cardName} :` : ''} {paymentLabel}
                         </p>
                       )}
                       {transaction.category && (() => {
