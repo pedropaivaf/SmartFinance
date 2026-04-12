@@ -1,8 +1,8 @@
-# SmartFinance — Claude Code Context
+# Syros — Claude Code Context
 
 ## Project Overview
 
-SmartFinance is a mobile-first personal finance React PWA designed for the iOS iPhone 16 / Safari "Add to Home Screen" experience. It runs entirely in the browser with localStorage for persistence — no backend required.
+Syros (formerly SmartFinance) is a mobile-first personal finance React PWA designed for the iOS iPhone 16 / Safari "Add to Home Screen" experience. It uses Supabase for auth and data persistence, with localStorage as fallback.
 
 **Freemium model**: Free plan with core features. Premium at R$12.90/mês unlocks envelopes, insights, credit cards, and more.
 
@@ -16,7 +16,8 @@ SmartFinance is a mobile-first personal finance React PWA designed for the iOS i
 | Charts | Chart.js (CDN) |
 | Font | Inter (Google Fonts) |
 | State | React useState/useEffect (no Redux, no Context) |
-| Persistence | localStorage via storageService.js |
+| Auth & DB | Supabase (auth + persistence) |
+| Persistence | Supabase + localStorage fallback via storageService.js |
 | Icons | Inline SVG (no icon library) |
 
 ## Commands
@@ -33,10 +34,10 @@ npm run preview  # Preview production build
 |------|---------|
 | [src/App.jsx](src/App.jsx) | All global state, page routing, bottom nav |
 | [src/config.js](src/config.js) | Feature flags, plan detection, hasFeature(), isPremium() |
-| [src/components/Header.jsx](src/components/Header.jsx) | App header — logo + title only |
+| [src/components/Header.jsx](src/components/Header.jsx) | App header — SVG logo + title, exports `SyrosLogo` |
 | [src/components/SummaryCards.jsx](src/components/SummaryCards.jsx) | 4 draggable financial metric cards |
 | [src/components/SettingsSection.jsx](src/components/SettingsSection.jsx) | Full settings screen (theme, data, integrations) |
-| [src/components/TransactionForm.jsx](src/components/TransactionForm.jsx) | Add transaction form |
+| [src/components/TransactionForm.jsx](src/components/TransactionForm.jsx) | Add transaction form with integrated payment method |
 | [src/components/TransactionList.jsx](src/components/TransactionList.jsx) | Transaction history grouped by month |
 | [src/services/storageService.js](src/services/storageService.js) | localStorage abstraction (Promise-based) |
 | [src/utils/calculations.js](src/utils/calculations.js) | Financial calculation helpers |
@@ -60,10 +61,10 @@ The app has **two independent data pipelines** for calculations:
 
 | Pipeline | Scope | Used by |
 |----------|-------|---------|
-| `overviewTransactions` / `overviewValues` | **Current month only** (billing cycle aware) | Overview page: SummaryCards, MiniChart, CategoryBreakdown, RecentTransactions, Insights |
-| `summaryTransactions` / `summaryValues` | Controlled by `currentFilter` (`'total'` / `'month'` / `'range'`) | History page (FilterBar, TransactionList), Graphs & Goals page |
+| `overviewTransactions` / `overviewValues` | Controlled by `overviewFilter` (`'month'` / `'range'`) | Overview page: SummaryCards, MiniChart, CategoryBreakdown, RecentTransactions, Insights |
+| `summaryTransactions` / `summaryValues` | Controlled by `currentFilter` (`'month'` / `'range'`) | History/Transações page (FilterBar, TransactionList), Graphs & Goals page |
 
-Both pipelines use `filterByCurrentMonth(transactions, billingCycleDay)` — a shared helper that filters by the current billing cycle, respecting custom billing cycle day from settings.
+Both pipelines default to current month via `filterByCurrentMonth(transactions, billingCycleDay)`. The FilterBar shows "Mês Atual" + DateRangePicker (no "Total" button).
 
 ### Calculation formulas (same for both pipelines)
 
@@ -80,7 +81,9 @@ balance      = income + paidExpenseRaw  // income minus paid expenses (paidExpen
 
 Pages: `'overview'` | `'graphs-goals'` | `'history'` | `'new-transaction'` | `'settings'`
 
-Bottom nav: 4 `NavTab` items + 1 central FAB (`sky-500` pill) for "Nova". Defined in App.jsx as `NavTab` function component above the `App` component.
+Bottom nav: 4 `NavTab` items + 1 central inline "+" button for "Nova" (solid `var(--accent)` color). The `wallet` page was removed — its content (CreditCardsSection, ExportSection) now lives inside SettingsSection. A fallback redirects `activePage === 'wallet'` → `'settings'`.
+
+Tab labels (pt-BR): Início | Gráfico | **Nova** | Transações | Ajustes
 
 ## Premium Feature System
 
@@ -123,6 +126,23 @@ See [docs/FEATURES.md](docs/FEATURES.md) for the full feature matrix.
   isProjection?: boolean,   // auto-generated monthly copies
 }
 ```
+
+## Transaction Creation Flow
+
+When adding a new **expense**, payment method is selected directly in the form (not in a separate modal):
+
+| Payment Method | `paid` on creation | Card name |
+|----------------|-------------------|-----------|
+| Pix | `true` | — |
+| Débito | `true` | Optional (saved to localStorage) |
+| Crédito | `false` | Optional (saved to localStorage) |
+| Dinheiro | `true` | — |
+
+- Card names are persisted in `localStorage` key `syros_saved_card_names` for future auto-complete
+- If Premium cards exist (from CreditCardsSection), they appear as a dropdown instead of text input
+- **Success feedback**: fullscreen overlay — blue (#1B4965) for income, red (#9B2226) for expense — auto-closes after 2s
+
+The separate `PaymentModal` still exists for marking existing unpaid transactions as paid (toggle paid checkbox in history).
 
 ## Coding Conventions
 
