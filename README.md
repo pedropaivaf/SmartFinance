@@ -1,22 +1,52 @@
-SmartFinance (React)
-Aplicação React baseada na versão estática do SmartFinance, preservando layout, comportamento, acessibilidade e SEO. Usa Vite + React, mantendo Tailwind e Chart.js via CDN para compatibilidade com o original.
+# Syros
 
-Projeto rodando em -> https://smartfinance-app.netlify.app/
+Aplicativo de finanças pessoais mobile-first, construído como PWA para experiência nativa no iOS (Safari "Adicionar à Tela de Início") e Android.
 
-Estrutura
+**https://syrosfinance.netlify.app/**
 
-index.html: <head> original, Tailwind CDN, Chart.js e favicon.
-src/App.jsx: estado global (transações, metas, filtros, modais, tema).
-src/components/: componentes da interface.
-public/LogoSF.png e public/LogoSFblue.png: ícones e logotipo.
-Componentes Principais
+## Tech Stack
 
-Header (cabeçalho/tema), GoalsSection (metas e progresso), SummaryCards (resumo),
-TransactionForm (formulário), ChartSection (gráfico), FilterBar (filtros),
-PaymentTabs (abas de pagamento), TransactionList (lista), modais de edição/remoção.
-Notas
+| Camada | Tecnologia |
+|--------|-----------|
+| Framework | React 18 |
+| Build | Vite 7 |
+| Estilo | Tailwind CSS (CDN) |
+| Gráficos | Chart.js (CDN) |
+| Fonte | Inter (Google Fonts) |
+| Auth e DB | Supabase |
+| Persistência | Supabase + localStorage fallback |
 
-Dados em localStorage: smartfinance_transactions e smartfinance_goals.
-Tema claro/escuro via color-theme e classes Tailwind.
-Chart.js via CDN (window.Chart), recriado conforme filtros.
-Barras de progresso: renda azul-escuro → concluída azul-claro; gastos com escala verde/âmbar/laranja/rosa.
+## Funcionalidades
+
+- Registro de receitas e despesas com categorias personalizadas
+- Dashboard com resumo financeiro, gráficos e metas
+- Filtro por mês (com seletor de mês) ou período personalizado
+- Transações recorrentes com projeções automáticas
+- Métodos de pagamento (Pix, Débito, Crédito, Dinheiro)
+- Tema claro/escuro
+- Multilíngue (PT-BR, EN, ES, FR)
+- Exportação de dados (CSV)
+- Modelo freemium com recursos premium (envelopes, insights, cartões de crédito)
+
+## Como rodar
+
+```bash
+npm install
+npm run dev      # Dev server na porta 5173
+npm run build    # Build de produção → /dist
+npm run preview  # Preview do build
+```
+
+## Estrutura
+
+```
+src/
+  App.jsx              # Estado global, rotas, navegação
+  components/          # Componentes da interface
+  services/            # storageService, supabase client
+  utils/               # Cálculos financeiros
+  i18n/                # Traduções (pt-BR, en, es, fr)
+  data/                # Categorias
+public/                # Ícones, PWA assets
+docs/                  # Documentação (design system, arquitetura, features)
+```
