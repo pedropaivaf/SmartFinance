@@ -67,10 +67,9 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
               const isProjection = Boolean(transaction.isProjection);
               const sign = isIncome ? '+' : '-';
               const amount = Math.abs(transaction.amount);
-              const paymentLabel = transaction.paid && transaction.paymentMethod
-                ? paymentLabels[transaction.paymentMethod] || 'N/A'
-                : null;
-              const cardName = (transaction.paymentMethod === 'credit' || transaction.paymentMethod === 'debit') && transaction.creditCardName
+              const paymentMethod = transaction.paymentMethod;
+              const paymentLabel = paymentMethod ? (paymentLabels[paymentMethod] || null) : null;
+              const cardName = (paymentMethod === 'credit' || paymentMethod === 'debit') && transaction.creditCardName
                 ? transaction.creditCardName
                 : null;
 
@@ -121,9 +120,20 @@ function TransactionList({ transactions, onTogglePaid, onEdit, onDelete, formatC
                         {new Date(transaction.createdAt).toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang)}
                       </p>
                       {paymentLabel && (
-                        <p className="text-xs text-[#6B6B6B] dark:text-[#A09A92] mt-0.5">
-                          {t('list.paidWith')}{cardName ? ` ${cardName} :` : ''} {paymentLabel}
-                        </p>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          {cardName && (
+                            <span className="text-xs font-medium bg-[#E8E5E0] dark:bg-[#2D2B28] text-[#6B6B6B] dark:text-[#A09A92] px-2 py-0.5 rounded-full">
+                              {cardName}
+                            </span>
+                          )}
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            paymentMethod === 'credit'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+                              : 'bg-[#E8F0F4] text-[#1B4965] dark:bg-[#1B2B35] dark:text-[#5FA8D3]'
+                          }`}>
+                            {paymentLabel}
+                          </span>
+                        </div>
                       )}
                       {transaction.category && (() => {
                         const cat = getCategoryById(transaction.category, customCategories);
