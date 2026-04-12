@@ -136,7 +136,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
       className="modal-overlay fixed inset-0 bg-[#1A1A1A]/50 dark:bg-[#111110]/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
-      <div className="modal-container w-full max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[80vh] flex flex-col overflow-hidden">
+      <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-3xl sm:rounded-3xl shadow-xl h-[100dvh] sm:h-auto sm:max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
           <h3 className="text-base font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
@@ -193,7 +193,7 @@ function CategoryPicker({ isOpen, selected, onSelect, onClose, transactionType, 
         </div>
 
         {/* Create custom category */}
-        <div className="border-t border-[#E8E5E0] dark:border-[#2D2B28] px-5 py-3">
+        <div className="border-t border-[#E8E5E0] dark:border-[#2D2B28] px-5 py-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           {!showCreate ? (
             <button
               type="button"

@@ -4,6 +4,8 @@ import { exportAllData, importAllData } from '../services/storageService.js';
 import { useTranslation, LANGUAGES } from '../i18n/index.jsx';
 import LanguagePicker from './LanguagePicker.jsx';
 import OpenFinanceSection from './OpenFinanceSection.jsx';
+import CreditCardsSection from './CreditCardsSection.jsx';
+import ExportSection from './ExportSection.jsx';
 import {
   loadNotificationPrefs,
   saveNotificationPrefs,
@@ -113,7 +115,7 @@ function Toggle({ checked, onChange }) {
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function SettingsSection({ isDarkMode, onToggleTheme, transactions = [], onClearAll, onImportTransactions, userEmail, onSignOut, billingCycleDay = 1, onBillingCycleDayChange }) {
+export default function SettingsSection({ isDarkMode, onToggleTheme, transactions = [], onClearAll, onImportTransactions, userEmail, onSignOut, billingCycleDay = 1, onBillingCycleDayChange, cards, onSaveCards }) {
   const { t, lang } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
@@ -166,7 +168,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `smartfinance-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `syros-backup-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -199,7 +201,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `smartfinance-transacoes-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `syros-transacoes-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -495,6 +497,19 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
           chevron={false}
         />
       </SettingsGroup>
+
+      {/* Carteira */}
+      <div className="space-y-1.5 card-animate">
+        <p className="px-1 text-xs font-semibold uppercase tracking-wider text-[#1B4965] dark:text-[#5FA8D3]">
+          {t('page.wallet.overline')}
+        </p>
+        <CreditCardsSection
+          transactions={transactions}
+          cards={cards}
+          onSaveCards={onSaveCards}
+        />
+        <ExportSection />
+      </div>
 
       {/* Sobre */}
       <SettingsGroup title={t('settings.about.section')}>

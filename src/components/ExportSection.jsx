@@ -24,7 +24,7 @@ export default function ExportSection() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `smartfinance-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `syros-backup-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -63,7 +63,7 @@ export default function ExportSection() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `smartfinance-transacoes-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `syros-transacoes-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

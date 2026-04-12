@@ -66,7 +66,7 @@ import { setCurrentPlan, getCurrentPlan } from './config.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 import { calculateTotals } from './utils/calculations.js';
 
-const logoBlue = '/LogoSFblue.png';
+import { SyrosLogo } from './components/Header.jsx';
 
 function NavTab({ target, label, activePage, onNavigate, children }) {
   const isActive = activePage === target;
@@ -172,6 +172,8 @@ function AppContent() {
   const [currentFilter, setCurrentFilter] = useState('total');
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
   const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [overviewFilter, setOverviewFilter] = useState('month');
+  const [overviewDateRange, setOverviewDateRange] = useState({ from: null, to: null });
   const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'income' | 'expense'
   const [valueRange, setValueRange] = useState({ min: 0, max: 0 });
   const [valueRangeActive, setValueRangeActive] = useState(false);
@@ -194,7 +196,8 @@ function AppContent() {
   const [editAllValueState, setEditAllValueState] = useState({ open: false, groupId: null });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [successModal, setSuccessModal] = useState({ open: false, type: null });
-  const [activePage, setActivePage] = useState('overview');
+  const [activePage, setActivePageRaw] = useState('overview');
+  const setActivePage = (page) => setActivePageRaw(page === 'wallet' ? 'settings' : page);
 
   // Load data from Supabase on mount
   useEffect(() => {
@@ -300,10 +303,24 @@ function AppContent() {
     return processedTransactions;
   }, [processedTransactions, currentFilter, dateRange, billingCycleDay]);
 
-  const overviewTransactions = useMemo(
-    () => filterByCurrentMonth(processedTransactions, billingCycleDay),
-    [processedTransactions, billingCycleDay],
-  );
+  const overviewTransactions = useMemo(() => {
+    if (overviewFilter === 'month') {
+      return filterByCurrentMonth(processedTransactions, billingCycleDay);
+    }
+    if (overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to) {
+      const fromTime = overviewDateRange.from.getTime();
+      const toEnd = new Date(overviewDateRange.to);
+      toEnd.setHours(23, 59, 59, 999);
+      const toTime = toEnd.getTime();
+      return processedTransactions.filter((tx) => {
+        const date = new Date(tx.createdAt);
+        if (Number.isNaN(date.getTime())) return false;
+        const time = date.getTime();
+        return time >= fromTime && time <= toTime;
+      });
+    }
+    return processedTransactions;
+  }, [processedTransactions, overviewFilter, overviewDateRange, billingCycleDay]);
 
   const overviewValues = useMemo(
     () => calculateTotals(overviewTransactions),
@@ -620,7 +637,7 @@ function AppContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
+          <div className="mx-auto animate-pulse"><SyrosLogo className="h-16 w-16" /></div>
           <p className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">{t('app.loading') || 'Carregando...'}</p>
         </div>
       </div>
@@ -644,15 +661,27 @@ function AppContent() {
           data-page="overview"
           className={`page-section space-y-5 ${activePage === 'overview' ? '' : 'hidden'}`}
         >
-          <Header logoSrc={logoBlue} />
+          <Header />
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
               <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
               <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
-                {new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })}
+                {overviewFilter === 'month'
+                  ? new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })
+                  : overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to
+                    ? `${overviewDateRange.from.toLocaleDateString(lang)} — ${overviewDateRange.to.toLocaleDateString(lang)}`
+                    : t('filter.total')
+                }
               </p>
             </div>
+            <FilterBar
+              currentFilter={overviewFilter}
+              onChange={setOverviewFilter}
+              dateRange={overviewDateRange}
+              onDateRangeChange={setOverviewDateRange}
+              showTitle={false}
+            />
             <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.drag')}</p>
             <SummaryCards
               totalIncome={overviewValues.income}
@@ -891,24 +920,6 @@ function AppContent() {
           </div>
         </section>
 
-        {/* WALLET */}
-        <section
-          id="page-wallet"
-          data-page="wallet"
-          className={`page-section space-y-5 ${activePage === 'wallet' ? '' : 'hidden'}`}
-        >
-          <div className={`${panelClasses} p-5 sm:p-6 space-y-2`}>
-            <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.wallet.overline')}</p>
-            <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.wallet.title')}</h2>
-          </div>
-          <CreditCardsSection
-            transactions={transactions}
-            cards={cards}
-            onSaveCards={handleSaveCards}
-          />
-          <ExportSection />
-        </section>
-
         {/* NEW TRANSACTION */}
         <section
           id="page-new-transaction"
@@ -937,29 +948,15 @@ function AppContent() {
             onSignOut={signOut}
             billingCycleDay={billingCycleDay}
             onBillingCycleDayChange={handleBillingCycleDayChange}
+            cards={cards}
+            onSaveCards={handleSaveCards}
           />
         </section>
       </main>
 
       {/* BOTTOM NAV — mobile only */}
       <nav id="bottom-nav" className="fixed bottom-0 inset-x-0 z-30 lg:hidden">
-        <div className="mx-auto max-w-lg relative">
-          {/* FAB - floating above nav, centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-14 z-10">
-            <button
-              type="button"
-              aria-label="Nova transacao"
-              onClick={() => setActivePage('new-transaction')}
-              className={`fab-button flex items-center justify-center w-[50px] h-[50px] rounded-full focus:outline-none ${
-                activePage === 'new-transaction' ? 'fab-active ring-4 ring-[#1B4965]/20 dark:ring-[#5FA8D3]/20' : 'fab-pulse'
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
-              </svg>
-            </button>
-          </div>
-          {/* Nav bar — 5 tabs evenly distributed */}
+        <div className="mx-auto max-w-lg">
           <div className="nav-glass flex items-end justify-evenly px-2 pt-2 pb-1">
             <NavTab target="overview" label={t('nav.home')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -967,9 +964,26 @@ function AppContent() {
             <NavTab target="graphs-goals" label={t('nav.chart')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
             </NavTab>
-            <NavTab target="wallet" label={t('nav.wallet')} activePage={activePage} onNavigate={setActivePage}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </NavTab>
+            {/* Center + button */}
+            <button
+              type="button"
+              aria-label={t('nav.new')}
+              onClick={() => setActivePage('new-transaction')}
+              className="nav-tab-item flex flex-col items-center justify-center gap-0.5 pt-1 -mt-5"
+            >
+              <span className={`flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200 ${
+                activePage === 'new-transaction'
+                  ? 'fab-active bg-gradient-to-br from-[#1B4965] to-[#5FA8D3] shadow-lg shadow-[#1B4965]/30 scale-105'
+                  : 'fab-button bg-gradient-to-br from-[#1B4965] to-[#5FA8D3] shadow-md'
+              }`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
+                </svg>
+              </span>
+              <span className={`text-[10px] leading-none ${
+                activePage === 'new-transaction' ? 'font-bold text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B9B9B] dark:text-[#6B6560]'
+              }`}>{t('nav.new')}</span>
+            </button>
             <NavTab target="history" label={t('nav.history')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </NavTab>
@@ -1039,7 +1053,7 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8] dark:bg-[#111110]">
         <div className="text-center space-y-4">
-          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto rounded-2xl shadow-lg animate-pulse" />
+          <div className="mx-auto animate-pulse"><SyrosLogo className="h-16 w-16" /></div>
           <p className="text-sm text-[#9B9B9B] dark:text-[#6B6560]">{t('app.loading') || 'Carregando...'}</p>
         </div>
       </div>

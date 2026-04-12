@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../i18n/index.jsx';
-
-const logoBlue = '/LogoSFblue.png';
+import { SyrosLogo } from './Header.jsx';
 
 const navItems = [
   {
@@ -18,11 +17,6 @@ const navItems = [
     id: 'new-transaction',
     labelKey: 'nav.new',
     icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />,
-  },
-  {
-    id: 'wallet',
-    labelKey: 'nav.wallet',
-    icon: <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />,
   },
   {
     id: 'history',
@@ -43,8 +37,8 @@ function DesktopSidebar({ activePage, onNavigate, userEmail, onSignOut }) {
     <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:left-0 z-40 bg-[#FAFAF8] dark:bg-[#111110] border-r border-[#E8E5E0] dark:border-[#2D2B28]">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
-        <img src={logoBlue} alt="Smart Finance" className="h-10 w-10 rounded-xl shadow-sm" />
-        <span className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</span>
+        <SyrosLogo className="h-10 w-10" />
+        <span className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('app.name')}</span>
       </div>
 
       {/* Nav */}

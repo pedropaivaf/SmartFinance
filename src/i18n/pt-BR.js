@@ -1,16 +1,15 @@
 export default {
   // App / Header
-  'app.name': 'Smart Finance',
-  'app.subtitle': 'Organize suas finanças de forma inteligente',
+  'app.name': 'Syros',
   'app.overline': 'Dashboard',
 
   // Nav
   'nav.home': 'Início',
   'nav.chart': 'Gráfico',
   'nav.wallet': 'Carteira',
-  'nav.history': 'Histórico',
+  'nav.history': 'Transações',
   'nav.new': 'Nova',
-  'nav.config': 'Config',
+  'nav.config': 'Ajustes',
 
   // Pages
   'page.wallet.overline': 'CARTEIRA',
@@ -18,7 +17,7 @@ export default {
   'page.overview.overline': 'Visão geral',
   'page.overview.title': 'Suas métricas organizadas para fácil visualização.',
   'page.overview.drag': 'Segure e arraste os cards para alterar a ordem.',
-  'page.history.overline': 'Histórico',
+  'page.history.overline': 'TRANSAÇÕES',
   'page.history.title': 'Transações por período',
   'page.new.overline': 'Ação principal',
 
@@ -92,7 +91,7 @@ export default {
   'months.11': 'Dezembro',
 
   // Settings
-  'settings.title': 'Configurações',
+  'settings.title': 'Ajustes',
   'settings.account.section': 'Conta e Plano',
   'settings.account.plan': 'Seu Plano',
   'settings.account.planFree': 'Plano Gratuito',
@@ -121,7 +120,7 @@ export default {
   'settings.openfinance.noNew': 'Nenhuma transação nova para importar.',
   'settings.openfinance.error': 'Erro ao conectar. Tente novamente.',
   'settings.openfinance.configMissing': 'Configure as credenciais Pluggy no servidor.',
-  'settings.openfinance.securityNote': 'Suas credenciais bancárias não são armazenadas pelo Smart Finance.',
+  'settings.openfinance.securityNote': 'Suas credenciais bancárias não são armazenadas pelo Syros.',
   'settings.openfinance.banks': 'Bancos suportados',
 
   'settings.notifications.section': 'Notificações',
@@ -150,13 +149,13 @@ export default {
   'settings.data.exportError': 'Erro ao exportar dados.',
   'settings.data.exportCsvError': 'Erro ao exportar CSV.',
   'settings.data.importSuccess': 'Backup restaurado! O app será recarregado.',
-  'settings.data.importError': 'Arquivo inválido. Use um backup exportado pelo Smart Finance.',
+  'settings.data.importError': 'Arquivo inválido. Use um backup exportado pelo Syros.',
   'settings.data.importFail': 'Falha ao importar dados.',
 
   'settings.about.section': 'Sobre',
   'settings.about.version': 'Versão',
   'settings.about.feedback': 'Enviar Feedback',
-  'settings.about.feedbackDesc': 'Ajude a melhorar o Smart Finance',
+  'settings.about.feedbackDesc': 'Ajude a melhorar o Syros',
   'settings.about.privacy': 'Política de Privacidade',
   'settings.about.privacySoon': 'Política de privacidade em breve.',
 
@@ -195,6 +194,8 @@ export default {
   'modal.payment.confirm': 'Confirmar',
 
   // Filter bar
+  'filter.month': 'Mês',
+  'filter.total': 'Total',
   'filter.all': 'Todos',
 
   // Goals

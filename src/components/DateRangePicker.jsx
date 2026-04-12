@@ -167,7 +167,7 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
           className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
           onClick={handleOverlayClick}
         >
-          <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[92vh] overflow-y-auto">
+          <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-2xl sm:rounded-2xl shadow-xl h-[100dvh] sm:h-auto sm:max-h-[85vh] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-[#1E1D1C] z-10 flex justify-between items-center px-6 pt-6 pb-4 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
               <div>
@@ -187,55 +187,58 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
               </button>
             </div>
 
-            {/* Month navigation */}
-            <div className="flex items-center justify-between px-6 pt-4 pb-2">
-              <button type="button" onClick={prevMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              {hasRange && (
-                <span className="text-xs text-[#1B4965] dark:text-[#5FA8D3] font-medium">
-                  {formatShortDate(dateRange.from)} — {formatShortDate(dateRange.to)}
-                </span>
-              )}
-              <button type="button" onClick={nextMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Month navigation */}
+              <div className="flex items-center justify-between px-6 pt-4 pb-2">
+                <button type="button" onClick={prevMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                {hasRange && (
+                  <span className="text-xs text-[#1B4965] dark:text-[#5FA8D3] font-medium">
+                    {formatShortDate(dateRange.from)} — {formatShortDate(dateRange.to)}
+                  </span>
+                )}
+                <button type="button" onClick={nextMonth} className="p-2 rounded-xl hover:bg-[#F4F3EF] dark:hover:bg-[#1A1918] transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B6B6B] dark:text-[#A09A92]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
 
-            {/* Calendar grids */}
-            <div className="px-6 pb-2">
-              <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-1">
-                  <MonthGrid
-                    year={viewDate.getFullYear()}
-                    month={viewDate.getMonth()}
-                    rangeFrom={rangeFrom}
-                    rangeTo={rangeTo}
-                    hoverDate={hoverDate}
-                    onDayClick={handleDayClick}
-                    onDayHover={setHoverDate}
-                  />
-                </div>
-                <div className="hidden sm:block flex-1">
-                  <MonthGrid
-                    year={secondMonth.getFullYear()}
-                    month={secondMonth.getMonth()}
-                    rangeFrom={rangeFrom}
-                    rangeTo={rangeTo}
-                    hoverDate={hoverDate}
-                    onDayClick={handleDayClick}
-                    onDayHover={setHoverDate}
-                  />
+              {/* Calendar grids */}
+              <div className="px-6 pb-2">
+                <div className="flex flex-col sm:flex-row gap-6">
+                  <div className="flex-1">
+                    <MonthGrid
+                      year={viewDate.getFullYear()}
+                      month={viewDate.getMonth()}
+                      rangeFrom={rangeFrom}
+                      rangeTo={rangeTo}
+                      hoverDate={hoverDate}
+                      onDayClick={handleDayClick}
+                      onDayHover={setHoverDate}
+                    />
+                  </div>
+                  <div className="hidden sm:block flex-1">
+                    <MonthGrid
+                      year={secondMonth.getFullYear()}
+                      month={secondMonth.getMonth()}
+                      rangeFrom={rangeFrom}
+                      rangeTo={rangeTo}
+                      hoverDate={hoverDate}
+                      onDayClick={handleDayClick}
+                      onDayHover={setHoverDate}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-[#E8E5E0] dark:border-[#2D2B28]">
+            <div className="px-6 py-4 border-t border-[#E8E5E0] dark:border-[#2D2B28]" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
               <button
                 type="button"
                 onClick={handleClear}

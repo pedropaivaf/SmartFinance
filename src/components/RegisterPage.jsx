@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
-
-const logoBlue = '/LogoSFblue.png';
+import { SyrosLogo } from './Header.jsx';
 
 const inputBase =
   'w-full block text-sm px-4 py-3.5 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
@@ -83,8 +82,8 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAFAF8] dark:bg-[#111110]">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
-          <img src={logoBlue} alt="Smart Finance" className="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-md" />
-          <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">Smart Finance</h1>
+          <div className="mx-auto mb-4 w-16"><SyrosLogo className="h-16 w-16" /></div>
+          <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('app.name')}</h1>
           <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">
             {t('auth.register.subtitle') || 'Crie sua conta gratuita'}
           </p>
