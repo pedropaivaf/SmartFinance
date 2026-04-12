@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import Chart from 'chart.js/auto';
 
 function ChartSection({ transactions, isDarkMode }) {
   const canvasRef = useRef(null);
@@ -34,11 +35,10 @@ function ChartSection({ transactions, isDarkMode }) {
       return;
     }
 
-    if (!window.Chart || !canvasRef.current) {
+    if (!canvasRef.current) {
       return;
     }
 
-    const Chart = window.Chart;
     const context = canvasRef.current.getContext('2d');
 
     if (chartRef.current) {

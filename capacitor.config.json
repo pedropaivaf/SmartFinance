@@ -1,0 +1,28 @@
+{
+  "appId": "com.syros.app",
+  "appName": "Syros",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#FAFAF8"
+  },
+  "android": {
+    "backgroundColor": "#FAFAF8"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#1B4965",
+      "showSpinner": false,
+      "androidSplashResourceName": "splash",
+      "iosSpinnerStyle": "small"
+    },
+    "StatusBar": {
+      "style": "DEFAULT",
+      "backgroundColor": "#FAFAF8"
+    }
+  }
+}

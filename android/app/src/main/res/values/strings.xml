@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Syros</string>
+    <string name="title_activity_main">Syros</string>
+    <string name="package_name">com.syros.app</string>
+    <string name="custom_url_scheme">com.syros.app</string>
+</resources>

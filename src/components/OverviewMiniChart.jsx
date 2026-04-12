@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import Chart from 'chart.js/auto';
 import { useTranslation } from '../i18n/index.jsx';
 
 function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
@@ -36,9 +37,7 @@ function OverviewMiniChart({ transactions, isDarkMode, formatCurrency }) {
       return;
     }
 
-    if (!window.Chart || !canvasRef.current) return;
-
-    const Chart = window.Chart;
+    if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
 
     if (chartRef.current) {

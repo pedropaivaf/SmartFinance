@@ -4,6 +4,9 @@ import './index.css';
 import App from './App.jsx';
 import { LanguageProvider } from './i18n/index.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
+import { initNative } from './native.js';
+
+initNative();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
