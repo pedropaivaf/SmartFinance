@@ -169,7 +169,7 @@ function AppContent() {
   const { user, signOut } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState({ incomeGoal: '', expenseGoal: '' });
-  const [currentFilter, setCurrentFilter] = useState('total');
+  const [currentFilter, setCurrentFilter] = useState('month');
   const [currentPaymentFilter, setCurrentPaymentFilter] = useState('all');
   const [dateRange, setDateRange] = useState({ from: null, to: null });
   const [overviewFilter, setOverviewFilter] = useState('month');
@@ -667,11 +667,9 @@ function AppContent() {
               <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
               <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
               <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
-                {overviewFilter === 'month'
-                  ? new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })
-                  : overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to
-                    ? `${overviewDateRange.from.toLocaleDateString(lang)} — ${overviewDateRange.to.toLocaleDateString(lang)}`
-                    : t('filter.total')
+                {overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to
+                  ? `${overviewDateRange.from.toLocaleDateString(lang)} — ${overviewDateRange.to.toLocaleDateString(lang)}`
+                  : new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })
                 }
               </p>
             </div>
@@ -928,7 +926,7 @@ function AppContent() {
         >
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4 lg:max-w-3xl`}>
             <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.new.overline')}</p>
-            <TransactionForm onAddTransactions={handleAddTransactions} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} />
+            <TransactionForm onAddTransactions={handleAddTransactions} customCategories={customCategories} onAddCustomCategory={handleAddCustomCategory} cards={cards} />
           </div>
         </section>
 
@@ -973,8 +971,8 @@ function AppContent() {
             >
               <span className={`flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200 ${
                 activePage === 'new-transaction'
-                  ? 'fab-active bg-gradient-to-br from-[#1B4965] to-[#5FA8D3] shadow-lg shadow-[#1B4965]/30 scale-105'
-                  : 'fab-button bg-gradient-to-br from-[#1B4965] to-[#5FA8D3] shadow-md'
+                  ? 'fab-active shadow-lg shadow-[#1B4965]/30 scale-105'
+                  : 'fab-button shadow-md'
               }`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
@@ -1035,10 +1033,6 @@ function AppContent() {
         isOpen={successModal.open}
         transactionType={successModal.type}
         onClose={() => setSuccessModal({ open: false, type: null })}
-        onGoToHistory={() => {
-          setSuccessModal({ open: false, type: null });
-          setActivePage('history');
-        }}
       />
     </>
   );

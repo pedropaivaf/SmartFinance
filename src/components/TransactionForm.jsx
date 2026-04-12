@@ -12,7 +12,29 @@ const inputBase =
   'placeholder:text-[#9B9B9B] dark:placeholder:text-[#6B6560] focus:outline-none focus:ring-2 ' +
   'focus:ring-[#1B4965] focus:border-[#1B4965] transition leading-tight';
 
-function TransactionForm({ onAddTransactions, customCategories = [], onAddCustomCategory }) {
+const SAVED_CARDS_KEY = 'syros_saved_card_names';
+
+function getSavedCardNames() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_CARDS_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveCardName(name) {
+  if (!name) return;
+  const names = getSavedCardNames();
+  if (!names.includes(name)) {
+    names.push(name);
+    localStorage.setItem(SAVED_CARDS_KEY, JSON.stringify(names));
+  }
+}
+
+function removeCardName(name) {
+  const names = getSavedCardNames().filter((n) => n !== name);
+  localStorage.setItem(SAVED_CARDS_KEY, JSON.stringify(names));
+}
+
+function TransactionForm({ onAddTransactions, customCategories = [], onAddCustomCategory, cards = [] }) {
   const { t } = useTranslation();
   const today = useMemo(() => formatDate(new Date()), []);
   const [description, setDescription] = useState('');
@@ -26,6 +48,9 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
   const [category, setCategory] = useState('');
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [prepaidPaymentMethod, setPrepaidPaymentMethod] = useState('pix');
+  const [paymentMethod, setPaymentMethod] = useState('pix');
+  const [creditCardName, setCreditCardName] = useState('');
+  const [savedCardNames, setSavedCardNames] = useState(() => getSavedCardNames());
 
   useEffect(() => {
     setTransactionDate(today);
@@ -44,6 +69,8 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
     setInstallments('');
     setPaidInstallments('0');
     setPrepaidPaymentMethod('pix');
+    setPaymentMethod('pix');
+    setCreditCardName('');
     const current = formatDate(new Date());
     setTransactionDate(current);
     setInstallmentStartDate(current);
@@ -112,6 +139,17 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
       const transactionBaseDate = recurrence === 'single' ? selectedDate : new Date();
       const signedAmount = type === 'expense' ? -Math.abs(numericAmount) : Math.abs(numericAmount);
 
+      // For expenses: auto-paid for pix/debit/cash, not paid for credit
+      const isExpense = type === 'expense';
+      const autoPaid = isExpense && paymentMethod !== 'credit';
+      const trimmedCardName = creditCardName.trim();
+
+      // Save card name for future use
+      if (isExpense && (paymentMethod === 'credit' || paymentMethod === 'debit') && trimmedCardName) {
+        saveCardName(trimmedCardName);
+        setSavedCardNames(getSavedCardNames());
+      }
+
       newTransactions.push({
         id: Date.now().toString(),
         description: trimmedDescription,
@@ -120,9 +158,9 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
         category: category || '',
         createdAt: transactionBaseDate.toISOString(),
         recurrence,
-        paid: false,
-        paymentMethod: null,
-        creditCardName: null,
+        paid: isExpense ? autoPaid : false,
+        paymentMethod: isExpense ? paymentMethod : null,
+        creditCardName: isExpense && (paymentMethod === 'credit' || paymentMethod === 'debit') ? trimmedCardName || null : null,
       });
     }
 
@@ -363,6 +401,75 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
             {t('form.type.helper')}
           </p>
         </fieldset>
+        {/* Payment method for expenses */}
+        {type === 'expense' && !isInstallment && (
+          <div className="space-y-2.5 pt-1">
+            <p className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92]">
+              {t('modal.payment.method')}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'pix', label: 'Pix' },
+                { id: 'debit', label: t('list.paymentMethods.debit') },
+                { id: 'credit', label: t('list.paymentMethods.credit') },
+                { id: 'cash', label: t('list.paymentMethods.cash') },
+              ].map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setPaymentMethod(m.id)}
+                  className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all duration-150 min-h-[44px] ${
+                    paymentMethod === m.id
+                      ? 'bg-[#1B4965] dark:bg-[#5FA8D3] text-white shadow-sm ring-2 ring-[#1B4965]/20 dark:ring-[#5FA8D3]/20'
+                      : 'bg-[#F4F3EF] dark:bg-[#1A1918] text-[#6B6B6B] dark:text-[#A09A92] hover:bg-[#E8E5E0] dark:hover:bg-[#2D2B28]'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            {/* Card name for credit or debit */}
+            {(paymentMethod === 'credit' || paymentMethod === 'debit') && (
+              <div className="pt-1">
+                <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
+                  {cards.length > 0 ? 'Selecione o Cartão' : `Nome do Cartão (${paymentMethod === 'credit' ? 'Crédito' : 'Débito'})`}
+                </label>
+                {cards.length > 0 ? (
+                  <select
+                    value={creditCardName}
+                    onChange={(e) => setCreditCardName(e.target.value)}
+                    className={inputBase}
+                  >
+                    <option value="">Selecione...</option>
+                    {cards.map((card) => (
+                      <option key={card.id} value={card.name}>{card.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={creditCardName}
+                      onChange={(e) => setCreditCardName(e.target.value)}
+                      placeholder="Ex: Nubank"
+                      className={inputBase}
+                    />
+                    {savedCardNames.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {savedCardNames.map((name) => (
+                          <span key={name} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]">
+                            <button type="button" onClick={() => setCreditCardName(name)} className="hover:underline">{name}</button>
+                            <button type="button" onClick={() => { removeCardName(name); setSavedCardNames(getSavedCardNames()); }} className="ml-0.5 text-[#9B9B9B] hover:text-[#9B2226] dark:hover:text-[#E76F51]">×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <button
           type="submit"
           className="w-full bg-[#1B4965] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#153B52] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4965] transition duration-300"

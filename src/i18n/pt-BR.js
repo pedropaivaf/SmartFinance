@@ -194,8 +194,7 @@ export default {
   'modal.payment.confirm': 'Confirmar',
 
   // Filter bar
-  'filter.month': 'Mês',
-  'filter.total': 'Total',
+  'filter.month': 'Mês Atual',
   'filter.all': 'Todos',
 
   // Goals

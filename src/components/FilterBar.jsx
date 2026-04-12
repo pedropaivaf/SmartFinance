@@ -40,9 +40,6 @@ function FilterBar({ currentFilter, onChange, dateRange, onDateRangeChange, show
         <button type="button" data-filter="month" onClick={handleClick} className={filterBtnClass('month')}>
           {t('filter.month')}
         </button>
-        <button type="button" data-filter="total" onClick={handleClick} className={filterBtnClass('total')}>
-          {t('filter.total')}
-        </button>
         <DateRangePicker
           dateRange={dateRange}
           onDateRangeChange={handleDateRangeChange}
