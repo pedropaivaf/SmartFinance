@@ -3,6 +3,7 @@ import { SMARTFINANCE_CONFIG, isPremium } from '../config.js';
 import { exportAllData, importAllData } from '../services/storageService.js';
 import { useTranslation, LANGUAGES } from '../i18n/index.jsx';
 import LanguagePicker from './LanguagePicker.jsx';
+import PrivacyPolicyModal from './PrivacyPolicyModal.jsx';
 import OpenFinanceSection from './OpenFinanceSection.jsx';
 import CreditCardsSection from './CreditCardsSection.jsx';
 import ExportSection from './ExportSection.jsx';
@@ -119,6 +120,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
   const { t, lang } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [showOpenFinance, setShowOpenFinance] = useState(false);
   const [notifPrefs, setNotifPrefs] = useState(() => loadNotificationPrefs());
   const [notifPermission, setNotifPermission] = useState(() => getNotificationPermission());
@@ -545,12 +547,13 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
             </svg>
           }
           label={t('settings.about.privacy')}
-          onClick={() => alert(t('settings.about.privacySoon'))}
+          onClick={() => setShowPrivacy(true)}
         />
       </SettingsGroup>
 
       {/* Language Picker Modal */}
       <LanguagePicker isOpen={showLangPicker} onClose={() => setShowLangPicker(false)} />
+      <PrivacyPolicyModal isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
     </div>
   );
 }

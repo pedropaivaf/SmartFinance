@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
 import { SyrosLogo } from './Header.jsx';
+import PrivacyPolicyModal from './PrivacyPolicyModal.jsx';
 
 const inputBase =
   'w-full block text-sm px-4 py-3.5 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
@@ -16,6 +17,7 @@ function LoginPage({ onSignIn, onSwitchToRegister, onSwitchToForgotPassword }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,7 +139,17 @@ function LoginPage({ onSignIn, onSwitchToRegister, onSwitchToForgotPassword }) {
             {t('auth.login.createAccount') || 'Criar conta'}
           </button>
         </p>
+        <p className="text-center">
+          <button
+            type="button"
+            onClick={() => setShowPrivacy(true)}
+            className="text-xs text-[#9B9B9B] dark:text-[#6B6560] underline underline-offset-2 hover:text-[#1B4965] dark:hover:text-[#5FA8D3] transition"
+          >
+            {t('settings.about.privacy')}
+          </button>
+        </p>
       </div>
+      <PrivacyPolicyModal isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
     </div>
   );
 }

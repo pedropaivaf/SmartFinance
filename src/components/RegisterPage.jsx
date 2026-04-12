@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../i18n/index.jsx';
 import { SyrosLogo } from './Header.jsx';
+import PrivacyPolicyModal from './PrivacyPolicyModal.jsx';
 
 const inputBase =
   'w-full block text-sm px-4 py-3.5 rounded-xl border border-[#E8E5E0] dark:border-[#2D2B28] ' +
@@ -17,6 +18,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -24,7 +26,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
     setError('');
 
     if (password !== confirmPassword) {
-      setError(t('auth.error.passwordMismatch') || 'As senhas nao coincidem.');
+      setError(t('auth.error.passwordMismatch') || 'As senhas não coincidem.');
       return;
     }
     if (password.length < 6) {
@@ -32,7 +34,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
       return;
     }
     if (!lgpdConsent) {
-      setError(t('auth.error.lgpdRequired') || 'Voce precisa aceitar os termos para continuar.');
+      setError(t('auth.error.lgpdRequired') || 'Você precisa aceitar os termos para continuar.');
       return;
     }
 
@@ -51,6 +53,8 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
     }
   };
 
+  const handleClosePrivacy = () => setShowPrivacy(false);
+
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAFAF8] dark:bg-[#111110]">
@@ -64,7 +68,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
             {t('auth.register.successTitle') || 'Conta criada!'}
           </h2>
           <p className="text-sm text-[#6B6B6B] dark:text-[#A09A92]">
-            {t('auth.register.successMessage') || 'Verifique seu email para confirmar o cadastro, ou faca login diretamente.'}
+            {t('auth.register.successMessage') || 'Verifique seu email para confirmar o cadastro, ou faça login diretamente.'}
           </p>
           <button
             type="button"
@@ -190,7 +194,15 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
               className="mt-0.5 h-5 w-5 rounded border-[#D4D0C8] dark:border-[#3A3835] text-[#1B4965] focus:ring-[#1B4965] cursor-pointer flex-shrink-0"
             />
             <span className="text-xs text-[#6B6B6B] dark:text-[#A09A92] leading-relaxed">
-              {t('auth.register.lgpdConsent') || 'Concordo com os termos de uso e politica de privacidade. Seus dados sao protegidos conforme a LGPD.'}
+              {t('auth.register.lgpdPrefix') || 'Concordo com os '}
+              <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); setShowPrivacy(true); }}
+                className="text-[#1B4965] dark:text-[#5FA8D3] font-semibold underline underline-offset-2"
+              >
+                {t('auth.register.lgpdTermsLink') || 'Termos de Uso e Política de Privacidade'}
+              </button>
+              {t('auth.register.lgpdSuffix') || '. Seus dados são protegidos conforme a LGPD.'}
             </span>
           </label>
 
@@ -204,7 +216,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
         </form>
 
         <p className="text-center text-sm text-[#6B6B6B] dark:text-[#A09A92]">
-          {t('auth.register.hasAccount') || 'Ja tem uma conta?'}{' '}
+          {t('auth.register.hasAccount') || 'Já tem uma conta?'}{' '}
           <button
             type="button"
             onClick={onSwitchToLogin}
@@ -214,6 +226,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
           </button>
         </p>
       </div>
+      <PrivacyPolicyModal isOpen={showPrivacy} onClose={handleClosePrivacy} />
     </div>
   );
 }

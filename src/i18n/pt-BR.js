@@ -157,7 +157,6 @@ export default {
   'settings.about.feedback': 'Enviar Feedback',
   'settings.about.feedbackDesc': 'Ajude a melhorar o Syros',
   'settings.about.privacy': 'Política de Privacidade',
-  'settings.about.privacySoon': 'Política de privacidade em breve.',
 
   // Language picker
   'language.picker.title': 'Selecionar Idioma',
@@ -241,7 +240,9 @@ export default {
   'auth.register.button': 'Criar conta',
   'auth.register.hasAccount': 'Já tem uma conta?',
   'auth.register.goToLogin': 'Fazer login',
-  'auth.register.lgpdConsent': 'Concordo com os termos de uso e política de privacidade. Seus dados são protegidos conforme a LGPD.',
+  'auth.register.lgpdPrefix': 'Concordo com os ',
+  'auth.register.lgpdTermsLink': 'Termos de Uso e Política de Privacidade',
+  'auth.register.lgpdSuffix': '. Seus dados são protegidos conforme a LGPD.',
   'auth.register.successTitle': 'Conta criada!',
   'auth.register.successMessage': 'Verifique seu email para confirmar o cadastro, ou faça login diretamente.',
   'auth.login.forgotPassword': 'Esqueci minha senha',
@@ -309,4 +310,23 @@ export default {
   'categories.investments': 'Investimentos',
   'categories.bonus': 'Bônus',
   'categories.other': 'Outros',
+
+  // Privacy Policy
+  'privacy.title': 'Política de Privacidade',
+  'privacy.lastUpdated': 'Última atualização: abril de 2026',
+  'privacy.close': 'Entendi',
+  'privacy.s1.title': '1. Dados que coletamos',
+  'privacy.s1.body': 'O Syros coleta apenas as informações necessárias para o funcionamento do aplicativo: email para autenticação e os dados financeiros que você registra (transações, categorias, metas). Não coletamos dados de localização, contatos ou qualquer informação pessoal além do necessário.',
+  'privacy.s2.title': '2. Como usamos seus dados',
+  'privacy.s2.body': 'Seus dados são utilizados exclusivamente para fornecer as funcionalidades do aplicativo: exibir resumos financeiros, gráficos, metas e histórico de transações. Não vendemos, compartilhamos ou transferimos seus dados para terceiros.',
+  'privacy.s3.title': '3. Armazenamento e segurança',
+  'privacy.s3.body': 'Seus dados são armazenados de forma segura no Supabase (com criptografia em trânsito e em repouso) e localmente no seu dispositivo via localStorage. Você pode exportar ou excluir todos os seus dados a qualquer momento pela tela de Ajustes.',
+  'privacy.s4.title': '4. Open Finance',
+  'privacy.s4.body': 'Se você optar por conectar uma conta bancária via Open Finance, a conexão é intermediada pela Pluggy. O Syros não armazena suas credenciais bancárias. Os dados importados são tratados com o mesmo nível de segurança dos demais dados.',
+  'privacy.s5.title': '5. Seus direitos (LGPD)',
+  'privacy.s5.body': 'Conforme a Lei Geral de Proteção de Dados (LGPD), você tem direito a: acessar seus dados, corrigi-los, exportá-los, solicitar exclusão e revogar consentimento a qualquer momento. Todas essas ações podem ser realizadas diretamente no aplicativo.',
+  'privacy.s6.title': '6. Cookies e rastreamento',
+  'privacy.s6.body': 'O Syros não utiliza cookies de rastreamento, analytics de terceiros ou qualquer ferramenta de monitoramento comportamental. Seu uso do aplicativo é totalmente privado.',
+  'privacy.s7.title': '7. Contato',
+  'privacy.s7.body': 'Para dúvidas sobre privacidade ou solicitações relacionadas aos seus dados, entre em contato pelo email: feedback@smartfinance.app',
 };
