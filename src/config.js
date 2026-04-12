@@ -88,6 +88,23 @@ export function isPremium() {
 }
 
 /**
+ * Avalia se as preferências do usuário indicam premium ativo.
+ * Regras:
+ * - plan !== 'premium' → false
+ * - plan === 'premium' e sem premium_expires_at → true (legacy/lifetime)
+ * - plan === 'premium' com premium_expires_at no futuro → true
+ * - plan === 'premium' com premium_expires_at no passado → false (expirou)
+ */
+export function isPremiumActive(prefs) {
+  if (!prefs) return false;
+  if (prefs.plan !== 'premium') return false;
+  if (!prefs.premiumExpiresAt) return true;
+  const expires = new Date(prefs.premiumExpiresAt);
+  if (Number.isNaN(expires.getTime())) return true;
+  return expires.getTime() > Date.now();
+}
+
+/**
  * Retorna mensagem de upgrade para premium
  * @returns {string}
  */

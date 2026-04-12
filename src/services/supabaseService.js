@@ -251,6 +251,10 @@ export async function dbLoadUserPreferences() {
     theme: data.theme || 'light',
     language: data.language || 'pt-BR',
     plan: data.plan || 'free',
+    premiumExpiresAt: data.premium_expires_at || null,
+    planSource: data.plan_source || null,
+    planProviderId: data.plan_provider_id || null,
+    trialStartedAt: data.trial_started_at || null,
     summaryOrder: data.summary_order || ['income', 'expense', 'paid', 'balance'],
     notificationPrefs: notifPrefs,
     customCategories: notifPrefs.customCategories || [],
@@ -265,6 +269,10 @@ export async function dbSaveUserPreferences(prefs) {
   if (prefs.theme !== undefined) row.theme = prefs.theme;
   if (prefs.language !== undefined) row.language = prefs.language;
   if (prefs.plan !== undefined) row.plan = prefs.plan;
+  if (prefs.premiumExpiresAt !== undefined) row.premium_expires_at = prefs.premiumExpiresAt;
+  if (prefs.planSource !== undefined) row.plan_source = prefs.planSource;
+  if (prefs.planProviderId !== undefined) row.plan_provider_id = prefs.planProviderId;
+  if (prefs.trialStartedAt !== undefined) row.trial_started_at = prefs.trialStartedAt;
   if (prefs.summaryOrder !== undefined) row.summary_order = prefs.summaryOrder;
   if (prefs.notificationPrefs !== undefined) row.notification_prefs = prefs.notificationPrefs;
   if (prefs.customCategories !== undefined) row.notification_prefs = { ...(row.notification_prefs || {}), customCategories: prefs.customCategories };

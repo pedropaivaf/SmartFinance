@@ -61,7 +61,7 @@ import {
 } from './services/supabaseService.js';
 
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
-import { setCurrentPlan, getCurrentPlan } from './config.js';
+import { setCurrentPlan, getCurrentPlan, isPremiumActive } from './config.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 import { calculateTotals } from './utils/calculations.js';
 
@@ -243,7 +243,7 @@ function AppContent() {
         if (prefs.theme === 'dark') setIsDarkMode(true);
         else if (prefs.theme === 'light') setIsDarkMode(false);
         if (prefs.summaryOrder) setSummaryOrder(prefs.summaryOrder);
-        if (prefs.plan) setCurrentPlan(prefs.plan);
+        setCurrentPlan(isPremiumActive(prefs) ? 'premium' : 'free');
         if (prefs.customCategories) setCustomCategories(prefs.customCategories);
         if (prefs.notificationPrefs?.billingCycleDay) setBillingCycleDay(prefs.notificationPrefs.billingCycleDay);
         if (prefs.notificationPrefs?.defaultPeriodFilter) {
