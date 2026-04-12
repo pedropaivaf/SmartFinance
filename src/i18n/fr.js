@@ -166,6 +166,8 @@ export default {
   'modal.payment.confirm': 'Confirmer',
   'filter.month': 'Mois Actuel',
   'filter.all': 'Tous',
+  'picker.month.title': 'Sélectionner le Mois',
+  'picker.month.confirm': 'Confirmer',
   'goals.title': 'Objectifs',
   'goals.income': 'Objectif de revenus',
   'goals.expense': 'Objectif de dépenses',

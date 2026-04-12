@@ -166,6 +166,8 @@ export default {
   'modal.payment.confirm': 'Confirmar',
   'filter.month': 'Mes Actual',
   'filter.all': 'Todos',
+  'picker.month.title': 'Seleccionar Mes',
+  'picker.month.confirm': 'Confirmar',
   'goals.title': 'Metas',
   'goals.income': 'Meta de Ingresos',
   'goals.expense': 'Meta de Gastos',
