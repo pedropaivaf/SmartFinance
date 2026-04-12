@@ -21,6 +21,7 @@
     "@capacitor/ios": "^8.3.0",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@revenuecat/purchases-capacitor": "^12.3.2",
     "@supabase/supabase-js": "^2.98.0",
     "chart.js": "^4.5.1",
     "react": "^18.3.1",

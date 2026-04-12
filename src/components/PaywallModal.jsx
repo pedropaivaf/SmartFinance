@@ -3,11 +3,21 @@ import ReactDOM from 'react-dom';
 import { useTranslation } from '../i18n/index.jsx';
 import { PACKAGES, PREMIUM_FEATURES, formatPrice, monthlyEquivalent, getPrice } from '../paywall/packages.js';
 import { isNativeApp } from '../utils/platform.js';
+import {
+  getPackageByIdentifier,
+  purchasePackage,
+  restorePurchases,
+  getCustomerInfo,
+  extractPremiumPayload,
+} from '../services/purchases.js';
+import { dbSaveUserPreferences } from '../services/supabaseService.js';
+import { setCurrentPlan } from '../config.js';
 
 function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
   const { t, lang } = useTranslation();
   const [selected, setSelected] = useState('annual');
   const [busy, setBusy] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   if (!isOpen) return null;
 
@@ -23,11 +33,40 @@ function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
     if (e.target === e.currentTarget && !busy) onClose();
   };
 
+  const applyEntitlementFromInfo = async () => {
+    const info = await getCustomerInfo();
+    const payload = extractPremiumPayload(info);
+    if (!payload) return false;
+    setCurrentPlan('premium');
+    await dbSaveUserPreferences(payload);
+    return true;
+  };
+
   const handleSubscribe = async () => {
     if (busy) return;
     setBusy(true);
+    setErrorMsg(null);
     try {
-      if (onPurchase) await onPurchase(selected);
+      if (native) {
+        const pkg = PACKAGES[selected];
+        const rcPackage = await getPackageByIdentifier(pkg.id);
+        if (!rcPackage) {
+          setErrorMsg(t('paywall.error.unavailable'));
+          return;
+        }
+        const res = await purchasePackage(rcPackage);
+        if (res.cancelled) return;
+        if (!res.ok) {
+          setErrorMsg(t('paywall.error.generic'));
+          return;
+        }
+        await applyEntitlementFromInfo();
+        onClose();
+      } else if (onPurchase) {
+        await onPurchase(selected);
+      } else {
+        setErrorMsg(t('paywall.error.webSoon'));
+      }
     } finally {
       setBusy(false);
     }
@@ -36,8 +75,23 @@ function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
   const handleRestore = async () => {
     if (busy) return;
     setBusy(true);
+    setErrorMsg(null);
     try {
-      if (onRestore) await onRestore();
+      if (native) {
+        const res = await restorePurchases();
+        if (!res.ok) {
+          setErrorMsg(t('paywall.error.generic'));
+          return;
+        }
+        const found = await applyEntitlementFromInfo();
+        if (!found) {
+          setErrorMsg(t('paywall.error.nothingToRestore'));
+          return;
+        }
+        onClose();
+      } else if (onRestore) {
+        await onRestore();
+      }
     } finally {
       setBusy(false);
     }
@@ -158,6 +212,9 @@ function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
 
         {/* CTA */}
         <div className="px-5 pt-2 pb-5 space-y-2.5 border-t border-[#E8E5E0] dark:border-[#2D2B28] bg-white dark:bg-[#1E1D1C]">
+          {errorMsg && (
+            <p className="text-center text-xs text-rose-500 dark:text-rose-400">{errorMsg}</p>
+          )}
           <button
             type="button"
             onClick={handleSubscribe}

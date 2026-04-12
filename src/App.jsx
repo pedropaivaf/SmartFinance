@@ -62,6 +62,7 @@ import {
 
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
 import { setCurrentPlan, getCurrentPlan, isPremiumActive } from './config.js';
+import { initPurchases, getCustomerInfo, extractPremiumPayload } from './services/purchases.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 import { calculateTotals } from './utils/calculations.js';
 
@@ -252,6 +253,20 @@ function AppContent() {
           setCurrentFilter(df);
           setOverviewFilter(df);
         }
+      }
+
+      // Native IAP (RevenueCat): identify user and reconcile entitlement.
+      // Defensive — the webhook is the real source of truth (Phase 6).
+      try {
+        await initPurchases(user.id);
+        const info = await getCustomerInfo();
+        const premium = extractPremiumPayload(info);
+        if (premium && !isPremiumActive(prefs)) {
+          setCurrentPlan('premium');
+          dbSaveUserPreferences(premium);
+        }
+      } catch (err) {
+        console.warn('[purchases] boot reconcile failed', err);
       }
 
       setIsLoading(false);

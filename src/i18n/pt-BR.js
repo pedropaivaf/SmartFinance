@@ -222,6 +222,10 @@ export default {
   'paywall.features.emergency_fund': 'Reserva de emergência',
   'paywall.features.category_ranking': 'Ranking de categorias',
   'paywall.features.spending_heatmap': 'Mapa de calor de gastos',
+  'paywall.error.unavailable': 'Plano indisponível nesta loja no momento.',
+  'paywall.error.generic': 'Não foi possível concluir. Tente novamente.',
+  'paywall.error.nothingToRestore': 'Nenhuma compra encontrada para restaurar.',
+  'paywall.error.webSoon': 'Pagamento pelo site em breve.',
 
   // Goals
   'goals.title': 'Metas',
