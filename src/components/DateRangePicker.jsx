@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 const WEEKDAYS_PT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MONTHS_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -162,12 +163,12 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
         )}
       </button>
 
-      {isOpen && (
+      {isOpen && ReactDOM.createPortal(
         <div
-          className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
+          className="modal-overlay fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
           onClick={handleOverlayClick}
         >
-          <div className="modal-container animate-slide-up w-full sm:max-w-md bg-white dark:bg-[#1E1D1C] rounded-t-2xl sm:rounded-2xl shadow-xl h-[100dvh] sm:h-auto sm:max-h-[85vh] flex flex-col overflow-hidden">
+          <div className="modal-container animate-slide-up w-[calc(100%-32px)] max-w-sm bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-xl max-h-[85vh] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-[#1E1D1C] z-10 flex justify-between items-center px-6 pt-6 pb-4 border-b border-[#E8E5E0] dark:border-[#2D2B28]">
               <div>
@@ -248,7 +249,8 @@ function DateRangePicker({ dateRange, onDateRangeChange }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
