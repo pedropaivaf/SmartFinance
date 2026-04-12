@@ -538,7 +538,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
           iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
           label={t('settings.about.feedback')}
           sublabel={t('settings.about.feedbackDesc')}
-          onClick={() => window.open('mailto:feedback@smartfinance.app')}
+          onClick={() => window.open('mailto:contactsyros@gmail.com')}
         />
         <SettingsRow
           icon={

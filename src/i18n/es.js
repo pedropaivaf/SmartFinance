@@ -294,5 +294,5 @@ export default {
   'privacy.s6.title': '6. Cookies y rastreo',
   'privacy.s6.body': 'Syros no utiliza cookies de rastreo, analíticas de terceros ni herramientas de monitoreo de comportamiento. Tu uso de la aplicación es completamente privado.',
   'privacy.s7.title': '7. Contacto',
-  'privacy.s7.body': 'Para preguntas sobre privacidad o solicitudes relacionadas con tus datos, contáctanos en: feedback@smartfinance.app',
+  'privacy.s7.body': 'Para preguntas sobre privacidad o solicitudes relacionadas con tus datos, contáctanos en: contactsyros@gmail.com',
 };

@@ -12,15 +12,15 @@
  */
 export function calculateTotals(transactions) {
   const income = transactions
-    .filter(t => t.type === 'income' && !t.isProjection)
+    .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const totalExpense = transactions
-    .filter(t => t.type === 'expense' && !t.isProjection)
+    .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const paidExpense = transactions
-    .filter(t => t.type === 'expense' && t.paid && !t.isProjection)
+    .filter(t => t.type === 'expense' && t.paid)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const balance = income - paidExpense;
@@ -81,7 +81,7 @@ export function calculateExpensesByCategory(transactions) {
   const categories = {};
 
   transactions
-    .filter(t => t.type === 'expense' && !t.isProjection)
+    .filter(t => t.type === 'expense')
     .forEach(t => {
       const cat = t.category || 'Sem categoria';
       if (!categories[cat]) {
@@ -210,12 +210,12 @@ export function compareCurrentVsPreviousMonth(transactions) {
 
   const currentMonthTransactions = transactions.filter(t => {
     const tDate = new Date(t.createdAt);
-    return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear && !t.isProjection;
+    return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
   });
 
   const previousMonthTransactions = transactions.filter(t => {
     const tDate = new Date(t.createdAt);
-    return tDate.getMonth() === previousMonth && tDate.getFullYear() === previousYear && !t.isProjection;
+    return tDate.getMonth() === previousMonth && tDate.getFullYear() === previousYear;
   });
 
   const currentIncome = currentMonthTransactions
