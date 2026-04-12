@@ -93,7 +93,7 @@ export default function ExportSection() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28] p-6">
+    <div className="p-6">
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-xl font-semibold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">
           Exportar & Backup

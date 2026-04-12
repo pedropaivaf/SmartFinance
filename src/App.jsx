@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 // Componentes existentes
-import Header from './components/Header.jsx';
 import GoalsSection from './components/GoalsSection.jsx';
 import SummaryCards from './components/SummaryCards.jsx';
 import TransactionForm from './components/TransactionForm.jsx';
@@ -685,8 +684,7 @@ function AppContent() {
     persistPreferences({ summaryOrder: newOrder });
   };
 
-  const panelClasses =
-    'bg-white dark:bg-[#1E1D1C] rounded-2xl shadow-sm border border-[#E8E5E0] dark:border-[#2D2B28]';
+  const panelClasses = '';
 
   if (isLoading) {
     return (
@@ -716,7 +714,6 @@ function AppContent() {
           data-page="overview"
           className={`page-section space-y-5 ${activePage === 'overview' ? '' : 'hidden'}`}
         >
-          <Header />
           <div className={`${panelClasses} p-5 sm:p-6 space-y-4`}>
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
@@ -1018,26 +1015,9 @@ function AppContent() {
             <NavTab target="graphs-goals" label={t('nav.chart')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 3v18M6 8v13M16 13v8" />
             </NavTab>
-            {/* Center + button */}
-            <button
-              type="button"
-              aria-label={t('nav.new')}
-              onClick={() => setActivePage('new-transaction')}
-              className="nav-tab-item flex flex-col items-center justify-center gap-0.5 pt-1 -mt-5"
-            >
-              <span className={`flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200 ${
-                activePage === 'new-transaction'
-                  ? 'fab-active shadow-lg shadow-[#1B4965]/30 scale-105'
-                  : 'fab-button shadow-md'
-              }`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
-                </svg>
-              </span>
-              <span className={`text-[10px] leading-none ${
-                activePage === 'new-transaction' ? 'font-bold text-[#1B4965] dark:text-[#5FA8D3]' : 'text-[#9B9B9B] dark:text-[#6B6560]'
-              }`}>{t('nav.new')}</span>
-            </button>
+            <NavTab target="new-transaction" label={t('nav.new')} activePage={activePage} onNavigate={setActivePage}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
+            </NavTab>
             <NavTab target="history" label={t('nav.history')} activePage={activePage} onNavigate={setActivePage}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </NavTab>
