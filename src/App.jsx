@@ -139,14 +139,15 @@ const generateProcessedTransactions = (transactions) => {
 };
 
 const filterByMonth = (transactions, year, month, billingCycleDay) => {
-  const cycleDay = billingCycleDay || 1;
+  const cycleDay = parseInt(billingCycleDay) || 1;
   let cycleStart, cycleEnd;
   if (cycleDay === 1) {
     cycleStart = new Date(year, month, 1);
     cycleEnd = new Date(year, month + 1, 0, 23, 59, 59, 999);
   } else {
-    cycleStart = new Date(year, month, cycleDay);
-    cycleEnd = new Date(year, month + 1, cycleDay - 1, 23, 59, 59, 999);
+    // "Abril" with cycleDay=21 means March 21 → April 20
+    cycleStart = new Date(year, month - 1, cycleDay);
+    cycleEnd = new Date(year, month, cycleDay - 1, 23, 59, 59, 999);
   }
   const startTime = cycleStart.getTime();
   const endTime = cycleEnd.getTime();
@@ -242,6 +243,21 @@ function AppContent() {
     loadData();
     return () => { cancelled = true; };
   }, [user]);
+
+  // Adjust selected months when billingCycleDay loads and is > 1
+  useEffect(() => {
+    if (billingCycleDay > 1) {
+      const now = new Date();
+      let y = now.getFullYear(), m = now.getMonth();
+      // If today >= cycleDay, current cycle's label is next month
+      if (now.getDate() >= billingCycleDay) {
+        m += 1;
+        if (m > 11) { m = 0; y += 1; }
+      }
+      setOverviewSelectedMonth({ year: y, month: m });
+      setHistorySelectedMonth({ year: y, month: m });
+    }
+  }, [billingCycleDay]);
 
   // Dark mode toggle
   useEffect(() => {
