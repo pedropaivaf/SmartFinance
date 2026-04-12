@@ -63,6 +63,7 @@ import {
 import { migrateLocalStorageToSupabase, hasLocalData } from './services/migrationService.js';
 import { setCurrentPlan, getCurrentPlan, isPremiumActive } from './config.js';
 import { initPurchases, getCustomerInfo, extractPremiumPayload } from './services/purchases.js';
+import { isReturningFromCheckout, clearCheckoutQueryParam } from './services/checkout.js';
 import { loadNotificationPrefs, runNotificationChecks } from './services/notificationService.js';
 import { calculateTotals } from './utils/calculations.js';
 
@@ -267,6 +268,17 @@ function AppContent() {
         }
       } catch (err) {
         console.warn('[purchases] boot reconcile failed', err);
+      }
+
+      // Web: if we just returned from Stripe Checkout, the webhook may still
+      // be in flight. Refetch once after a short delay to pick up the updated
+      // plan before clearing the query param.
+      if (isReturningFromCheckout()) {
+        clearCheckoutQueryParam();
+        setTimeout(async () => {
+          const fresh = await dbLoadUserPreferences();
+          if (fresh && isPremiumActive(fresh)) setCurrentPlan('premium');
+        }, 1500);
       }
 
       setIsLoading(false);

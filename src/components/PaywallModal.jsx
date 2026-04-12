@@ -11,6 +11,7 @@ import {
   extractPremiumPayload,
 } from '../services/purchases.js';
 import { dbSaveUserPreferences } from '../services/supabaseService.js';
+import { createCheckoutSession } from '../services/checkout.js';
 import { setCurrentPlan } from '../config.js';
 
 function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
@@ -62,10 +63,17 @@ function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
         }
         await applyEntitlementFromInfo();
         onClose();
-      } else if (onPurchase) {
-        await onPurchase(selected);
       } else {
-        setErrorMsg(t('paywall.error.webSoon'));
+        if (onPurchase) {
+          await onPurchase(selected);
+          return;
+        }
+        const res = await createCheckoutSession(selected);
+        if (!res.ok) {
+          setErrorMsg(t('paywall.error.generic'));
+          return;
+        }
+        window.location.href = res.url;
       }
     } finally {
       setBusy(false);
