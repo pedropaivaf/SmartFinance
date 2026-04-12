@@ -6,7 +6,11 @@
       "Bash(node --input-type=module -e \":*)",
       "Bash(curl -s -X POST http://localhost:3001/api/pluggy/connect-token)",
       "Bash(taskkill //F //IM node.exe)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(npx vite:*)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Skill(commit-commands:commit-push-pr:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
