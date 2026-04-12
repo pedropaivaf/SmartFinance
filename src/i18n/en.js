@@ -164,6 +164,7 @@ export default {
   'modal.payment.cash': 'Cash',
   'modal.payment.confirm': 'Confirm',
   'filter.month': 'Current Month',
+  'filter.cycle': 'Cycle',
   'filter.all': 'All',
   'picker.month.title': 'Select Month',
   'picker.month.confirm': 'Confirm',
@@ -188,6 +189,10 @@ export default {
   'settings.billingCycle.section': 'MONTHLY CYCLE',
   'settings.billingCycle.label': 'Cycle start day',
   'settings.billingCycle.desc': 'Set when your financial month begins',
+  'settings.defaultPeriod.label': 'Default view',
+  'settings.defaultPeriod.desc': 'Which filter to show when opening the app',
+  'settings.defaultPeriod.month': 'Current month',
+  'settings.defaultPeriod.cycle': 'Current cycle',
   'settings.billingCycle.day1': 'Day 1 (default)',
   'settings.billingCycle.dayN': 'Day {day}',
 

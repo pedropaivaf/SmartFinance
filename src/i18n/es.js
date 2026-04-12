@@ -164,6 +164,7 @@ export default {
   'modal.payment.cash': 'Efectivo',
   'modal.payment.confirm': 'Confirmar',
   'filter.month': 'Mes Actual',
+  'filter.cycle': 'Ciclo',
   'filter.all': 'Todos',
   'picker.month.title': 'Seleccionar Mes',
   'picker.month.confirm': 'Confirmar',
@@ -188,6 +189,10 @@ export default {
   'settings.billingCycle.section': 'CICLO MENSUAL',
   'settings.billingCycle.label': 'Día de inicio del ciclo',
   'settings.billingCycle.desc': 'Define cuándo comienza tu mes financiero',
+  'settings.defaultPeriod.label': 'Vista predeterminada',
+  'settings.defaultPeriod.desc': 'Qué filtro mostrar al abrir la app',
+  'settings.defaultPeriod.month': 'Mes actual',
+  'settings.defaultPeriod.cycle': 'Ciclo actual',
   'settings.billingCycle.day1': 'Día 1 (predeterminado)',
   'settings.billingCycle.dayN': 'Día {day}',
 

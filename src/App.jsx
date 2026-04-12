@@ -138,19 +138,30 @@ const generateProcessedTransactions = (transactions) => {
   return processed;
 };
 
-const filterByMonth = (transactions, year, month, billingCycleDay) => {
-  const cycleDay = parseInt(billingCycleDay) || 1;
-  let cycleStart, cycleEnd;
-  if (cycleDay === 1) {
-    cycleStart = new Date(year, month, 1);
-    cycleEnd = new Date(year, month + 1, 0, 23, 59, 59, 999);
+const filterByMonth = (transactions, year, month) => {
+  const startTime = new Date(year, month, 1).getTime();
+  const endTime = new Date(year, month + 1, 0, 23, 59, 59, 999).getTime();
+  return transactions.filter((tx) => {
+    const date = new Date(tx.createdAt);
+    if (Number.isNaN(date.getTime())) return false;
+    const t = date.getTime();
+    return t >= startTime && t <= endTime;
+  });
+};
+
+const filterByCycle = (transactions, cycleDay) => {
+  const today = new Date();
+  const day = parseInt(cycleDay) || 1;
+  let start, end;
+  if (today.getDate() >= day) {
+    start = new Date(today.getFullYear(), today.getMonth(), day);
+    end = new Date(today.getFullYear(), today.getMonth() + 1, day - 1, 23, 59, 59, 999);
   } else {
-    // "Abril" with cycleDay=21 means March 21 → April 20
-    cycleStart = new Date(year, month - 1, cycleDay);
-    cycleEnd = new Date(year, month, cycleDay - 1, 23, 59, 59, 999);
+    start = new Date(today.getFullYear(), today.getMonth() - 1, day);
+    end = new Date(today.getFullYear(), today.getMonth(), day - 1, 23, 59, 59, 999);
   }
-  const startTime = cycleStart.getTime();
-  const endTime = cycleEnd.getTime();
+  const startTime = start.getTime();
+  const endTime = end.getTime();
   return transactions.filter((tx) => {
     const date = new Date(tx.createdAt);
     if (Number.isNaN(date.getTime())) return false;
@@ -190,6 +201,7 @@ function AppContent() {
   const [cards, setCards] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
   const [billingCycleDay, setBillingCycleDay] = useState(1);
+  const [defaultPeriodFilter, setDefaultPeriodFilter] = useState('month');
   const [isLoading, setIsLoading] = useState(true);
 
   const [editModalState, setEditModalState] = useState({ open: false, transaction: null });
@@ -235,6 +247,12 @@ function AppContent() {
         if (prefs.plan) setCurrentPlan(prefs.plan);
         if (prefs.customCategories) setCustomCategories(prefs.customCategories);
         if (prefs.notificationPrefs?.billingCycleDay) setBillingCycleDay(prefs.notificationPrefs.billingCycleDay);
+        if (prefs.notificationPrefs?.defaultPeriodFilter) {
+          const df = prefs.notificationPrefs.defaultPeriodFilter;
+          setDefaultPeriodFilter(df);
+          setCurrentFilter(df);
+          setOverviewFilter(df);
+        }
       }
 
       setIsLoading(false);
@@ -243,21 +261,6 @@ function AppContent() {
     loadData();
     return () => { cancelled = true; };
   }, [user]);
-
-  // Adjust selected months when billingCycleDay loads and is > 1
-  useEffect(() => {
-    if (billingCycleDay > 1) {
-      const now = new Date();
-      let y = now.getFullYear(), m = now.getMonth();
-      // If today >= cycleDay, current cycle's label is next month
-      if (now.getDate() >= billingCycleDay) {
-        m += 1;
-        if (m > 11) { m = 0; y += 1; }
-      }
-      setOverviewSelectedMonth({ year: y, month: m });
-      setHistorySelectedMonth({ year: y, month: m });
-    }
-  }, [billingCycleDay]);
 
   // Dark mode toggle
   useEffect(() => {
@@ -304,7 +307,10 @@ function AppContent() {
 
   const summaryTransactions = useMemo(() => {
     if (currentFilter === 'month') {
-      return filterByMonth(processedTransactions, historySelectedMonth.year, historySelectedMonth.month, billingCycleDay);
+      return filterByMonth(processedTransactions, historySelectedMonth.year, historySelectedMonth.month);
+    }
+    if (currentFilter === 'cycle') {
+      return filterByCycle(processedTransactions, billingCycleDay);
     }
     if (currentFilter === 'range' && dateRange.from && dateRange.to) {
       const fromTime = dateRange.from.getTime();
@@ -323,7 +329,10 @@ function AppContent() {
 
   const overviewTransactions = useMemo(() => {
     if (overviewFilter === 'month') {
-      return filterByMonth(processedTransactions, overviewSelectedMonth.year, overviewSelectedMonth.month, billingCycleDay);
+      return filterByMonth(processedTransactions, overviewSelectedMonth.year, overviewSelectedMonth.month);
+    }
+    if (overviewFilter === 'cycle') {
+      return filterByCycle(processedTransactions, billingCycleDay);
     }
     if (overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to) {
       const fromTime = overviewDateRange.from.getTime();
@@ -402,7 +411,14 @@ function AppContent() {
   const handleBillingCycleDayChange = (day) => {
     const numDay = parseInt(day) || 1;
     setBillingCycleDay(numDay);
-    dbSaveUserPreferences({ notificationPrefs: { billingCycleDay: numDay } });
+    dbSaveUserPreferences({ notificationPrefs: { billingCycleDay: numDay, defaultPeriodFilter } });
+  };
+
+  const handleDefaultPeriodFilterChange = (value) => {
+    setDefaultPeriodFilter(value);
+    setCurrentFilter(value);
+    setOverviewFilter(value);
+    dbSaveUserPreferences({ notificationPrefs: { billingCycleDay, defaultPeriodFilter: value } });
   };
 
   const handleAddTransactions = (newTransactions) => {
@@ -984,6 +1000,8 @@ function AppContent() {
             onSignOut={signOut}
             billingCycleDay={billingCycleDay}
             onBillingCycleDayChange={handleBillingCycleDayChange}
+            defaultPeriodFilter={defaultPeriodFilter}
+            onDefaultPeriodFilterChange={handleDefaultPeriodFilterChange}
             cards={cards}
             onSaveCards={handleSaveCards}
           />

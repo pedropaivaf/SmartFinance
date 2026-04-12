@@ -194,6 +194,7 @@ export default {
 
   // Filter bar
   'filter.month': 'Mês Atual',
+  'filter.cycle': 'Ciclo',
   'filter.all': 'Todos',
   'picker.month.title': 'Selecionar Mês',
   'picker.month.confirm': 'Confirmar',
@@ -222,6 +223,10 @@ export default {
   'settings.billingCycle.section': 'CICLO MENSAL',
   'settings.billingCycle.label': 'Dia de início do ciclo',
   'settings.billingCycle.desc': 'Define quando seu mês financeiro começa',
+  'settings.defaultPeriod.label': 'Visualização padrão',
+  'settings.defaultPeriod.desc': 'Qual filtro exibir ao abrir o app',
+  'settings.defaultPeriod.month': 'Mês atual',
+  'settings.defaultPeriod.cycle': 'Ciclo atual',
   'settings.billingCycle.day1': 'Dia 1 (padrão)',
   'settings.billingCycle.dayN': 'Dia {day}',
 

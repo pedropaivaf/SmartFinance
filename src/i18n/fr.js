@@ -164,6 +164,7 @@ export default {
   'modal.payment.cash': 'Espèces',
   'modal.payment.confirm': 'Confirmer',
   'filter.month': 'Mois Actuel',
+  'filter.cycle': 'Cycle',
   'filter.all': 'Tous',
   'picker.month.title': 'Sélectionner le Mois',
   'picker.month.confirm': 'Confirmer',
@@ -188,6 +189,10 @@ export default {
   'settings.billingCycle.section': 'CYCLE MENSUEL',
   'settings.billingCycle.label': 'Jour de début du cycle',
   'settings.billingCycle.desc': 'Définit quand votre mois financier commence',
+  'settings.defaultPeriod.label': 'Vue par défaut',
+  'settings.defaultPeriod.desc': 'Quel filtre afficher à l\'ouverture',
+  'settings.defaultPeriod.month': 'Mois actuel',
+  'settings.defaultPeriod.cycle': 'Cycle actuel',
   'settings.billingCycle.day1': 'Jour 1 (par défaut)',
   'settings.billingCycle.dayN': 'Jour {day}',
 
