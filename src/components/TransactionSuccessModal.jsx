@@ -27,8 +27,8 @@ function TransactionSuccessModal({ isOpen, transactionType, onClose }) {
   const isIncome = transactionType === 'income';
 
   const bgClass = isIncome
-    ? 'bg-[#1B4965] dark:bg-[#0F2B3D]'
-    : 'bg-[#9B2226] dark:bg-[#5A1416]';
+    ? 'bg-gradient-to-b from-[#1B4965] to-[#143A52] dark:from-[#0F2B3D] dark:to-[#0A1F2D]'
+    : 'bg-gradient-to-b from-[#D4726A] to-[#B84C4C] dark:from-[#7A2C2F] dark:to-[#3D1517]';
 
   const opacity = phase === 'visible' ? 'opacity-100' : 'opacity-0';
   const scale = phase === 'visible' ? 'scale-100' : phase === 'enter' ? 'scale-110' : 'scale-95';
@@ -40,8 +40,8 @@ function TransactionSuccessModal({ isOpen, transactionType, onClose }) {
     >
       <div className={`text-center transition-transform duration-500 ${scale}`} style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}>
         {/* Animated check circle */}
-        <div className="success-icon-animate mx-auto w-24 h-24 rounded-full bg-white/15 flex items-center justify-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+        <div className="success-icon-animate mx-auto w-24 h-24 rounded-full bg-white/10 ring-2 ring-white/20 flex items-center justify-center mb-8">
+          <div className="w-16 h-16 rounded-full bg-white/25 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
@@ -51,7 +51,7 @@ function TransactionSuccessModal({ isOpen, transactionType, onClose }) {
         <h2 className="text-2xl font-bold text-white mb-2">
           {isIncome ? 'Renda adicionada!' : 'Despesa adicionada!'}
         </h2>
-        <p className="text-white/70 text-sm">
+        <p className="text-white/80 text-sm">
           {isIncome
             ? 'Sua renda foi registrada com sucesso.'
             : 'Sua despesa foi registrada com sucesso.'}

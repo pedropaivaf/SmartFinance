@@ -138,21 +138,15 @@ const generateProcessedTransactions = (transactions) => {
   return processed;
 };
 
-const filterByCurrentMonth = (transactions, billingCycleDay) => {
-  const now = new Date();
+const filterByMonth = (transactions, year, month, billingCycleDay) => {
   const cycleDay = billingCycleDay || 1;
   let cycleStart, cycleEnd;
   if (cycleDay === 1) {
-    cycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    cycleStart = new Date(year, month, 1);
+    cycleEnd = new Date(year, month + 1, 0, 23, 59, 59, 999);
   } else {
-    if (now.getDate() >= cycleDay) {
-      cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
-      cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1, 23, 59, 59, 999);
-    } else {
-      cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
-      cycleEnd = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1, 23, 59, 59, 999);
-    }
+    cycleStart = new Date(year, month, cycleDay);
+    cycleEnd = new Date(year, month + 1, cycleDay - 1, 23, 59, 59, 999);
   }
   const startTime = cycleStart.getTime();
   const endTime = cycleEnd.getTime();
@@ -177,6 +171,14 @@ function AppContent() {
   const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'income' | 'expense'
   const [valueRange, setValueRange] = useState({ min: 0, max: 0 });
   const [valueRangeActive, setValueRangeActive] = useState(false);
+  const [overviewSelectedMonth, setOverviewSelectedMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+  const [historySelectedMonth, setHistorySelectedMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('color-theme');
     if (stored) return stored === 'dark';
@@ -286,7 +288,7 @@ function AppContent() {
 
   const summaryTransactions = useMemo(() => {
     if (currentFilter === 'month') {
-      return filterByCurrentMonth(processedTransactions, billingCycleDay);
+      return filterByMonth(processedTransactions, historySelectedMonth.year, historySelectedMonth.month, billingCycleDay);
     }
     if (currentFilter === 'range' && dateRange.from && dateRange.to) {
       const fromTime = dateRange.from.getTime();
@@ -301,11 +303,11 @@ function AppContent() {
       });
     }
     return processedTransactions;
-  }, [processedTransactions, currentFilter, dateRange, billingCycleDay]);
+  }, [processedTransactions, currentFilter, dateRange, billingCycleDay, historySelectedMonth]);
 
   const overviewTransactions = useMemo(() => {
     if (overviewFilter === 'month') {
-      return filterByCurrentMonth(processedTransactions, billingCycleDay);
+      return filterByMonth(processedTransactions, overviewSelectedMonth.year, overviewSelectedMonth.month, billingCycleDay);
     }
     if (overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to) {
       const fromTime = overviewDateRange.from.getTime();
@@ -320,7 +322,7 @@ function AppContent() {
       });
     }
     return processedTransactions;
-  }, [processedTransactions, overviewFilter, overviewDateRange, billingCycleDay]);
+  }, [processedTransactions, overviewFilter, overviewDateRange, billingCycleDay, overviewSelectedMonth]);
 
   const overviewValues = useMemo(
     () => calculateTotals(overviewTransactions),
@@ -666,18 +668,14 @@ function AppContent() {
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.08em] text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.overline')}</p>
               <h2 className="text-lg font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('page.overview.title')}</h2>
-              <p className="text-xs font-medium text-sky-500 dark:text-sky-400 capitalize">
-                {overviewFilter === 'range' && overviewDateRange.from && overviewDateRange.to
-                  ? `${overviewDateRange.from.toLocaleDateString(lang)} — ${overviewDateRange.to.toLocaleDateString(lang)}`
-                  : new Date().toLocaleDateString(lang === 'pt-BR' ? 'pt-BR' : lang, { month: 'long', year: 'numeric' })
-                }
-              </p>
             </div>
             <FilterBar
               currentFilter={overviewFilter}
               onChange={setOverviewFilter}
               dateRange={overviewDateRange}
               onDateRangeChange={setOverviewDateRange}
+              selectedMonth={overviewSelectedMonth}
+              onMonthChange={setOverviewSelectedMonth}
               showTitle={false}
             />
             <p className="text-xs text-[#9B9B9B] dark:text-[#6B6560]">{t('page.overview.drag')}</p>
@@ -760,6 +758,8 @@ function AppContent() {
               onChange={setCurrentFilter}
               dateRange={dateRange}
               onDateRangeChange={setDateRange}
+              selectedMonth={historySelectedMonth}
+              onMonthChange={setHistorySelectedMonth}
             />
             <div className="border-b border-[#E8E5E0] dark:border-[#2D2B28]" />
             <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />

@@ -63,6 +63,29 @@ body {
   background: #8B8680;
 }
 
+/* ── Month picker ─────────────────────────────────────────────────────── */
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.month-picker-gradient-top {
+  background: linear-gradient(to bottom, #ffffff 10%, transparent);
+}
+.dark .month-picker-gradient-top {
+  background: linear-gradient(to bottom, #1E1D1C 10%, transparent);
+}
+.month-picker-gradient-bottom {
+  background: linear-gradient(to top, #ffffff 10%, transparent);
+}
+.dark .month-picker-gradient-bottom {
+  background: linear-gradient(to top, #1E1D1C 10%, transparent);
+}
+
 /* ── Page transitions ──────────────────────────────────────────────────── */
 
 .page-section {

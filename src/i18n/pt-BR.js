@@ -196,6 +196,8 @@ export default {
   // Filter bar
   'filter.month': 'Mês Atual',
   'filter.all': 'Todos',
+  'picker.month.title': 'Selecionar Mês',
+  'picker.month.confirm': 'Confirmar',
 
   // Goals
   'goals.title': 'Metas',
