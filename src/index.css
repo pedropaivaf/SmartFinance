@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ── Editorial Design System: Ink & Paper ─────────────────────────────── */
 
 :root {
