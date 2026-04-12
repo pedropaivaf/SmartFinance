@@ -4,6 +4,7 @@ import { exportAllData, importAllData } from '../services/storageService.js';
 import { useTranslation, LANGUAGES } from '../i18n/index.jsx';
 import LanguagePicker from './LanguagePicker.jsx';
 import PrivacyPolicyModal from './PrivacyPolicyModal.jsx';
+import PaywallModal from './PaywallModal.jsx';
 import OpenFinanceSection from './OpenFinanceSection.jsx';
 import CreditCardsSection from './CreditCardsSection.jsx';
 import ExportSection from './ExportSection.jsx';
@@ -121,6 +122,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
   const [isExporting, setIsExporting] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [showOpenFinance, setShowOpenFinance] = useState(false);
   const [notifPrefs, setNotifPrefs] = useState(() => loadNotificationPrefs());
   const [notifPermission, setNotifPermission] = useState(() => getNotificationPermission());
@@ -305,7 +307,7 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
             iconBg="bg-[#E8F0F4] dark:bg-[#1B2B35]"
             label={t('settings.account.upgrade')}
             sublabel={`R$ ${SMARTFINANCE_CONFIG.pricing.monthly.toFixed(2)}${t('settings.account.upgradeDesc')}`}
-            onClick={() => alert(t('settings.account.soon'))}
+            onClick={() => setShowPaywall(true)}
           />
         )}
       </SettingsGroup>
@@ -575,6 +577,12 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       {/* Language Picker Modal */}
       <LanguagePicker isOpen={showLangPicker} onClose={() => setShowLangPicker(false)} />
       <PrivacyPolicyModal isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onPurchase={() => { setShowPaywall(false); }}
+        onRestore={() => { setShowPaywall(false); }}
+      />
     </div>
   );
 }
