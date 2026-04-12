@@ -434,7 +434,7 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
                 <label className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1.5 block">
                   {cards.length > 0 ? 'Selecione o Cartão' : `Nome do Cartão (${paymentMethod === 'credit' ? 'Crédito' : 'Débito'})`}
                 </label>
-                {cards.length > 0 ? (
+                {cards.length > 0 && (
                   <select
                     value={creditCardName}
                     onChange={(e) => setCreditCardName(e.target.value)}
@@ -445,27 +445,26 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
                       <option key={card.id} value={card.name}>{card.name}</option>
                     ))}
                   </select>
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      value={creditCardName}
-                      onChange={(e) => setCreditCardName(e.target.value)}
-                      placeholder="Ex: Nubank"
-                      className={inputBase}
-                    />
-                    {savedCardNames.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {savedCardNames.map((name) => (
-                          <span key={name} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]">
-                            <button type="button" onClick={() => setCreditCardName(name)} className="hover:underline">{name}</button>
-                            <button type="button" onClick={() => { removeCardName(name); setSavedCardNames(getSavedCardNames()); }} className="ml-0.5 text-[#9B9B9B] hover:text-[#9B2226] dark:hover:text-[#E76F51]">×</button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </>
                 )}
+                <div className={cards.length > 0 ? 'mt-2' : ''}>
+                  <input
+                    type="text"
+                    value={creditCardName}
+                    onChange={(e) => setCreditCardName(e.target.value)}
+                    placeholder="Ex: Nubank"
+                    className={inputBase}
+                  />
+                  {savedCardNames.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {savedCardNames.map((name) => (
+                        <span key={name} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#E8F0F4] dark:bg-[#1B2B35] text-[#1B4965] dark:text-[#5FA8D3]">
+                          <button type="button" onClick={() => setCreditCardName(name)} className="hover:underline">{name}</button>
+                          <button type="button" onClick={() => { removeCardName(name); setSavedCardNames(getSavedCardNames()); }} className="ml-0.5 text-[#9B9B9B] hover:text-[#9B2226] dark:hover:text-[#E76F51]">×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
