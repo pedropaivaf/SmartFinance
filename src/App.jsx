@@ -760,6 +760,7 @@ function AppContent() {
               onDateRangeChange={setDateRange}
               selectedMonth={historySelectedMonth}
               onMonthChange={setHistorySelectedMonth}
+              showTitle={false}
             />
             <div className="border-b border-[#E8E5E0] dark:border-[#2D2B28]" />
             <PaymentTabs currentPaymentFilter={currentPaymentFilter} onChange={setCurrentPaymentFilter} />

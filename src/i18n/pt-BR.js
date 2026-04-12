@@ -39,7 +39,7 @@ export default {
   'form.description.helper': 'Nome para identificar a transação',
   'form.amount.label': 'Valor (R$)',
   'form.amount.placeholder': '250,50',
-  'form.amount.helper': 'Informe o Valor da transação',
+  'form.amount.helper': 'Informe o valor da transação',
   'form.date.label': 'Data',
   'form.date.helper': 'Use a data de ocorrência da transação. Ela define em qual mês o lançamento aparecerá.',
   'form.recurrence.label': 'Tipo de Recorrência',

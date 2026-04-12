@@ -185,13 +185,13 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
     try {
       setIsExporting(true);
       const data = await exportAllData();
-      const headers = ['Data', 'Descricao', 'Tipo', 'Valor', 'Pago', 'Metodo', 'Categoria', 'Recorrencia'];
+      const headers = ['Data', 'Descrição', 'Tipo', 'Valor', 'Pago', 'Método', 'Categoria', 'Recorrência'];
       const rows = data.transactions.map((tx) => [
         new Date(tx.createdAt).toLocaleDateString(lang),
         tx.description,
         tx.type === 'income' ? t('form.type.income') : t('form.type.expense'),
         Math.abs(tx.amount).toFixed(2),
-        tx.paid ? 'Sim' : 'Nao',
+        tx.paid ? 'Sim' : 'Não',
         tx.paymentMethod || '-',
         tx.category || '-',
         tx.recurrence || 'single',

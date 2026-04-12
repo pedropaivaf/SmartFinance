@@ -338,7 +338,7 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
         {showPaidInstallments && parseInt(paidInstallments, 10) > 0 && (
           <div>
             <label htmlFor="prepaid-payment-method" className="text-sm font-medium text-[#6B6B6B] dark:text-[#A09A92] mb-1 block">
-              {t('form.installments.paymentMethod') || 'Metodo de pagamento das parcelas pagas'}
+              {t('form.installments.paymentMethod') || 'Método de pagamento das parcelas pagas'}
             </label>
             <select
               id="prepaid-payment-method"

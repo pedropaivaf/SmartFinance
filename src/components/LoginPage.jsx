@@ -128,7 +128,7 @@ function LoginPage({ onSignIn, onSwitchToRegister, onSwitchToForgotPassword }) {
         </form>
 
         <p className="text-center text-sm text-[#6B6B6B] dark:text-[#A09A92]">
-          {t('auth.login.noAccount') || 'Nao tem uma conta?'}{' '}
+          {t('auth.login.noAccount') || 'Não tem uma conta?'}{' '}
           <button
             type="button"
             onClick={onSwitchToRegister}
