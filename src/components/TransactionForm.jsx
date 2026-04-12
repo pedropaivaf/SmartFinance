@@ -348,7 +348,7 @@ function TransactionForm({ onAddTransactions, customCategories = [], onAddCustom
             >
               <option value="pix">Pix</option>
               <option value="debit">{t('list.paymentMethods.debit') || 'Debito'}</option>
-              <option value="credit">{t('list.paymentMethods.credit') || 'Credito'}</option>
+              <option value="credit">{t('list.paymentMethods.credit') || 'Crédito'}</option>
               <option value="cash">{t('list.paymentMethods.cash') || 'Dinheiro'}</option>
             </select>
           </div>

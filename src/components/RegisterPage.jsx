@@ -44,7 +44,7 @@ function RegisterPage({ onSignUp, onSwitchToLogin }) {
 
     if (err) {
       if (err.message?.includes('already registered')) {
-        setError(t('auth.error.alreadyRegistered') || 'Este email ja esta cadastrado.');
+        setError(t('auth.error.alreadyRegistered') || 'Este email já está cadastrado.');
       } else {
         setError(err.message || (t('auth.error.generic') || 'Erro ao criar conta.'));
       }

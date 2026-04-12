@@ -1,7 +1,7 @@
 /**
  * CreditCardsSection Component
  *
- * Gerenciamento de cartoes de credito e faturas
+ * Gerenciamento de cartões de crédito e faturas
  * Feature Premium
  */
 
@@ -23,7 +23,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
   const isPremium = hasFeature('credit_cards');
 
-  // Calcula summary de cada cartao
+  // Calcula summary de cada cartão
   const cardsWithSummary = useMemo(() => {
     return cards.map(card => {
       const summary = calculateCardSummary(transactions, card);
@@ -33,7 +33,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
   const handleAddCard = () => {
     if (!newCard.name || !newCard.limitTotal || !newCard.closingDay || !newCard.dueDay) {
-      alert('Por favor, preencha todos os campos obrigatorios.');
+      alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -52,7 +52,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
   };
 
   const handleDeleteCard = (id) => {
-    if (confirm('Deseja realmente excluir este cartao?')) {
+    if (confirm('Deseja realmente excluir este cartão?')) {
       onSaveCards(cards.filter(c => c.id !== id));
     }
   };
@@ -71,8 +71,8 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
   if (!isPremium) {
     return (
       <PremiumCard
-        title="Cartoes e Faturas"
-        description="Cadastre seus cartoes de credito, acompanhe faturas em tempo real e controle seu limite disponivel."
+        title="Cartões e Faturas"
+        description="Cadastre seus cartões de crédito, acompanhe faturas em tempo real e controle seu limite disponível."
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -87,7 +87,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold text-[#1A1A1A] dark:text-[#E8E4DF]">
-            Cartoes de Credito
+            Cartões de Crédito
           </h2>
           <PremiumBadge size="xs" />
         </div>
@@ -104,7 +104,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-[#1A1A1A] dark:text-[#E8E4DF] mb-1">
-                Nome do Cartao *
+                Nome do Cartão *
               </label>
               <input
                 type="text"
@@ -175,7 +175,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
               onClick={handleAddCard}
               className="w-full bg-[#2D6A4F] hover:bg-[#245840] text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              Adicionar Cartao
+              Adicionar Cartão
             </button>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
       {cardsWithSummary.length === 0 ? (
         <p className="text-center text-[#9B9B9B] dark:text-[#6B6560] py-8 text-sm">
-          Nenhum cartao cadastrado. Clique em "+ Novo" para comecar.
+          Nenhum cartão cadastrado. Clique em "+ Novo" para começar.
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -201,7 +201,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <p className="text-xs opacity-75 mb-1">{card.brand || 'Cartao'}</p>
+                      <p className="text-xs opacity-75 mb-1">{card.brand || 'Cartão'}</p>
                       <h3 className="font-bold text-lg">{card.name}</h3>
                     </div>
                     <button
@@ -222,7 +222,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
                     <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="opacity-75">Limite Disponivel</span>
+                        <span className="opacity-75">Limite Disponível</span>
                         <span className="font-medium">{usagePercent.toFixed(0)}% usado</span>
                       </div>
                       <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -243,7 +243,7 @@ export default function CreditCardsSection({ transactions, cards, onSaveCards })
 
                     {usagePercent >= 80 && (
                       <p className="text-xs bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-1.5 mt-2">
-                        ⚠️ Atencao: voce ja usou {usagePercent.toFixed(0)}% do limite!
+                        ⚠️ Atenção: você já usou {usagePercent.toFixed(0)}% do limite!
                       </p>
                     )}
                   </div>

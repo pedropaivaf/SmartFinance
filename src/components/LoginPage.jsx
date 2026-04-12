@@ -37,7 +37,7 @@ function LoginPage({ onSignIn, onSwitchToRegister, onSwitchToForgotPassword }) {
           <div className="mx-auto mb-4 w-16"><SyrosLogo className="h-16 w-16" /></div>
           <h1 className="text-2xl font-bold font-display text-[#1A1A1A] dark:text-[#E8E4DF]">{t('app.name')}</h1>
           <p className="mt-2 text-sm text-[#6B6B6B] dark:text-[#A09A92]">
-            {t('auth.login.subtitle') || 'Entre para acessar suas financas'}
+            {t('auth.login.subtitle') || 'Entre para acessar suas finanças'}
           </p>
         </div>
 
