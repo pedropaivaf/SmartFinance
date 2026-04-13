@@ -580,8 +580,6 @@ export default function SettingsSection({ isDarkMode, onToggleTheme, transaction
       <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
-        onPurchase={() => { setShowPaywall(false); }}
-        onRestore={() => { setShowPaywall(false); }}
       />
     </div>
   );

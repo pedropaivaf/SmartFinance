@@ -166,8 +166,8 @@ function PaywallModal({ isOpen, onClose, onPurchase, onRestore }) {
             </svg>
           </button>
           <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1B4965] to-[#5FA8D3] flex items-center justify-center shadow-md shadow-[#1B4965]/25 mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 3l14 9-14 9V3z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" />
             </svg>
           </div>
           <h2 className="text-center text-xl font-display font-bold text-[#1A1A1A] dark:text-[#E8E4DF]">

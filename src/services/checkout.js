@@ -7,17 +7,39 @@ import { supabase } from './supabaseClient.js';
  * @param {'monthly'|'annual'} packageId
  */
 export async function createCheckoutSession(packageId) {
-  const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-    body: { packageId },
-  });
-  if (error) {
-    console.error('[checkout] invoke failed', error);
-    return { ok: false, error };
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+  if (!accessToken) {
+    console.error('[checkout] no active session');
+    return { ok: false, error: new Error('no-session') };
   }
-  if (!data?.url) {
-    return { ok: false, error: new Error('no-url') };
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/create-checkout-session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: anonKey,
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ packageId }),
+    });
+    const text = await res.text();
+    let data = null;
+    try { data = JSON.parse(text); } catch { /* non-JSON */ }
+    if (!res.ok) {
+      console.error('[checkout] http error', res.status, text);
+      return { ok: false, error: new Error(`http-${res.status}`) };
+    }
+    if (!data?.url) {
+      return { ok: false, error: new Error('no-url') };
+    }
+    return { ok: true, url: data.url };
+  } catch (err) {
+    console.error('[checkout] fetch failed', err);
+    return { ok: false, error: err };
   }
-  return { ok: true, url: data.url };
 }
 
 export function isReturningFromCheckout() {
