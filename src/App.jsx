@@ -275,10 +275,20 @@ function AppContent() {
       // plan before clearing the query param.
       if (isReturningFromCheckout()) {
         clearCheckoutQueryParam();
-        setTimeout(async () => {
+        // Poll a few times — webhook may take a couple seconds to land.
+        // Once we see premium, reload so every component picks up the new plan.
+        let attempts = 0;
+        const pollPremium = async () => {
+          attempts += 1;
           const fresh = await dbLoadUserPreferences();
-          if (fresh && isPremiumActive(fresh)) setCurrentPlan('premium');
-        }, 1500);
+          if (fresh && isPremiumActive(fresh)) {
+            setCurrentPlan('premium');
+            window.location.reload();
+            return;
+          }
+          if (attempts < 6) setTimeout(pollPremium, 1500);
+        };
+        setTimeout(pollPremium, 1000);
       }
 
       setIsLoading(false);
