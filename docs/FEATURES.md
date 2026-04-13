@@ -78,14 +78,32 @@ import PremiumBadge from './PremiumBadge';
 
 ## Pricing
 
-- Monthly: R$ 12.90/mês
-- Currency: BRL
+Single source of truth: [src/paywall/packages.js](../src/paywall/packages.js). Never hardcode BRL values in components.
+
+| Tier | Web (Stripe) | Mobile (IAP) | Trial |
+|------|--------------|--------------|-------|
+| Premium Monthly | R$ 12,90 | R$ 14,90 | 7 days |
+| Premium Annual | R$ 99,90 | R$ 119,90 | 7 days |
+
+Mobile prices absorb the 15% App Store / Play Store fee. Platform is detected via `isNativeApp()` (`src/utils/platform.js`); the paywall picks `priceWeb` or `priceApp` automatically.
+
+## Billing Architecture
+
+- **Web**: `createCheckoutSession()` → `create-checkout-session` Edge Function → Stripe Checkout.
+- **iOS / Android**: `purchasePackage()` → RevenueCat → StoreKit / Play Billing.
+- **Source of truth**: `billing-webhook` Edge Function receives events from both providers and updates `user_preferences` (`plan`, `premium_expires_at`, `plan_source`, `plan_provider_id`).
+- Client never writes the plan field directly on purchase — it polls prefs after checkout and reloads.
 
 ## Testing Premium Mode
 
-In `src/config.js`, change:
-```javascript
-plan: 'free'  →  plan: 'premium'
+For UI / feature-gate testing (no real payment):
+
+```sql
+update user_preferences
+set plan = 'premium',
+    premium_expires_at = now() + interval '1 month',
+    plan_source = 'manual'
+where user_id = '<uuid>';
 ```
 
-All premium sections will unlock immediately (no auth required — flag only).
+`isPremiumActive(prefs)` in `src/config.js` respects the expiration — set `premium_expires_at = now() - interval '1 day'` to simulate an expired plan and verify the downgrade path.
