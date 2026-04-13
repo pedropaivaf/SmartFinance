@@ -209,6 +209,7 @@ The separate `PaymentModal` still exists for marking existing unpaid transaction
 
 | Doc | Purpose |
 |-----|---------|
+| [docs/STATUS.md](docs/STATUS.md) | **Live status** of the mobile + billing rollout — fases, bloqueios, Stripe live checklist. Read this first in any new session. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Component tree, state map, localStorage keys |
 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, typography, spacing, shadows, iOS patterns |
 | [docs/FEATURES.md](docs/FEATURES.md) | Free vs Premium feature matrix |
